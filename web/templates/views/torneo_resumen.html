@@ -1,0 +1,14 @@
+{% extends "root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block body %}
+
+    {% include "banner/banner_torneo_resumen.html" %}
+
+    {% include "front/front_torneo.html" %}
+
+{% endblock %}

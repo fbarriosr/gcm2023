@@ -1,0 +1,53 @@
+{% load static %} {% static "" as baseUrl %}
+
+<header data-bs-theme="">
+  <nav
+    class="navbar navbar-expand-md navbar-light fixed-top bg-dark"
+    style="background-color: #e3f2fd"
+  >
+    <div class="container-fluid">
+      <a class="navbar-brand"  href="{% url 'home'%}"
+        ><img src="{% static 'web/assets/logos/logo.png' %}"
+      /></a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarCollapse"
+        aria-controls="navbarCollapse"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon iColorBlack"></span>
+      </button>
+      <div
+        class="collapse navbar-collapse justify-content-end"
+        id="navbarCollapse"
+      >
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <li class="nav-item dropdown">
+            <button
+              class="btn dropdown-toggle nav-link active"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              EL CLUB
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item menu" href="">BASES GENERALES</a></li>
+              <li><a class="dropdown-item menu" href="">NORMAS Y REGLAMENTOS</a></li>
+              <li><a class="dropdown-item menu" href="">MEMORIAS Y BALANCE</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'ranking'%}">RANKING</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'noticias'%} ">NOTICIAS</a>
+          </li>
+        </ul>
+      </div>
+      <a href="{% url 'logout'%}"><img src="static/web/assets/logos/logout.png" style="padding: 10px;"> </a>
+    </div>
+  </nav>
+</header>

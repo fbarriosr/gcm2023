@@ -1,0 +1,13 @@
+version: '3'
+services:
+  web:
+    container_name: web_cgm
+    restart: always
+    build: ./
+    image: cgm
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "9000:8000"
+    

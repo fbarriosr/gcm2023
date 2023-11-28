@@ -1,0 +1,187 @@
+.marketing h1 {
+	padding:30px;
+	padding-bottom: 50px;
+	font-family: 'Roboto';
+	font-weight: 900;
+  	font-style: normal;
+
+}
+.marketing img {
+	padding: 30px;
+}
+
+.form-floating{
+	margin: 20px;
+}
+
+.bg-dark{
+	background-color: #E4E3E4 !important;
+}
+.nav-link, .navbar-nav .nav-link.active, .navbar-nav .nav-link.show   {
+ 	color: black !important;
+ 	font-family: 'Roboto';
+	font-weight: 500;
+  	font-style: normal;
+  	margin-left: 20px;
+  	margin-right: 20px;
+  	background: transparent!important;
+}
+
+ul.dropdown-menu.show {
+    background-color: white;
+}
+a.dropdown-item {
+    color: black !important;
+ 	font-family: 'Roboto';
+	font-weight: 500;
+  	font-style: normal;
+}
+.menu:hover{
+	background-color: #BF9D5E;
+	color: white!important;
+}
+.carousel-item img {
+	width: 100%;
+}
+
+.context h1 , p{
+	text-align: justify
+
+}
+
+.card-body h5{
+	font-weight: 800;
+
+}
+
+.card-body h4{
+	font-weight: 800;
+	font-size: 36px;
+	text-align: center;
+	color: #BF9B5A;
+
+}
+.card.mb-3 {
+    background-color:#FBF8F4 ;
+    border: none;
+    margin: auto;
+}
+.btn-primary ,.btn-secondary, .btn-success, .btn-info, .btn-danger, .btn-warning{
+	color: white;
+    border: none;
+    border-radius: 50px;
+    width: 100%;
+}
+
+.btn-sutil{
+	color: #BF9D5E;
+    border-width: 2px;
+    border-radius: 50px;
+    border-color: #BF9D5E;
+    background-color: transparent;
+    width: 100%;
+}
+
+.btn-circle{
+	color: white;
+	background: #BF9D5E;
+	border-radius: 100px;
+}
+
+
+.btn-primary{
+    background: #BF9D5E;
+}
+.btn-danger{
+    background: #CB0808;
+}
+.btn-sutil:hover, .btn-circle:hover{
+	background-color: #A3803E!important;
+	color: white;
+
+}
+.btn-primary:hover{
+	background-color: #A3803E!important;
+}
+.btn-danger:hover{
+	background-color: #F44336!important;
+}
+.btn-info:hover, .btn-warning:hover, .btn-circle:hover{
+	color: white!important;
+}
+
+
+.cardTorneo{
+	background-color: #FAFAFA!important;
+}
+
+.indicadores p {
+	font-weight: 800;
+	font-size: 120px;
+	text-align: center;
+}
+
+
+.noticia , .torneo {
+	width: 100%;
+    height: 100%;
+    object-fit: cover;
+  	
+}
+.torneo {
+ background-color: #FAFAFA!important;
+
+}
+
+.evento{
+	padding-bottom: 0px!important;
+}
+
+.fotos{
+	margin-bottom: 10px!important;
+}
+.img-thumbnail{
+	max-width: 100%!important;
+}
+
+.switch {
+	background-color: gray!important;
+    width: 80px !important;
+    height: 40px !important;
+}
+.switch:checked {
+	background-color: #BF9D5E!important;
+	border: none;
+}
+
+.switch:focus {
+    border-color: rgba(0, 0, 0, 0.25);
+    outline: 0;
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+ }
+
+.btn-sutil:checked, .btn-sutil:active, .btn-sutil:after {
+	border: none;
+	background-color: #A3803E!important;
+}
+.btn-check:checked+.btn, .btn.active, .btn.show, .btn:first-child:active, :not(.btn-check)+.btn:active {
+	background-color: #198754!important;
+	color:white!important;
+	border: none;
+}
+
+
+
+
+@media (max-width: 768px) { 
+.carousel-item  img{
+	width: auto;
+  transform: translate(-36%, 5%);
+ 
+}
+
+}
+
+
+
+

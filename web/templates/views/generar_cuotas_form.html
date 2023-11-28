@@ -1,0 +1,81 @@
+{% extends "root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block body %}
+  {% include "banner/banner.html" %}
+  <div style="margin: 150px 100px 50px 100px;">
+    <fieldset style="padding: 15px;border: solid 1px; color: #555; width: 550px;">
+      <legend>Generar Cuotas Anuales Socios</legend>
+      <p style="width: 450px;" for="">Genera los registros de las 12 cuotas mensuales 
+        de todos los socios del club par el año que se sea ingresado
+      </p>
+      <form action="{% url 'generar_cuotas' %}" method="post">
+        {% csrf_token %}
+        <label for="">Ingrese el año:</label>
+        <input type="number" name="año" id="" placeholder="2024" required>
+        <br>
+        <label for="">Ingrese valor de la cuota:</label>
+        <input type="number" name="valor" id="" placeholder="15000" required>
+        <input type="submit" value="Aceptar">
+      </form>
+    </fieldset>
+  </div>
+
+  <div style="margin: 5px 100px 50px 100px;">
+    <fieldset style="padding: 15px;border: solid 1px; color: #555; width: 550px;">
+      <legend>Generar Cuotas Anuales Nuevo Socio</legend>
+      <p style="width: 450px;" for="">Genera los registros de las 12 cuotas mensuales 
+        para un nuevo socio del club. Para este caso se asume que el año en curso ya
+        se ha generado.
+      </p>
+      <form action="{% url 'generar_cuotas_socio' %}" method="post">
+        {% csrf_token %}
+        <label for="">Ingrese rut socio:</label>
+        <input type="text" name="rut" id="" placeholder="9054566-K">
+        <br>
+        <label for="">Ingrese el año:</label>
+        <input type="number" name="año" id="" placeholder="2024">
+        <input type="submit" value="Aceptar">
+      </form>
+    </fieldset>
+  </div>
+
+  <div style="margin: 5px 100px 50px 100px;">
+    <fieldset style="padding: 15px;border: solid 1px; color: #555; width: 550px;">
+      <legend>Borrar Cuotas Anuales Socios</legend>
+      <p style="width: 450px;" for="">Borra los registros de las 12 cuotas mensuales 
+        del año seleccionado, para todos los socios del club.
+      </p>
+      <form action="{% url 'borrar_cuotas' %}" method="post">
+        {% csrf_token %}
+         <label for="">Ingrese el año:</label>
+        <input type="number" name="año" id="" placeholder="2024" required>
+        <input type="submit" value="Aceptar">
+      </form>
+    </fieldset>
+  </div>
+
+  <div style="margin: 5px 100px 100px 100px;">
+    <fieldset style="padding: 15px;border: solid 1px; color: #555; width: 550px;">
+      <legend>Borrar Cuotas Anuales Nuevo Socio</legend>
+      <p style="width: 450px;" for="">Borra los registros de las 12 cuotas mensuales 
+        del año seleccionado, para un socio en particular.
+      </p>
+      <form action="{% url 'borrar_cuotas_socio' %}" method="post">
+        {% csrf_token %}
+         <label for="">Ingrese rut socio:</label>
+        <input type="text" name="rut" id="" placeholder="9054566-K">
+        <br>
+        <label for="">Ingrese el año:</label>
+        <input type="number" name="año" id="" placeholder="2024">
+        <input type="submit" value="Aceptar">
+      </form>
+    </fieldset>
+  </div>
+
+
+{% endblock %}

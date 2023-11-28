@@ -1,0 +1,24 @@
+
+
+1.- ¿Se separan los componentes de las páginas como en "home.html" en el cual su archivo principal conserva la mayoria de la estructura o
+    como en "noticia.html" donde se rompe y manda a llamar cada uno de sus componentes?.
+
+2.- ¿Es mejor reutilizar archivos como "front.html" cuyo contenido lo actualizo dependiendo de si lo llama "historia.html" o "noticia.html" o
+    o lo correcto sería generar un archivo independiente para cada plantilla que lo esta llamando como lo hice con "listado" o "banner"?.
+
+3.- La relación de llave foranea funcionó entre "Listado" y "Tipo", pero por alguna razon desde "/Admin" cuando creo un nuevo "listado" y seleccino
+    a que "tipo" pertenece, me muestra el "ID" y no el nombre, por lo que debo filtrar por "ID" en "views.py"
+
+4.- Encontré una alternativa a crear otras tablas y usar llaves foraneas, esto es usando tuplas que se almacenan en un archivo "choices.py", lo utilicé
+    como ejemplo con el campo "sexo" en "Usuario", ¿lo utilizamos o descartamos?.
+
+5.- ¿No estaba la "tarjeta" para hacer el listado de noticias?
+
+
+NOTA: en la reunion del viernes 13
+
+* quieren que el encargad de crear los nuevos torneos pueda enviar un correo estandar a todos los miembros del club avisando de que ya esta disponible,
+con la intencion de que entren al sitio a participar.
+
+* pidieron que 'seria ideal' organizar la informacion del sitio tal cual el calendario del sitio web agosech, porque se les hace más faciles porque
+son viejitos.

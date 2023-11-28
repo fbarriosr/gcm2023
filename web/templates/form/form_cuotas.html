@@ -1,0 +1,32 @@
+{% load static %} {% static "" as baseUrl %}
+
+<div class="container marketing" id="links">
+        <!-- Three columns of text below the carousel -->
+        <div class="row" >
+          <div class="col-lg-12 context">
+            <h1>PERIODO 2023</h1>
+            {#<h1>{{listado}}</h1>#}
+            
+            {#  {% for l in listado %} #}
+            {#    {{l.mes}} {{l.usuario.primer_nombre}} {{l.usuario.apellido_paterno}} {{l.usuario.rut}} {{l.año.monto_cuota}} #}
+            {#  {% endfor %} #}
+          
+          </div>
+        </div>
+        <div class="row align-items-center"  style="background-color: #F6F1E8;">
+          {% for l in listado %}
+            <div class="col-sm-3 " >
+              <h1 style="padding-bottom: 0px !important">{{ l.mes_datetime|date:"F" }}</h1>
+            </div>
+            <div class="col-sm-3">
+              <a href="#" class="btn btn-primary">VER</a>
+            </div>
+            <div class="col-sm-3">
+              <a href="#" class="btn btn-primary">VER</a>
+            </div>
+            <div class="col-sm-3">
+              <a href="#" class="btn btn-primary">VER</a>
+            </div>
+          {% endfor %}
+        </div>
+      </div><!-- /.container -->

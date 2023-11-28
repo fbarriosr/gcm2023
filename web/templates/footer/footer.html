@@ -1,0 +1,44 @@
+{% load static %} {% static "" as baseUrl %}
+<footer class="footer">
+  <div
+    class="container text-center d-flex align-content-center flex-wrap containerFooter"
+  >
+    <div class="row">
+      <div class="col-md-3 col-sm-12 d-none d-sm-block">
+        <div class="text-center">
+          <img
+            src="{% static 'web/assets/footer/tiro.png' %}"
+            width="80%"
+            class="rounded"
+            alt="..."
+          />
+        </div>
+      </div>
+      <div class="col-md-6 col-sm-12">
+        <div class="text-center">
+          <img
+            src="{% static 'web/assets/footer/footerLogo.png' %}"
+            width="80%"
+            class="rounded"
+            alt="..."
+          />
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-12 d-none d-sm-block">
+        <div class="text-center">
+          <img
+            src="{% static 'web/assets/footer/carro.png' %}"
+            width="80%"
+            class="rounded"
+            alt="..."
+          />
+        </div>
+      </div>
+      <div class="col-12 footerText">
+        <span class="text-center">
+          Copyright @2023. Todos lo derechos reservados
+        </span>
+      </div>
+    </div>
+  </div>
+</footer>

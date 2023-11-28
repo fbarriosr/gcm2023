@@ -1,0 +1,35 @@
+/* Custom page CSS
+-------------------------------------------------- */
+/* Not required for template or sticky footer method. */
+
+
+
+.footer {
+  height: auto;
+}
+.footer {
+  background-color: #F6F1E9;
+}
+.footer span{
+  color: #BD9A59;
+}
+.container.text-center {
+    height: 100%;
+}
+.container ,.containerFooter {
+    padding: 50px;
+}
+.footerText{
+  padding-top: 30px;
+}
+
+@media (max-width: 768px) { 
+.container {
+    padding: 0px;
+}
+
+.containerFooter {
+    padding: 40px;
+}
+}
+

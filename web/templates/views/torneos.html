@@ -1,0 +1,25 @@
+{% extends "root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block header %} 
+
+      {% include "header/header_backend.html" %}
+
+{% endblock %}
+
+
+{% block body %}
+{% include "cards/main_card.html" %}
+
+{% include "banner/banner_torneo.html" %}
+  
+  <!-- /.container -->
+ 
+ {% include "cards/card_torneo.html" %}
+<!-- /.container -->
+
+{% endblock %}

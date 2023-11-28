@@ -1,0 +1,12 @@
+{% extends "root/origin.html" %}
+{% load static %}
+{% static "" as baseUrl %}
+
+{% block title %}
+    {{ nameWeb }} {{ title }}
+{% endblock %}
+
+{% block body %}
+    {% include "banner/banner_cuotas.html"%}
+    {% include "form/form_cuotas.html" %}
+{% endblock %}

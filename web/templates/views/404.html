@@ -1,0 +1,21 @@
+{% extends "root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block body %}
+
+{% include "banner/banner2.html" %}
+
+<div class="container marketing" id="links">
+
+  <div class="row">
+    <div class="col-lg-12 context">
+      <h1>{{ h1 }}</h1>
+    </div>
+  </div>
+</div><!-- /.container -->
+
+{% endblock %}
