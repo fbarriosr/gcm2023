@@ -1,0 +1,42 @@
+{% load static %} {% static "" as baseUrl %}
+
+{% if torneoCard %}
+ <div class="container ">
+
+   <h1 class="card-title ">TEMPORADA {{ year }}</h1>
+   <div class="row row-cols-1 row-cols-md-3 g-4">
+     {% for value in torneoCard %}
+     <a class="" href="{%url 'torneo' value.slug %}">
+     <div class="col-sm-12">
+       <div class="card h-100 cardTorneo">
+         <img src="media/{{ value.img }}" class="card-img-top" alt="...">
+              <div class="card-body cardTorneo">
+                <h5 class="card-title"> {{ value.titulo | upper }} 
+                  {% if value.abierto %}
+                  <img src="static/web/assets/logos/lockOpen.png" style="padding: 10px;">
+                  {% else %}
+                  <img src="static/web/assets/logos/lockClose.png" style="padding: 10px;">
+                  {% endif %} 
+                  {% if value.activo %}
+                  <img src="static/web/assets/logos/activo.png" style="padding: 10px;">
+                  {% else %}
+                  <img src="static/web/assets/logos/noActivo.png" style="padding: 10px;">
+                  {% endif %} 
+                </h5>
+                  
+                <h6> <img src="static/web/assets/logos/point.png" style="padding: 5px;">{{ value.direccion |capfirst}}, {{ value.get_region_display }}</h6>
+                <p class="card-text">{{ value.descripcion |capfirst }}</p>
+              </div>
+              <div class="card-footer">
+                <small class="text-body-secondary"> <img src="static/web/assets/logos/calendario.png" style="padding: 10px;">{{value.fecha|date:"d/m/Y"}}
+                <img src="static/web/assets/logos/user.png" style="padding-left:30px; "> {{ value.inscritos }}/{{ value.cupos }}
+              </small>
+            </div>
+          </div>
+        </div>
+        </a>
+        {% endfor %}
+        </div>
+      </div><!-- /.container -->
+
+{% endif %}

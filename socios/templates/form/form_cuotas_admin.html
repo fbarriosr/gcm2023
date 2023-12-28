@@ -1,0 +1,115 @@
+{% load static %} {% static "" as baseUrl %}
+
+<div class="container marketing" id="links">
+  <div class="row align-items-center" >
+    
+    <div class="col-lg-12">
+      <h1>CUOTA DEL CLUB</h1>
+    </div>
+
+     <!-- LISTADO DE AÑOS DE LA BARRA DE SELECCION -->
+    <div class="col-lg-4">
+      <form method="POST" action="{% url 'cuotas' %}" id="dropdown_form">
+        {% csrf_token %}
+        <select class="form-select form-select-lg mb-3" name="dropdown_anual" id="dropdown_anual" aria-label="Default select example" onchange="cambiarAnual()">
+          {% for año in años_cuotas_socio %}
+            <option value="{{ año }}" {% if año == año_filtro %} selected{% endif %}>{{ año }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+
+     <!-- LISTADO DE USUARIOS -->
+    <div class="col-lg-4">
+      <form method="POST" action="" id="dropdown_form">
+        {% csrf_token %}
+        <select class="form-select form-select-lg mb-3" name="dropdown_anual" id="dropdown_anual" aria-label="Default select example" onchange="cambiarAnual()">
+          {% for usuario in listado_usuarios %}
+            <option value="{{ usuario }}">{{ usuario }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+
+    
+    <!-- RADIO-BTN CUOTAS PENDIENTES  -->
+    <div class="col-lg-6 mb-3">
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+        <label class="form-check-label text-start" for="flexRadioDefault1">
+          Sin Pagar
+        </label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
+        <label class="form-check-label" for="flexRadioDefault2">
+          En revision
+        </label>
+      </div>
+    </div>
+    
+    <hr>
+    
+    <div class="col-lg-12">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Apellido</th>
+            <th scope="col">Email</th>
+            <th scope="col">Estado Persona</th>
+            <th scope="col">Deuda</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for elemento in cuotas %}
+            <tr>
+              <th scope="row">{{ forloop.counter }}</th>
+              <td>{{ elemento.usuario.primer_nombre}}</td>
+              <td>{{ elemento.usuario.apellido_paterno }}</td>
+              <td>{{ elemento.usuario.email }}</td>
+              <td>{{ elemento.usuario.estado_txt }}</td>
+              <td>{{ elemento.año.monto_cuota }}</td>
+            </tr>
+            {% endfor%}  
+          </tbody>
+        </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    cambiarAnual();  // Ejecutar la función al cargar la página
+  });
+
+  function cambiarAnual() {
+    var dropdown = document.getElementById("dropdown_anual");
+    var añoSeleccionado = dropdown.options[dropdown.selectedIndex].value;
+    document.getElementById("año_seleccionado").value = añoSeleccionado
+  
+    $('.ping').val(añoSeleccionado)
+
+    // Oculta todas las cuotas
+    var cuotas = document.querySelectorAll(".cuota-row");
+    cuotas.forEach(function (cuota) {
+      cuota.style.display = "none";
+    });
+
+    // Muestra solo las cuotas del año seleccionado
+    var cuotasAño = document.querySelectorAll(".cuota-año-" + añoSeleccionado);
+    cuotasAño.forEach(function (cuota) {
+      cuota.style.display = "flex";
+    });
+  }
+</script>
+
+  
+
+
+{#<h1>{{listado}}</h1>#}
+{#  {% for l in listado %} #}
+{#    {{l.mes}} {{l.usuario.primer_nombre}} {{l.usuario.apellido_paterno}} {{l.usuario.rut}} {{l.año.monto_cuota}} #}
+{#  {% endfor %} #}

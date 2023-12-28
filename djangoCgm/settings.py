@@ -40,8 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'search_admin_autocomplete',
-    'usuarios',
+    'django_cleanup.apps.CleanupConfig',
+    'import_export',
     'web',
+    'usuarios',
+    'socios',
+    'capitan',
+    
 ]
 
 MIDDLEWARE = [
@@ -60,7 +65,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # 'DIRS': [],
-        'DIRS': ['web/views', 'web/templates'],
+        'DIRS': ['usuarios/templates', 'web/templates', 'socios/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -139,6 +144,18 @@ STATIC_URL = '/static/'
 # se añadió
 MEDIA_URL = '/media/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT =[
+                os.path.join(BASE_DIR, 'web/static'),
+                os.path.join(BASE_DIR, 'socios/static'),
+                os.path.join(BASE_DIR, 'capitan/static'),
+                ]
 
 MEDIA_ROOT = os.path.join(BASE_DIR,'media/')
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'nicolas.ep.dev@gmail.com'
+EMAIL_HOST_PASSWORD = 'cqnw igqq uxcb gozx'
+EMAIL_USE_TLS = True
+

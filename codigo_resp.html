@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+</html>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    var selectAllSwitch = document.getElementById('SelectAllSwitch');
+    var checkboxes = document.querySelectorAll('.checkbox-element');
+    var dropdownContainer = document.getElementById('dropdown-container');
+    var estadoCuotaElement = document.getElementById('estadoCuota');
+    var estadoCuota = estadoCuotaElement.getAttribute('data-estado-cuota');
+
+    selectAllSwitch.addEventListener('change', function(){
+      checkboxes.forEach(function(checkbox){
+        checkbox.checked = selectAllSwitch.checked;
+        console.log(selectAllSwitch.checked);  
+      });
+    });
+    
+    if (dropdownContainer) {
+      dropdownContainer.addEventListener('click', function(event) {
+        var elemento = event.target;
+
+        if (elemento.classList.contains('dropdown-item')) {
+          var selectedItemText  = elemento.textContent;
+          var actionUrl         = elemento.getAttribute('data-action-url');
+          var actionValue       = elemento.getAttribute('data-action-value');
+          var registro_id       = elemento.getAttribute('data-registro-id');
+          // console.log('Seleccionado:', selectedItemText);
+          // console.log('URL:', actionUrl);
+          // console.log('ID CUOTA:', registro_id);
+          // console.log('VALOR CUOTA:', actionValue);
+  
+          var form = document.createElement('form');
+          form.method = 'POST';
+          form.action = actionUrl;
+  
+          var csrfTokenInput = document.createElement('input');
+          csrfTokenInput.type = 'hidden';
+          csrfTokenInput.name = 'csrfmiddlewaretoken';
+          csrfTokenInput.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+          form.appendChild(csrfTokenInput);
+  
+          var id_registro = document.createElement('input');
+          id_registro.type = 'hidden';
+          id_registro.name = 'id_cuota_mod';
+          id_registro.value = registro_id;
+          form.appendChild(id_registro);
+  
+          var input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'value';
+          input.value = actionValue;
+  
+          var est_cuota = document.createElement('input'); 
+          est_cuota.type = 'hidden';
+          est_cuota.name = 'filtro';
+          est_cuota.value = estadoCuota;
+  
+          form.appendChild(input);
+          form.appendChild(est_cuota);
+          document.body.appendChild(form);
+          form.submit();  
+  
+          // window.location.href = actionUrl; //para redirigir a una vista directamente sin form
+        }
+      });
+    }
+  });
+</script>

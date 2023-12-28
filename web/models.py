@@ -11,6 +11,7 @@ from django.utils import timezone
 import uuid
 from usuarios.models import Usuario
 from .choices import *
+from import_export.admin import ImportExportModelAdmin
 
 
 # Create your models here.
@@ -87,44 +88,6 @@ class FrontAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     list_per_page = 10
 
 
-# NOTICIAS DEL SITIO
-
-class Noticia (models.Model):
-    id              = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    titulo          = models.CharField(max_length = 200, blank = False, null = False)
-    img             = models.ImageField(upload_to='noticias/')
-    fecha           = models.DateField()
-    resumen         = models.CharField(max_length = 200, blank = False, null = False)
-    info            = models.TextField()
-    slug            = AutoSlugField(populate_from='titulo')
-    is_active       = models.BooleanField('Activo',default = False)
-    is_aprobado     = models.BooleanField('Aprobado',default = False)
-    is_pendiente    = models.BooleanField('Pendiente',default = True)
-    img1            = models.ImageField(upload_to='noticias/',blank = True)
-    img2            = models.ImageField(upload_to='noticias/',blank = True)
-    img3            = models.ImageField(upload_to='noticias/',blank = True)
-    img4            = models.ImageField(upload_to='noticias/',blank = True)
-    img5            = models.ImageField(upload_to='noticias/',blank = True)
-    direccion       = models.CharField(max_length = 200, blank = True, null = False)
-    region          = models.CharField(max_length=50,choices= regiones, default= 'XIII', verbose_name="Region")
- 
-    comentario      = models.TextField(default='Sin comentario')
-
-    class Meta:
-        verbose_name = "Noticia"
-        verbose_name_plural = "Noticias"
-        ordering = ["-fecha"]
-
-    def __str__(self):
-        return self.titulo
-
-
-class NoticiaAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
-    search_fields = ["titulo"]
-    list_display = ("titulo", "fecha", "resumen")
-    list_per_page = 10  # No of records per page
-
-
 # CLASIFICA A QUE PERTENECEN LAS LISTAS DE IMAGENES DEL MODELO 'LISTA'
 class Tipo(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -143,7 +106,7 @@ class Tipo(models.Model):
         return str(self.tipo)
 
 
-class TiposAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
+class TiposAdmin(ImportExportModelAdmin,SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["tipo"]
     list_display = ("tipo", "order")
     list_per_page = 10
@@ -174,31 +137,6 @@ class ListadosAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     list_display    =('titulo', 'order', 'tipo', 'actual')
     list_per_page   = 10 # No of records per page
 
-
-# ADMINISTRA LOS CARDS DE TORNEO
-class Torneo (models.Model):
-    id              = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    titulo          = models.CharField(max_length=200, blank=False, null= False, verbose_name="Titulo")
-    direccion       = models.CharField(max_length=200, blank=False, null= False, verbose_name="Direccion")
-    region          = models.CharField(max_length=50,choices= regiones, default= 'XIII', verbose_name="Region")
-    descripcion     = models.TextField(blank=True)
-    img             = models.ImageField(upload_to='torneo/')
-    fecha           = models.DateField()
-    cupos           = models.IntegerField()
-    inscritos       = models.IntegerField(default=0)
-    activo          = models.BooleanField(default=True)
-    proximo         = models.BooleanField(default=False)
-    order           = models.IntegerField(default=0)
-
-    class Meta:
-        verbose_name    = 'Torneo'
-        verbose_name_plural = 'Torneos'
-        ordering    = ['-proximo','activo','fecha']
-
-class TorneoAdmin (SearchAutoCompleteAdmin, admin.ModelAdmin):
-    search_fields   = ['titulo']
-    list_display    = ('titulo','fecha','region','activo','proximo')
-    list_per_page   = 10 # No of records per page
 
 
 # ADMINISTRA LOS CARDS DE TORNEO
@@ -333,64 +271,3 @@ class NormasReglasAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     list_display = ("titulo", "order")
     list_per_page = 10  # No of records per page
 
-
-# LA ESTRUCTURA DE LAS CUOTAS ANUALES DE LOS SOCIOS DEL CLUB CGM
-class CuotaAnual(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    año = models.PositiveIntegerField(verbose_name="Año cuotas")
-    monto_cuota = (
-        models.IntegerField()
-    )  # monto fijo anual aplicable a cada cuota del mes de dicho año.
-    order = models.IntegerField(default=0)
-
-    class Meta:
-        verbose_name = "CuotaAnual"
-        verbose_name_plural = "CuotasAnuales"
-        ordering = ["order"]
-
-    def __str__(self):
-        return str(self.año)
-
-
-class CuotasAnualesAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
-    search_fields = ["año"]
-    list_display = ("año", "order")
-    list_per_page = 10
-
-
-# LA ESTRUCTURA DE LAS CUOTAS DE LOS SOCIOS DEL CLUB CGM
-class Cuota(models.Model):
-    id                      = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    mes                     = models.IntegerField()
-    año                     = models.ForeignKey(CuotaAnual, blank=True, null=True, on_delete=models.CASCADE)  # monto fijo anual aplicable a cada cuota del mes de dicho año.
-    usuario                 = models.ForeignKey(Usuario, blank=False, null=False, on_delete=models.CASCADE, verbose_name="socio club")
-    monto_descuento         = models.PositiveIntegerField(blank=True, null=True)  # descuento que se podria aplicar a la cuota
-    monto_cargo             = models.PositiveIntegerField(blank=True, null=True)  # monto extra por atraso, castigo..
-    monto_pago              = models.PositiveIntegerField(blank=True, null=True)  # monto_pago = monto_cuota - monto_descuento + monto_cargo
-    fecha_pago              = models.DateField(blank=True, null=True, verbose_name="Fecha de pago")
-    estado_pago             = models.CharField(max_length=1, choices=estado_cuota, default="P", verbose_name="Estado de la cuota")
-    order                   = models.IntegerField(default=0)
-
-    class Meta:
-        verbose_name = "Cuota"
-        verbose_name_plural = "Cuotas"
-        ordering = ["año",'mes']
-
-    def nombre_mes(self):
-        return timezone.datetime(self.año.año, self.mes, 1).strftime("%B")
-
-    nombre_mes.short_description = "Mes"
-
-    def valor_cuota_mensual(self):
-        return self.año.monto_cuota
-
-    def __str__(self):
-        return f"{self.usuario.primer_nombre} - {self.año.año} - Mes {self.mes}"
-
-
-class CuotasAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
-    search_fields = ["mes"]
-    list_display = ("año", "mes", "order",'usuario')
-    autocomplete_fields = ['usuario']
-    list_filter = ('año','usuario')
-    list_per_page = 10

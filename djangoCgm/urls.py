@@ -36,6 +36,7 @@ from django.conf.urls.static import static
 
 from web.views import *
 from usuarios.views import *
+from socios.views import *
 
 admin.autodiscover()
 urlpatterns = [
@@ -44,5 +45,7 @@ urlpatterns = [
 	path('admin/',admin.site.urls ),
 	path('',include('web.urls')),
     path('',include('usuarios.urls')),
+    path('',include('socios.urls')),
+    path('',include('capitan.urls')),
 
 ] 

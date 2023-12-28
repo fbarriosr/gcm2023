@@ -1,0 +1,173 @@
+{% load static %} {% static "" as baseUrl %}
+
+<div class="container marketing" id="links">
+  <div class="row align-items-center" >
+    <!-- TITULO DE LA PLANTILLA -->
+    <div class="col-lg-12">
+      <h1 id="estadoCuota" data-estado-cuota = "{{ estado_cuota }}">CUOTAS {{ estado_cuota.upper }}
+      </h1>
+    </div>
+
+     <!-- LISTADO DE AÑOS DE LA BARRA DE SELECCION -->
+    <div class="col-lg-4">
+      <form method="POST" action="{% url 'cuotas' %}" id="dropdown_form">
+        {% csrf_token %}
+        <select class="form-select form-select-lg mb-3" name="dropdown_anual" id="dropdown_anual" aria-label="Default select example" onchange="cambiarAnual()">
+          {% for año in años_cuotas_socio %}
+            <option value="{{ año }}" {% if año == año_filtro %} selected{% endif %}>{{ año }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+
+     <!-- CONTROL CON EL LISTADO DE SOCIOS -->
+    <div class="col-lg-4">
+      <form method="POST" action="" id="dropdown_form">
+        {% csrf_token %}
+        <select class="form-select form-select-lg mb-3" name="dropdown_anual" id="dropdown_anual" aria-label="Default select example" onchange="cambiarAnual()">
+          {% for usuario in listado_usuarios %}
+            <option value="{{ usuario }}">{{ usuario }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+
+    <!-- ENCABEZADO PLANILLA DE DATOS DEL SOCIO -->
+    <div class="col-lg-12">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="SelectAllSwitch">
+                <label class="form-check-label" for="SelectAllSwitch">Todos</label>
+              </div>
+            </th>
+            <th scope="col">#</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Apellido</th>
+            <th scope="col">Email</th>
+            <th scope="col">Deuda</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Cambiar estado</th>
+            <th scope="col">ID Cuota</th>
+          </tr>
+        </thead>
+        <!-- REGISTROS DE CUOTAS DEL SOCIO DE LA PLANILLA  -->
+        <tbody>
+          {% for elemento in cuotas %}
+            <tr>
+              <!-- CHECKBOX CON LA IDEA DE CAMBIAR EL ESTADO DE VARIAS CUOTAS A LA VEZ -->
+              <td>
+                <div class="form-check">
+                  <input class="form-check-input checkbox-element" type="checkbox" value="" id="flexCheckDefault{{ forloop.counter }}">
+                  <label class="form-check-label" for="flexCheckDefault{{ forloop.counter }}"></label>
+                </div>
+              </td>
+              <th scope="row">{{ forloop.counter }}</th>
+              <td>{{ elemento.usuario.primer_nombre}}</td>
+              <td>{{ elemento.usuario.apellido_paterno }}</td>
+              <td>{{ elemento.usuario.email }}</td>
+              <td>{{ elemento.usuario.estado_txt}}</td>
+              <td>{{ elemento.año.monto_cuota }}</td>
+              <td>{{ elemento.id }}</td>
+              <td>
+                <!-- BOTON DE CAMBIO DE ESTADO DE LA CUOTA -->
+                <div class="btn-group" role="group" id="dropdown-container-{{ elemento.id }}">
+                  <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Pendiente
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" id="registro-{{ elemento.id}}" data-action-url="{% url 'cuotas_admin_mod' %}" data-registro-id="{{ elemento.id }}" data-action-value="A">Aprobada</a></li>
+                    <li><a class="dropdown-item" href="#" id="registro-{{ elemento.id}}" data-action-url="{% url 'cuotas_admin_mod' %}" data-registro-id="{{ elemento.id }}" data-action-value="R">Rechazada</a></li>
+                  </ul>
+                </div>
+              </td>
+
+            </tr>
+          {% endfor%}  
+        </tbody>
+        </table>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    // Variables para el control del Switch
+    var selectAllSwitch = document.getElementById('SelectAllSwitch');
+    var checkboxes = document.querySelectorAll('.checkbox-element');
+    
+    // Variables para el cambio de estado de la cuota
+    var dropdownContainer = document.getElementById('dropdown-container'); // contenedor de los botone de cambio de cuota
+    
+    // Variable del tipo de cuotas que se estan mostrando en la plantilla
+    var estadoCuotaElement = document.getElementById('estadoCuota'); // primero se obtiene el elemento html que tiene el valor  
+    var estadoCuota = estadoCuotaElement.getAttribute('data-estado-cuota'); // luego se accede al valor mediante la propiedad 
+
+    // Activar o desactivar la seleccion de toos los registros con el Switch
+    selectAllSwitch.addEventListener('change', function(){
+      checkboxes.forEach(function(checkbox){
+        checkbox.checked = selectAllSwitch.checked;
+        console.log(selectAllSwitch.checked);  
+      });
+    });
+    
+    {% for elemento in cuotas %}
+      var dropdownContainer = document.getElementById('dropdown-container-{{ elemento.id|escapejs }}');
+      if(dropdownContainer) {
+        dropdownContainer.addEventListener('click', function(event){
+          var elemento = event.target;
+
+          if (elemento.classList.contains('dropdown-item')) {
+            var selectedItemText = elemento.textContent;
+            var actionUrl = elemento.getAttribute('data-action-url');
+            var actionValue = elemento.getAttribute('data-action-value');
+            var registro_id = elemento.getAttribute('data-registro-id');
+            console.log('Seleccionado:', selectedItemText);
+            console.log('URL:', actionUrl);
+            console.log('ID Cuota:', registro_id);
+            console.log('Valor Cuota:', actionValue);
+
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = actionUrl;
+
+            var csrfTokenInput = document.createElement('input');
+            csrfTokenInput.type = 'hidden';
+            csrfTokenInput.name = 'csrfmiddlewaretoken';
+            csrfTokenInput.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            form.appendChild(csrfTokenInput);
+
+            var id_registro = document.createElement('input');
+            id_registro.type = 'hidden';
+            id_registro.name = 'id_cuota_mod';
+            id_registro.value = registro_id;
+            form.appendChild(id_registro);
+
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'value';
+            input.value = actionValue;
+            form.appendChild(input);
+
+            var est_cuota = document.createElement('input');
+            est_cuota.type = 'hidden';
+            est_cuota.name = 'filtro';
+            est_cuota.value = estadoCuota;
+            form.appendChild(est_cuota);
+
+            document.body.appendChild(form);
+            form.submit();
+
+
+
+          }
+        }) 
+      }
+    {% endfor %}
+
+  });
+</script>

@@ -18,6 +18,13 @@ $ docker-compose run web python manage.py createsuperuser
 ```
 $ docker exec -it web bash
 ```
+### CREAR APP
+
+```
+$ docker-compose run web python manage.py startapp hello_world
+```
+
+ 
 
 ### ELIMINA CONTENDORES PARADOS
 

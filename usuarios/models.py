@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib import admin
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser,PermissionsMixin
 from search_admin_autocomplete.admin import SearchAutoCompleteAdmin
-from .choices import sexos, estado
+from .choices import sexos, estado, categoria
 
 class Perfil(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -64,14 +64,10 @@ class MyUserManager(BaseUserManager):
 
 
 class Usuario(AbstractBaseUser):
-    email = models.EmailField(
-        verbose_name="email",
-        max_length=255,
-        unique=True,
-    )
-    date_of_birth = models.DateField()
-    is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
+    email                   = models.EmailField(verbose_name="email", max_length=255, unique=True)
+    date_of_birth           = models.DateField()
+    is_active               = models.BooleanField(default=True)
+    is_admin                = models.BooleanField(default=False)
     rut                     = models.CharField(max_length=10, blank=True, null=False, verbose_name="Rut")
     primer_nombre           = models.CharField(max_length=200, blank=True, null=False, verbose_name="Primer nombre")
     segundo_nombre          = models.CharField(max_length=200, blank=True, null=False, verbose_name="Segundo nombre")
@@ -82,6 +78,7 @@ class Usuario(AbstractBaseUser):
     sexo                    = models.CharField(max_length=1, choices=sexos, default="M")
     perfil                  = models.ForeignKey(Perfil, blank=True, null=True, on_delete=models.CASCADE, verbose_name="Perfil de usuario")  # ej. socio,invitado, capitan, tesorero...
     estado                  = models.CharField(max_length=1, choices=estado, default="A")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
+    categoria               = models.CharField(max_length=1, choices=categoria, default="N")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
     
 
     objects = MyUserManager()

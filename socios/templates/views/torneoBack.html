@@ -1,0 +1,301 @@
+{% extends "root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block header %} 
+
+      {% include "header/header_socios.html" %}
+
+{% endblock %}
+
+{% block body %}
+
+    {% include "banner/banner_torneo_resumen.html" %}
+    {{ tornedoEstado }}
+    {% if formulario  %}
+      
+       <div class="container marketing" id="contacto">
+    <!-- Three columns of text below the carousel -->
+      <form enctype="multipart/form-data" id="form_edicion" class="contact-form c-mb-30 c-gutter-30 col-lg-12" action= "{{urlForm}}"  method="POST" > {% csrf_token %}
+        <div class="row">
+              <div class="col-lg-12 text-center">
+                <img src="{% static 'web/assets/logos/laurelDorado.png' %}  " style="padding-bottom: 0px!important;" />
+                <h1>SOLICITUD DE INSCRIPCIÓN AL TORNEO</h1>
+              </div>
+    
+              <div class="col-lg-3 form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="fecha"
+                  readonly
+                  value={{torneoFecha}}
+                />
+                <label for="fecha">Fecha</label>
+              </div>
+              <div class="col-lg-4 form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="lugar"
+                  readonly
+                  value={{torneoLugar}}
+                />
+                <label for="lugar">Lugar</label>
+              </div>
+               <div class="col-lg-3  form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="inscritos"
+                  value= {{torneoInscritos}}/{{torneoCupos}}
+                  readonly
+                />
+                <label for="inscritos">Inscritos</label>
+              </div>
+
+              <div class="col-lg-3  form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nombre"
+                  value= {{usuario}}
+                  readonly
+                />
+                <label for="nombre">Nombre</label>
+              </div>
+              <div class="col-lg-4  form-floating">
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  value={{email}}
+                  readonly
+                  />
+                <label for="email">email</label>
+              </div>
+              <div class="col-lg-3  form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="telefono"
+                  value= {{telefono}}
+                  readonly
+                />
+                <label for="telefono">Teléfono</label>
+              </div>
+        
+              <div class="col-lg-3">
+                 <label for="switchBus">¿Usará BUS CGM? (NO/SI)</label>
+              </div>
+              <div class="col-lg-3 form-check form-switch">
+                 <input class="form-check-input switch" type="checkbox" role="switch" id="switchBus">
+              </div>
+              <div class="col-lg-3">
+                 <label for="switchCarro">¿Participará en Carro? (NO/SI)</label>
+              </div>
+              <div class="col-lg-3 form-check form-switch">
+                 <input class="form-check-input switch" type="checkbox" role="switch" id="switchCarro">
+              </div>
+           
+              <div class="col-lg-3 form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="indice"
+                />
+                <label for="indice">Ingrese su Índice</label>
+              </div>
+              <div class="col-lg-2 form-floating">
+                <a href="#" class="btn btn-sutil">Ver Indice</a>
+              </div>
+              <div class="form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="acompanantes"
+                />
+                <label for="acompanantes">¿Con quien va?</label>
+              </div>
+              <div class="form-floating">
+                <textarea
+                  class="form-control"
+                  placeholder="Leave a comment here"
+                  id="floatingTextarea2"
+                  style="height: 200px"
+                ></textarea>
+                <label for="floatingTextarea2">Solicitud</label>
+              </div>
+        </div>
+        <hr>
+        <h3>Detalle:</h3>
+        <div class="row">
+                <div class="col-lg-3">
+                 <input
+                  type="text"
+                  class="form-control"
+                  id="deuda"
+                  value= 1
+                  readonly
+                />
+                 <label for="deuda">Cancela Deuda socio (NO/SI)</label>
+
+              </div>
+              <div class="col-lg-3 form-check form-switch">
+                 <input class="form-check-input switch" type="checkbox" role="switch" id="switchDeuda">
+              </div>
+               <div class="col-lg-3">
+                 <input
+                  type="text"
+                  class="form-control"
+                  id="recargo"
+                  value= 5000
+                  readonly
+                />
+                 <label for="recargo">Recargo</label>
+              </div>
+              <div class="col-lg-3">
+                 <input
+                  type="text"
+                  class="form-control"
+                  id="cuota"
+                  value= 7500
+                  readonly
+                />
+                 <label for="cuota">Cuota de Campeonato</label>
+              </div>
+        </div> 
+        <br>
+        <div class="row justify-content-end">
+            <div class="col-lg-3">
+              <h1 style="padding-top: 0px!important;">TOTAL</h1>
+            </div>
+            <div class="col-lg-3 ">
+                 <input
+                  type="text"
+                  class="form-control"
+                  id="total"
+                  value= 1200
+                  readonly
+                  style="font-weight: bolder; font-size: 24px;"
+                 />
+            </div>
+        </div>
+        <div class="row justify-content-end">
+            <div class="col-lg-3">
+                <button type="button" onclick="crearSolicitud()"  class="btn btn-primary"><strong>{{ btnAction }}</strong></button>
+            </div>
+     
+
+        </form>
+
+
+      </div>
+
+    {% else %}
+
+        {% if solicitud.estado == 'P' %}
+            <div class="container marketing" id="links">
+            <!-- Three columns of text below the carousel -->
+                <div class="row">
+                  <div class="col-lg-12 context">
+                    <h1> <img src="{% static '/web/assets/logos/pendiente.png' %}"> PENDIENTE </h1>
+                    <p>Gracias por tu interés en participar en nuestro próximo torneo de golf! Tu solicitud está siendo procesada. Agradecemos tu entusiasmo y paciencia.<br><br> ¡Prepárate para disfrutar de una experiencia única en el campo de golf! Si tienes alguna pregunta adicional, no dudes en contactarnos. ¡Nos vemos en el green!<br>
+                    </p>
+                  </div>
+                </div>
+            </div><!-- /.container -->
+
+        {% elif solicitud.estado == 'A'  %}
+            <div class="container marketing" id="links">
+                <!-- Three columns of text below the carousel -->
+                <div class="row">
+                    <div class="col-lg-4">
+                      <h6 ><a href="/media/{{bases}}"  target="_blank" style="color:#BF9D5E!important;">BASES</a></h6">
+                    </div>
+                    <div class="col-lg-4">
+                      <h6 style="color:black!important;"><a href="/media/{{resultados}}"  target="_blank" style="color:#BF9D5E!important;">RESULTADOS</a></h6">
+                    </div>
+                    <div class="col-lg-4">
+                      <h6 style="color:black!important;"><a href="/media/{{premiacion}}"  target="_blank" style="color:#BF9D5E!important;">PREMIACIÓN</a></h6">
+                    </div>
+                  </div>
+
+                <div class="row">
+                  <div class="col-lg-12 context">
+                    <h1> <img src="{% static '/web/assets/logos/ok.png' %}"> APROBADA</h1>
+                    <p> Estimado<br><br>
+
+                        ¡Nos complace informarte que tu solicitud para participar en nuestro torneo de golf ha sido aprobada! Felicitaciones por ser seleccionado para formar parte de este emocionante evento.<br><br>
+
+                        Estamos entusiasmados de contar contigo entre nuestros participantes. Tu dedicación y pasión por el golf son admirables, y estamos seguros de que tu presencia en el torneo será un gran aporte.<br><br>
+
+                        ¡Te deseamos mucha suerte en el torneo y esperamos que disfrutes al máximo esta experiencia!<br><br>
+
+                        Saludos cordiales<br><br>
+                        EL CAPITÁN
+                    </p>
+                    <h1> PARTICIPANTES </h1>
+                </div> 
+                <div class="row table-responsive" >
+                  <table class="table table-striped ">
+                    <thead>
+                      <tr>
+                        <th scope="col">Apellido</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Categorìa</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for t in listadoAceptados %}
+                      <tr>
+                        <td>{{ t.usuario.apellido_paterno  | upper   }}</td>
+                        <td>{{ t.usuario.primer_nombre | upper  }}</td>
+                        <td>{{ t.usuario.get_categoria_display | upper  }}</td>
+                      <tr>
+                     {% endfor%}
+                    </tbody>
+                  </table>
+
+                 </div>
+                </div>
+            </div><!-- /.container -->
+        {% elif solicitud.estado == 'R'  %}
+            <div class="container marketing" id="links">
+            <!-- Three columns of text below the carousel -->
+            <div class="row">
+              <div class="col-lg-12 context">
+                <h1> <img src="{% static '/web/assets/logos/rechazado.png' %}"> RECHAZADA </h1>
+                <p> Estimado<br><br>
+
+                    Agradecemos enormemente tu interés en participar en nuestro torneo de golf. Lamentablemente, debido: <strong>"{{ solicitud.motivo }}".</strong> Esta vez, tu solicitud no ha sido seleccionada para el torneo.<br><br>
+
+                    Queremos expresar nuestro agradecimiento por tu interés y te animamos a seguir participando en futuros eventos. Valoramos tu dedicación al golf y esperamos contar contigo en próximas oportunidades.<br><br>
+
+                    Te deseamos mucho éxito en tus futuras actividades y esperamos verte pronto en otros eventos.<br><br>
+
+                    Atentamente.<br><br>
+                    EL CAPITÁN
+                </p>
+              </div>
+            </div>
+            </div><!-- /.container -->
+        {% endif %} 
+    
+    {% endif %}
+    
+    
+
+
+
+
+{% endblock %}
+
+{% block extraJs %} 
+
+<script src="{% static 'web/js/solicitud.js' %}"></script>   
+<script src="{% static 'socio/js/solicitud.js' %}"></script>    
+{% endblock %}

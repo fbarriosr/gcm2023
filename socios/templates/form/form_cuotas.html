@@ -1,0 +1,93 @@
+{% load static %} {% static "" as baseUrl %}
+
+<div class="container marketing" id="links">
+  <!-- Three columns of text below the carousel -->
+  <div class="row align-items-center" >
+    <div class="col-12">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-success" role="alert">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <div class="col-lg-4 context">
+      {% if cuotas %}
+        <h1>{{ cuotas.0.usuario.primer_nombre|upper }} {{ cuotas.0.usuario.apellido_paterno|upper }}</h1>
+      {% endif %}
+    </div>
+    
+    <div class="col-lg-4">
+      <h1>PERIODO</h1>
+    </div>
+    <!-- LISTADO DE AÑOS DE LA BARRA DE SELECCION -->
+    <div class="col-lg-4">
+      <form method="POST" action="{% url 'cuotas' %}" id="dropdown_form">
+        {% csrf_token %}
+        <select class="form-select form-select-lg mb-3" name="dropdown_anual" id="dropdown_anual" aria-label="Default select example" onchange="cambiarAnual()">
+          {% for año in años_cuotas_socio %}
+            <option value="{{ año }}" {% if año == año_filtro %} selected{% endif %}>{{ año }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <form class="d-flex col-6" role="search">
+      <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
+  </div>
+  {% for l in cuotas %}
+    <div class="row align-items-center cuota-row cuota-año-{{ l.año.año }}"  style="background-color: #F6F1E8;">
+      <!-- NOMBRE DE LOS MESES PARA CADA CUOTA DEL AÑO -->
+      <div class="col-sm-8 align-items-center">
+        <h1 style="padding-bottom: 0px !important">{{ l.mes_cuota|date:"F" }}</h1>
+      </div>
+      <!-- BOTONES DE CUOTA PARA CADA MES DEL AÑO -->
+      <div class="col-sm-4">
+        {% if l.estado_pago == 'P' %}
+          <form action="{% url 'cuotas' %}" method="POST"> 
+            {% csrf_token %}
+            <input type="hidden" name="email" value="{{ cuotas.0.usuario.email }}">
+            <input type="hidden" name="mes" value="{{ l.mes }}">
+            <input type="hidden" name="año_seleccionado" id="año_seleccionado" class ='ping' value="{{ año_filtro }}">
+            <input type="submit" class="btn btn-primary btn-lg" name="" value="PAGAR CUOTA">  
+          </form>
+        {% elif l.estado_pago == 'A' %}
+          <a href="" class="btn btn-success btn-lg disabled">APROBADO</a>
+        {% elif l.estado_pago == 'E' %}
+          <a href="" class="btn btn-warning btn-lg disabled">EN REVISION</a>
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+</div><!-- /.container -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    cambiarAnual();  // Ejecutar la función al cargar la página
+  });
+
+  function cambiarAnual() {
+    var dropdown = document.getElementById("dropdown_anual");
+    var añoSeleccionado = dropdown.options[dropdown.selectedIndex].value;
+    document.getElementById("año_seleccionado").value = añoSeleccionado
+  
+    $('.ping').val(añoSeleccionado)
+
+    // Oculta todas las cuotas
+    var cuotas = document.querySelectorAll(".cuota-row");
+    cuotas.forEach(function (cuota) {
+      cuota.style.display = "none";
+    });
+
+    // Muestra solo las cuotas del año seleccionado
+    var cuotasAño = document.querySelectorAll(".cuota-año-" + añoSeleccionado);
+    cuotasAño.forEach(function (cuota) {
+      cuota.style.display = "flex";
+    });
+  }
+</script>
