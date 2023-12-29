@@ -21,7 +21,7 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = Usuario
-        fields = ["email", "date_of_birth" ,'is_admin','is_active']
+        fields = ["email" ,'is_admin','is_active']
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -55,7 +55,7 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = Usuario
-        fields = ["password", "email", "date_of_birth", "is_active", "is_admin"]
+        fields = ["password", "email", "is_active", "is_admin"]
 
     def clean_password(self):
         # Regardless of what the user provides, return the initial value.
@@ -72,24 +72,26 @@ class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ["email",'apellido_paterno','primer_nombre', "date_of_birth", "is_admin",'is_active',]
+    list_display = ['email','rut','apellido_paterno','primer_nombre',"email",]
     list_filter = ["is_admin"]
     fieldsets = [
-        ('Principal', {"fields": ["email",'password']}),
-        ("Personal", {"fields": ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',"rut","date_of_birth"]}),
-        ('Info', {"fields": ["telefono",'sexo','perfil','estado']}),
+        ('Principal', {"fields": ["rut",'password']}),
+        ("Personal", {"fields": ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',"email",'fecha_nacimiento']}),
+        ('Info', {"fields": ["telefono",'sexo','eCivil','perfil','estado','categoria','situacionEspecial','fundador']}),
         ("Permisos", {"fields": ["is_admin",'is_active']}),
+        ("Personal Uniformado", {"fields": ["institucion",'grado', 'condicion','profesion','fecha_incorporacion']}),
     ]
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
     # overrides get_fieldsets to use this attribute when creating a user.
     add_fieldsets = [
-        ('Datos', {"fields": ["email", "password1",'password2']}),
-        ("Personal", {"fields": ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',"rut","date_of_birth"]}),
-        ('Info', {"fields": ["telefono",'sexo','perfil','estado']}),
+        ('Datos', {"fields": ["rut", "password1",'password2']}),
+        ("Personal", {"fields": ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',"email",'fecha_nacimiento']}),
+        ('Info', {"fields": ["telefono",'sexo','eCivil','perfil','estado','categoria','situacionEspecial','fundador']}),
         ("Permisos", {"fields": ["is_admin",'is_active']}),
+        ("Personal Uniformado", {"fields": ["institucion",'grado', 'condicion','profesion','fecha_incorporacion']}),
     ]
     search_fields = ["email",'apellido_paterno','rut']
-    ordering = ["email"]
+    ordering = ['rut',"email"]
     filter_horizontal = []
 
 

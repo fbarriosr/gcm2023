@@ -3,7 +3,8 @@ from django.db import models
 from django.contrib import admin
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser,PermissionsMixin
 from search_admin_autocomplete.admin import SearchAutoCompleteAdmin
-from .choices import sexos, estado, categoria
+from .choices import *
+import datetime
 
 class Perfil(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -65,26 +66,33 @@ class MyUserManager(BaseUserManager):
 
 class Usuario(AbstractBaseUser):
     email                   = models.EmailField(verbose_name="email", max_length=255, unique=True)
-    date_of_birth           = models.DateField()
     is_active               = models.BooleanField(default=True)
     is_admin                = models.BooleanField(default=False)
-    rut                     = models.CharField(max_length=10, blank=True, null=False, verbose_name="Rut")
+    rut                     = models.CharField(max_length=12,  unique=True, verbose_name="Rut")
     primer_nombre           = models.CharField(max_length=200, blank=True, null=False, verbose_name="Primer nombre")
     segundo_nombre          = models.CharField(max_length=200, blank=True, null=False, verbose_name="Segundo nombre")
     apellido_paterno        = models.CharField(max_length=200, blank=True, null=False, verbose_name="Apellido paterno")
     apellido_materno        = models.CharField(max_length=200, blank=True, null=False, verbose_name="Apellido materno")
     fecha_nacimiento        = models.DateField(blank=True, null=True, verbose_name="Fecha de nacimiento")
-    telefono                = models.IntegerField(blank=True, null=True, verbose_name="Telefono movil")
-    sexo                    = models.CharField(max_length=1, choices=sexos, default="M")
+    telefono                = models.IntegerField(blank=True, null=True, verbose_name="Celular")
+    sexo                    = models.CharField(max_length=1, choices=sexos, default="M", verbose_name="Genero")
+    eCivil                  = models.CharField(max_length=30, choices=civil, default="NI", verbose_name="Estado Civil")  
     perfil                  = models.ForeignKey(Perfil, blank=True, null=True, on_delete=models.CASCADE, verbose_name="Perfil de usuario")  # ej. socio,invitado, capitan, tesorero...
-    estado                  = models.CharField(max_length=1, choices=estado, default="A")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
-    categoria               = models.CharField(max_length=1, choices=categoria, default="N")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
-    
+    estado                  = models.CharField(max_length=20, choices=estado, default="A")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
+    categoria               = models.CharField(max_length=20, choices=categoria, default="N")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
+    situacionEspecial       = models.BooleanField(default=False, verbose_name="Situación Especial")
+    fundador                = models.BooleanField(default=False, verbose_name="Fundador")
 
+    institucion             = models.CharField(max_length=20, choices=instituciones, default="NI")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
+    grado                   = models.CharField(max_length=5, choices=grados, default="NI")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
+    condicion               = models.CharField(max_length=20, choices=condicion, default="NI")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
+
+    profesion               = models.CharField(max_length=200, blank=True, null=False, verbose_name="Profesión")
+    fecha_incorporacion     = models.DateField(default=datetime.date.today)
     objects = MyUserManager()
 
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["date_of_birth"]
+    USERNAME_FIELD = "rut"
+    REQUIRED_FIELDS = ["email",'apellido_paterno','primer_nombre']
 
     def __str__(self):
         return self.email

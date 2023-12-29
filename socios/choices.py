@@ -17,9 +17,11 @@ regiones = (
     ('XVI', 'Región de Ñuble ')
 )
 estado = (
-    ('A', 'Activo'),
-    ('I', 'Inactivo'),
-    ('S', 'Suspendido'),
+    ('A', 'ACTIVO'),
+    ('H', 'HONORARIO'),
+    ('C', 'COOPERADOR'),
+    ('PCS', 'PERDIDA CATEGORIA SOCIO'),
+    ('S', 'SUSPENDIDO'),
 )
 
 estado_solicitud = (

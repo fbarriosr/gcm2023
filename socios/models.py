@@ -86,6 +86,8 @@ class Solicitud (models.Model):
     usuario         = models.ForeignKey(Usuario,on_delete=models.CASCADE, null=True, verbose_name="Usuario") 
     torneo          = models.ForeignKey(Torneo,on_delete=models.CASCADE, null=True, verbose_name="Torneo")
     fecha           = models.DateTimeField(null=False)
+    auto            = models.BooleanField(default=False)
+    patente         = models.CharField(max_length=12, blank= True , verbose_name="Patente")
     busCGM          = models.BooleanField(default=False)
     carro           = models.BooleanField(default=False)
     indice          = models.IntegerField(blank=True, null=True, verbose_name="Indice")
@@ -103,7 +105,8 @@ class Solicitud (models.Model):
     hoyoInicial     = models.IntegerField(default=0,blank=True, null=True, verbose_name="Hoyo Inicial")
     suspende        = models.BooleanField(default=False, verbose_name='Suspende Participación' )
     motivoSuspencion= models.TextField(default='',blank=True, verbose_name='Motivo Suspención')
-    
+
+
     class Meta:
         verbose_name    = 'Solicitud'
         verbose_name_plural = 'Solicitudes'
