@@ -1,5 +1,6 @@
 
 $(document).ready(function () {
+   $("#patente").parent().hide() 
    deuda = $('#deuda').val()
    if (Number(deuda)== 0){
        $('#recargo').val(0)
@@ -25,6 +26,14 @@ $("#cancela_deuda_socio").change(function() {
       cuota = $('#cuota').val()
       total =  Number(recargo) + Number(cuota)
       $('#total').val(total)
+    }
+});
+
+$("#auto").change(function() {
+    if(this.checked) {
+        $("#patente").parent().show()
+    }else{
+        $("#patente").parent().hide() 
     }
 });
 

@@ -163,3 +163,15 @@ class normas_reglas(TemplateView):
         #contexto['personal']  = list(front.values('titulo','img', 'tipo', 'subtitulo', 'order'))
 
         return contexto
+
+class estatutos(TemplateView):
+    template_name = "views/estatutos.html"
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto["nameWeb"] = nameWeb
+
+        contexto["title"] = "Estatutos"
+        front = Front.objects.filter(titulo="Estatutos")
+        contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
+        
+        return contexto

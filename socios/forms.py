@@ -10,12 +10,14 @@ from .models import *
 class FormularioSolicitudView(forms.ModelForm):
     class Meta:
         model = Solicitud
-        fields = ['indice','busCGM','carro','descripcion',
+        fields = ['indice','auto','patente','busCGM','carro','descripcion',
                     'acompanantes','deuda_socio','recargo','cuota','monto','cancela_deuda_socio']
         labels = {
             'usuario':'Usuario',
             'torneo': 'Torneo',
             'fecha': 'Fecha',
+            'auto': '¿Vas en auto?',
+            'patente': 'Registre la Patente',
             'busCGM':'¿Usará BUS CGM? (NO/SI)',
             'carro': '¿Participará en Carro? (NO/SI)',
             'indice':'Ingrese su Índice',
@@ -50,6 +52,21 @@ class FormularioSolicitudView(forms.ModelForm):
                     'class': 'form-control ',
                     'id': 'fecha',
                     'readonly':''
+                }                
+            ),
+            'auto': forms.CheckboxInput(
+                attrs = {
+                    'class': 'form-check-input switch',
+                    'id': 'auto',
+                    'type':'checkbox',
+                    'rol': 'switch'
+
+                }                
+            ),
+            'patente': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'patente',
                 }                
             ),
             'busCGM': forms.CheckboxInput(

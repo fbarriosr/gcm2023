@@ -293,9 +293,11 @@ class crearSolicitud(CreateView):
             form = self.form_class(request.POST)
             if form.is_valid():
                 solicitud = Solicitud(
-                    usuario      = Usuario.objects.get(email=  self.request.user.email),
+                    usuario      = Usuario.objects.get(rut=  self.request.user.rut),
                     torneo       = self.get_object(), 
                     fecha        = datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    auto = form.cleaned_data.get('auto'),
+                    patente = form.cleaned_data.get('patente'),
                     busCGM = form.cleaned_data.get('busCGM'),
                     carro =  form.cleaned_data.get('carro'),
                     indice       = form.cleaned_data.get('indice'),
@@ -353,7 +355,7 @@ class crearSolicitudSuspender(CreateView):
     def get_solicitud(self, **kwargs):
         torneo   = self.get_object()
         torneoid = torneo.id
-        current = Solicitud.objects.filter(usuario__email=self.request.user.email).filter(torneo__id=torneoid).filter(estado='A').order_by('-fecha')
+        current = Solicitud.objects.filter(usuario__rut=self.request.user.rut).filter(torneo__id=torneoid).filter(estado='A').order_by('-fecha')
         return current
 
 
@@ -363,9 +365,11 @@ class crearSolicitudSuspender(CreateView):
             form = self.form_class(request.POST)
             if form.is_valid():
                 solicitud = Solicitud(
-                    usuario      = Usuario.objects.get(email=  solicitud.usuario),
+                    usuario      = Usuario.objects.get(rut=  solicitud.rut),
                     torneo       = self.get_object(), 
                     fecha        = datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    auto         = solicitud.auto,
+                    patente      = solicitud.patente,
                     busCGM       = solicitud.busCGM,
                     carro        = solicitud.carro,
                     indice       = solicitud.indice,

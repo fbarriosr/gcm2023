@@ -10,6 +10,7 @@ urlpatterns = [
     path('comite', comite.as_view(), name="comite"),
     path('404', notFound404.as_view(), name= '404'),
     path('normas_reglas', normas_reglas.as_view(), name='normas_reglas'),
+    path('estatutos', estatutos.as_view(), name='estatutos'),
     
 
     

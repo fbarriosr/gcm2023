@@ -41,6 +41,16 @@
         <form enctype="multipart/form-data" id="form_edicion" class="contact-form c-mb-30 c-gutter-30 col-lg-12" action= "{{urlForm}}"  method="POST" > {% csrf_token %}
           <div class="row">
                 <div class="col-lg-3">
+                   {{form.auto.label}}
+                </div>
+                <div class="col-lg-3 form-check form-switch">
+                   {{form.auto}}
+                </div>
+                <div class="col-lg-3 form-floating">
+                  {{form.patente}}
+                  <label> {{form.patente.label}}</label>
+                </div>
+                <div class="col-lg-3">
                    {{form.busCGM.label}}
                 </div>
                 <div class="col-lg-3 form-check form-switch">
