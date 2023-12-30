@@ -110,29 +110,52 @@ def actualiza_cuota(email, año, mes):
     
 
 # Función para realizar envios de correo
-def contact(email, año, mes):
-    
-    correo = email
-    mes = mes
-    mes_txt = mes_num_texto[mes]
-    año = año
+def contact(tipo, nombre=None, asunto=None, mensaje=None, email=None, año=None, mes=None):
+  
+    if tipo == 'pago_cuotas':
+        correo = email
+        mes = mes
+        año = año
+        print(f'pago cuotas. correo:{correo}, mes:{mes}, año:{año}')   
+        mes_txt = mes_num_texto[mes]
 
-    mensaje_ok = f' Se actualizó el estado de la cuota existente para el usuario {email}, año {año}, mes {mes_txt} a "En Revisión"'
-    subject ='Aviso solicitud pago de cuota'
-    message = f'El usuario {correo} ha enviado una solicitud de pago para la cuota del mes de {mes_txt}'
-
-    template = render_to_string('views/email_template.html', {
+        subject ='Aviso solicitud pago de cuota'
+        message = f'El usuario {correo} ha enviado una solicitud de pago para la cuota del mes de {mes_txt} del {año}'
+        mensaje_ok = f' Se actualizó el estado de la cuota existente para el usuario {email}, año {año}, mes {mes_txt} a "En Revisión"'
+   
+        template = render_to_string('views/email_template.html', {
         'email': correo,
         'mes': mes,
         'message': message,   
-    })
+        })
 
-    email = EmailMessage(
-        subject,
-        template,
-        settings.EMAIL_HOST_USER,
-        ['nicolas.ep.dev@gmail.com']
-    )
+        email = EmailMessage(
+            subject,
+            template,
+            settings.EMAIL_HOST_USER, # deja como remitente al correo configurado del sistema
+            ['nicolas.ep.dev@gmail.com']
+        )
+
+    elif tipo == 'formulario_contacto':  
+        correo = email
+        nombre = nombre
+        subject = asunto
+        message = mensaje
+        mensaje_ok = f'Mensaje enviado con exito'
+
+        template = render_to_string('views/email_template.html', {
+        'email': correo,
+        'mes': mes,
+        'message': message,   
+        })
+
+        email = EmailMessage(
+            subject,
+            template,
+            correo, # usar como remitente el correo proporcionado en el formulario
+            ['nicolas.ep.dev@gmail.com']
+        )
+  
 
     email.fail_silently = False
     email.send()

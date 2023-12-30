@@ -31,13 +31,30 @@ from .mixins import *
 from .utils import *
 from django.shortcuts import HttpResponse
 from datetime import datetime
+from socios.utils import contact
 
 nameWeb = "CGM"
 
 # Create your views here.
-class home(TemplateView):
+class home(TemplateView, View):
     template_name = "views/home.html"
-    # template_name = "root/empty.html"
+    
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+        # Obtener datos del formulario
+            nombre = request.POST.get('nombre')
+            email = request.POST.get('email')
+            asunto = request.POST.get('asunto')
+            mensaje = request.POST.get('mensaje')
+            tipo = 'formulario_contacto' 
+            print(f'enviando formulario_contacto: nombre{nombre}, email:{email}, asunto:{asunto}, mensaje:{mensaje}, tipo:{tipo}')
+            contact(tipo, nombre, asunto, mensaje, email)  
+
+        contexto = self.get_context_data()
+
+        return self.render_to_response(contexto)
+        #return render(request, 'views/home.html')
+
 
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)

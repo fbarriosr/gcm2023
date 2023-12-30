@@ -634,10 +634,14 @@ class cuotas(TemplateView, View):
             # Verificar que se haya actualizado la cuota antes de enviar el correo
             if filas_afectadas > 0: 
                 # Invocar a la funcion Contact para que envie el correo de aviso
-                resultado = contact(email, año_contact, mes) 
+                tipo = 'pago_cuotas'
+                print(f'enviando datos de cuotas a contact')
+                print(f'tipo:{tipo}, email:{email}, año_contact:{año_contact}, mes:{mes}')
+                #resultado = contact(tipo, email, año_contact, mes)
+                resultado = contact(tipo, email=email, año=año_contact, mes=mes) 
             else:
                 resultado = 'No se realizaron actualizaciones. Puede que no haya coincidencia con los criterios de filtro'
-
+  
             # Establecer un mensaje de aviso al volver a la plantilla html
             messages.success(request, resultado)
 

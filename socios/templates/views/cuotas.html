@@ -6,8 +6,11 @@
     {{ nameWeb }} {{ title }}
 {% endblock %}
 
+{% block header %} 
+    {% include "header/header_socios.html" %}
+{% endblock %}
+
 {% block body %}
     {% include "banner/banner2.html" %}
     {% include "form/form_cuotas.html" %}
-  
 {% endblock %}
