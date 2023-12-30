@@ -34,14 +34,20 @@
       </form>
     </div>
   </div>
+  <!-- BARRA DE BUSQUEDA, NO IMPLEMENTADA AUN -->
   <div class="row mb-4">
     <form class="d-flex col-6" role="search">
       <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
       <button class="btn btn-outline-success" type="submit">Search</button>
     </form>
   </div>
+  <!-- CHECKBOX PARA MOSTRAR EL ESTADO DE TODAS LAS CUOTAS INCLUIDAS LAS YA PAGADAS -->
+  <div class="form-check form-switch mb-4">
+    <input class="form-check-input" type="checkbox" role="switch" id="SwitchCheckCuotas">
+    <label class="form-check-label" for="SwitchCheckCuotas">Mostrar Todo</label>
+  </div>
   {% for l in cuotas %}
-    <div class="row align-items-center cuota-row cuota-año-{{ l.año.año }}"  style="background-color: #F6F1E8;">
+    <div class="row align-items-center cuota-row cuota-año-{{ l.año.año }}" data-filtro-cuota="{{ l.estado_pago }}"  style="background-color: #F6F1E8;">
       <!-- NOMBRE DE LOS MESES PARA CADA CUOTA DEL AÑO -->
       <div class="col-sm-8 align-items-center">
         <h1 style="padding-bottom: 0px !important">{{ l.mes_cuota|date:"F" }}</h1>
@@ -54,12 +60,14 @@
             <input type="hidden" name="email" value="{{ cuotas.0.usuario.email }}">
             <input type="hidden" name="mes" value="{{ l.mes }}">
             <input type="hidden" name="año_seleccionado" id="año_seleccionado" class ='ping' value="{{ año_filtro }}">
-            <input type="submit" class="btn btn-primary btn-lg" name="" value="PAGAR CUOTA">  
+            <input type="submit" class="btn btn-primary btn-lg" name="" value="PAGAR CUOTA">
           </form>
         {% elif l.estado_pago == 'A' %}
-          <a href="" class="btn btn-success btn-lg disabled">APROBADO</a>
+          <a href="" class="btn btn-success btn-lg disabled">APROBADA</a>
         {% elif l.estado_pago == 'E' %}
           <a href="" class="btn btn-warning btn-lg disabled">EN REVISION</a>
+        {% elif l.estado_pago == 'R' %}
+          <a href="" class="btn btn-danger btn-lg disabled">RECHAZADA</a>
         {% endif %}
       </div>
     </div>
@@ -68,10 +76,16 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    cambiarAnual();  // Ejecutar la función al cargar la página
+    var switchCheckCuotas = document.getElementById('SwitchCheckCuotas');
+    
+    switchCheckCuotas.addEventListener('change', ()=> {
+      cambiarAnual(switchCheckCuotas.checked);
+    });
+
+    cambiarAnual(switchCheckCuotas.checked);  // Ejecutar la función al cargar la página
   });
 
-  function cambiarAnual() {
+  function cambiarAnual(mostrarPagados) {
     var dropdown = document.getElementById("dropdown_anual");
     var añoSeleccionado = dropdown.options[dropdown.selectedIndex].value;
     document.getElementById("año_seleccionado").value = añoSeleccionado
@@ -87,7 +101,14 @@
     // Muestra solo las cuotas del año seleccionado
     var cuotasAño = document.querySelectorAll(".cuota-año-" + añoSeleccionado);
     cuotasAño.forEach(function (cuota) {
-      cuota.style.display = "flex";
+      if (mostrarPagados == false) {
+        // Obtener el valor de la propiedad data-filtro-cuota
+        var valorFiltroCuota = cuota.getAttribute('data-filtro-cuota');
+        cuota.style.display = (valorFiltroCuota !== 'A') ? 'flex' : 'none';
+      }
+      else {
+        cuota.style.display = "flex";
+      }
     });
   }
 </script>

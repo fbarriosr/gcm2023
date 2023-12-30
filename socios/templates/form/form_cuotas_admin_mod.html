@@ -37,6 +37,7 @@
       <table class="table">
         <thead>
           <tr>
+            <!-- SWITCH DE SELECCION DE REGISTROS -->
             <th scope="col">
               <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" role="switch" id="SelectAllSwitch">
@@ -72,14 +73,19 @@
               <td>{{ elemento.año.monto_cuota }}</td>
               <td>{{ elemento.id }}</td>
               <td>
-                <!-- BOTON DE CAMBIO DE ESTADO DE LA CUOTA -->
+                <!-- DROPDOWN DE CAMBIO DE ESTADO DE LA CUOTA -->
                 <div class="btn-group" role="group" id="dropdown-container-{{ elemento.id }}">
                   <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    Pendiente
+                    Actualizar 
                   </button>
                   <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#" id="registro-{{ elemento.id}}" data-action-url="{% url 'cuotas_admin_mod' %}" data-registro-id="{{ elemento.id }}" data-action-value="A">Aprobada</a></li>
-                    <li><a class="dropdown-item" href="#" id="registro-{{ elemento.id}}" data-action-url="{% url 'cuotas_admin_mod' %}" data-registro-id="{{ elemento.id }}" data-action-value="R">Rechazada</a></li>
+                    {% if estado_cuota == 'En Revision'%}
+                      <li><a class="dropdown-item" href="#" id="registro-{{ elemento.id}}" data-action-url="{% url 'cuotas_admin_mod' %}" data-registro-id="{{ elemento.id }}" data-action-value="A">Aprobada</a></li>
+                      <li><a class="dropdown-item" href="#" id="registro-{{ elemento.id}}" data-action-url="{% url 'cuotas_admin_mod' %}" data-registro-id="{{ elemento.id }}" data-action-value="R">Rechazada</a></li>
+                    {% elif estado_cuota == 'Rechazada' %}
+                      <li><a class="dropdown-item" href="#" id="registro-{{ elemento.id}}" data-action-url="{% url 'cuotas_admin_mod' %}" data-registro-id="{{ elemento.id }}" data-action-value="A">Aprobada</a></li>
+                      <li><a class="dropdown-item" href="#" id="registro-{{ elemento.id}}" data-action-url="{% url 'cuotas_admin_mod' %}" data-registro-id="{{ elemento.id }}" data-action-value="P">Pendiente</a></li>
+                    {% endif %}
                   </ul>
                 </div>
               </td>
@@ -94,43 +100,30 @@
 </div>
 
 
-<script>
-  document.addEventListener('DOMContentLoaded', function(){
-    // Variables para el control del Switch
-    var selectAllSwitch = document.getElementById('SelectAllSwitch');
-    var checkboxes = document.querySelectorAll('.checkbox-element');
-    
-    // Variables para el cambio de estado de la cuota
-    var dropdownContainer = document.getElementById('dropdown-container'); // contenedor de los botone de cambio de cuota
-    
-    // Variable del tipo de cuotas que se estan mostrando en la plantilla
-    var estadoCuotaElement = document.getElementById('estadoCuota'); // primero se obtiene el elemento html que tiene el valor  
-    var estadoCuota = estadoCuotaElement.getAttribute('data-estado-cuota'); // luego se accede al valor mediante la propiedad 
 
-    // Activar o desactivar la seleccion de toos los registros con el Switch
-    selectAllSwitch.addEventListener('change', function(){
-      checkboxes.forEach(function(checkbox){
-        checkbox.checked = selectAllSwitch.checked;
-        console.log(selectAllSwitch.checked);  
-      });
+
+<script>
+  document.addEventListener('DOMContentLoaded', ()=> {
+    var switchSelected = document.getElementById('SelectAllSwitch');
+    var checkboxes = document.querySelectorAll('.checkbox-element');
+    var filtroPlantilla = document.getElementById('estadoCuota').dataset.estadoCuota;
+
+    switchSelected.addEventListener('change', ()=> {
+      checkboxes.forEach((checkbox)=> checkbox.checked = switchSelected.checked);
     });
-    
+
     {% for elemento in cuotas %}
       var dropdownContainer = document.getElementById('dropdown-container-{{ elemento.id|escapejs }}');
       if(dropdownContainer) {
-        dropdownContainer.addEventListener('click', function(event){
+        dropdownContainer.addEventListener('click', (event)=> {
           var elemento = event.target;
 
-          if (elemento.classList.contains('dropdown-item')) {
+          if(elemento.classList.contains('dropdown-item')) {
             var selectedItemText = elemento.textContent;
             var actionUrl = elemento.getAttribute('data-action-url');
             var actionValue = elemento.getAttribute('data-action-value');
             var registro_id = elemento.getAttribute('data-registro-id');
-            console.log('Seleccionado:', selectedItemText);
-            console.log('URL:', actionUrl);
-            console.log('ID Cuota:', registro_id);
-            console.log('Valor Cuota:', actionValue);
-
+            
             var form = document.createElement('form');
             form.method = 'POST';
             form.action = actionUrl;
@@ -156,16 +149,13 @@
             var est_cuota = document.createElement('input');
             est_cuota.type = 'hidden';
             est_cuota.name = 'filtro';
-            est_cuota.value = estadoCuota;
+            est_cuota.value = filtroPlantilla;
             form.appendChild(est_cuota);
 
             document.body.appendChild(form);
             form.submit();
-
-
-
-          }
-        }) 
+          };
+        });
       }
     {% endfor %}
 
