@@ -46,3 +46,13 @@ estado = (
     ('I', 'Inactivo'),
     ('S', 'Suspendido'),
 )
+
+tipo_link = (
+    ('F', 'FEDERACION Y/O ASOCIACIÓN'),
+    ('NR', 'NOTICIAS Y REVISTAS'),
+    ('T', 'TIENDA'),
+    ('TR', 'TOUR'),
+    ('R', 'REGLAS'),
+    ('NA', 'NO APLICA'),
+)
+

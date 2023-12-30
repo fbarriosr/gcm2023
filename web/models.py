@@ -47,12 +47,14 @@ class Links(models.Model):
     titulo = models.CharField(max_length=200, blank=False, null=False)
     parrafo = models.TextField()
     img = models.ImageField(upload_to="links/")
+    tipo = models.CharField(max_length=20, choices=tipo_link, default="NA")  
+    url = models.CharField(max_length=500, blank=False, default='#')
     order = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = "Link"
         verbose_name_plural = "Links"
-        ordering = ["order"]
+        ordering = ["tipo","order"]
 
     def __str__(self):
         return self.titulo
@@ -60,7 +62,7 @@ class Links(models.Model):
 
 class LinksAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["titulo"]
-    list_display = ("titulo", "order")
+    list_display = ("titulo",'tipo', "order")
     list_per_page = 10  # No of records per page
 
 

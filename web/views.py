@@ -45,7 +45,12 @@ class home(TemplateView):
         contexto["title"] = "home"
 
         galeria = Galeria.objects.order_by('order')
-        link = Links.objects.order_by('order')
+        federaciones = Links.objects.filter(tipo="F").order_by('order')
+        noticias = Links.objects.filter(tipo="NR").order_by('order')
+        tours = Links.objects.filter(tipo="TR").order_by('order')
+        tiendas = Links.objects.filter(tipo="T").order_by('order')
+        reglas = Links.objects.filter(tipo="R").order_by('order')
+
         # front = Front.objects.filter(titulo="historia")
         
         # print(galeria)
@@ -54,7 +59,11 @@ class home(TemplateView):
             print('hola')
 
         contexto['galeria']  = list(galeria.values('titulo','img', 'order'))
-        contexto['link']  = list(link.values('titulo','img', 'parrafo', 'order'))
+        contexto['federaciones']  = list(federaciones.values('titulo','img', 'url'))
+        contexto['noticias']  = list(noticias.values('titulo','img', 'url'))
+        contexto['tours']  = list(tours.values('titulo','img', 'url'))
+        contexto['tiendas']  = list(tiendas.values('titulo','img', 'url'))
+        contexto['reglas']  = list(reglas.values('titulo','img', 'url'))
         # contexto['front']  = list(front.values('titulo','img', 'contenido', 'order'))
         # #contexto['personal']  = list(front.values('titulo','img', 'tipo', 'subtitulo', 'order'))
 
