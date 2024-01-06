@@ -62,27 +62,12 @@ class home(TemplateView, View):
         contexto["title"] = "home"
 
         galeria = Galeria.objects.order_by('order')
-        federaciones = Links.objects.filter(tipo="F").order_by('order')
-        noticias = Links.objects.filter(tipo="NR").order_by('order')
-        tours = Links.objects.filter(tipo="TR").order_by('order')
-        tiendas = Links.objects.filter(tipo="T").order_by('order')
-        reglas = Links.objects.filter(tipo="R").order_by('order')
-
-        # front = Front.objects.filter(titulo="historia")
+        banner = Links.objects.filter(banner=True).order_by('order')
+        linksMenu = Links.objects.filter(banner=False).order_by('tipo','order')
         
-        # print(galeria)
-
-        if len(galeria)==0:
-            print('hola')
-
         contexto['galeria']  = list(galeria.values('titulo','img', 'order'))
-        contexto['federaciones']  = list(federaciones.values('titulo','img', 'url'))
-        contexto['noticias']  = list(noticias.values('titulo','img', 'url'))
-        contexto['tours']  = list(tours.values('titulo','img', 'url'))
-        contexto['tiendas']  = list(tiendas.values('titulo','img', 'url'))
-        contexto['reglas']  = list(reglas.values('titulo','img', 'url'))
-        # contexto['front']  = list(front.values('titulo','img', 'contenido', 'order'))
-        # #contexto['personal']  = list(front.values('titulo','img', 'tipo', 'subtitulo', 'order'))
+        contexto['banner'] = list(banner)
+        contexto['linksMenu'] = list(linksMenu.values('url', 'titulo'))
 
         return contexto
 
@@ -104,8 +89,9 @@ class historia(TemplateView):
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         contexto['listado_p'] = list(listado_p.values('titulo', 'img', 'order'))
         contexto['listado_pTitulo'] = 'Antiguos Presidentes'
-        # print(contexto['front'] )
-        #contexto['personal']  = list(front.values('titulo','img', 'tipo', 'subtitulo', 'order'))
+        
+        linksMenu = Links.objects.filter(banner=False).order_by('tipo','order')
+        contexto['linksMenu'] = list(linksMenu.values('url', 'titulo'))
 
         return contexto
 
@@ -144,6 +130,9 @@ class comite(TemplateView):
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         contexto['listado'] = list(listado.values('titulo', 'img', 'tipo__tipo', 'order'))
 
+        linksMenu = Links.objects.filter(banner=False).order_by('tipo','order')
+        contexto['linksMenu'] = list(linksMenu.values('url', 'titulo'))
+
         return contexto
 
 # Create your views here.
@@ -166,29 +155,12 @@ class directorio(TemplateView):
         
         contexto['listado_pTitulo'] = 'Presidente Actual'
         contexto['listado_capTitulo'] = 'Capitan Actual'
-        return contexto
 
-# Create your views here.
-class normas_reglas(TemplateView):
-    template_name = "views/normas_reglas.html"
-    # template_name = "root/empty.html"
-
-    def get_context_data(self, **kwargs):
-        contexto = super().get_context_data(**kwargs)
-        contexto["nameWeb"] = nameWeb
-        contexto["title"] = "normas y reglas"
-        front = Front.objects.filter(titulo="normas_reglas")
-        
-        #listado = Listado.objects.filter(tipo='presidentes')
-        listado = NormaRegla.objects.all()
-
-        # contexto['front']  = list(front.values('titulo','img', 'contenido', 'order'))[0]
-        contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
-        contexto['listado'] = list(listado.values('titulo', 'descripcion', 'archivo', 'order'))
-        # print(contexto['front'] )
-        #contexto['personal']  = list(front.values('titulo','img', 'tipo', 'subtitulo', 'order'))
+        linksMenu = Links.objects.filter(banner=False).order_by('tipo','order')
+        contexto['linksMenu'] = list(linksMenu.values('url', 'titulo'))
 
         return contexto
+
 
 class estatutos(TemplateView):
     template_name = "views/estatutos.html"
@@ -200,4 +172,7 @@ class estatutos(TemplateView):
         front = Front.objects.filter(titulo="Estatutos")
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         
+        linksMenu = Links.objects.filter(banner=False).order_by('tipo','order')
+        contexto['linksMenu'] = list(linksMenu.values('url', 'titulo'))
+
         return contexto

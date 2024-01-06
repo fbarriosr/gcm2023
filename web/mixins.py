@@ -10,3 +10,10 @@ class SocioMixin(object):
             return super().dispatch(request, *args, **kwargs)
         else:
             return redirect('login')
+
+class SecretarioMixin(object):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.perfil.perfil == "Secretario" or request.user.perfil.perfil == "Super Usuario" :
+            return super().dispatch(request, *args, **kwargs)
+        else:
+            return redirect('login')

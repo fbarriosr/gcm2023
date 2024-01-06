@@ -1,6 +1,7 @@
 
 $(document).ready(function () {
    $("#patente").parent().hide() 
+   $("#acompanantes").parent().hide()
    deuda = $('#deuda').val()
    if (Number(deuda)== 0){
        $('#recargo').val(0)
@@ -28,6 +29,15 @@ $("#cancela_deuda_socio").change(function() {
       $('#total').val(total)
     }
 });
+
+$("#carro").change(function() {
+    if(this.checked) {
+        $("#acompanantes").parent().show()
+    }else{
+        $("#acompanantes").parent().hide() 
+    }
+});
+
 
 $("#auto").change(function() {
     if(this.checked) {

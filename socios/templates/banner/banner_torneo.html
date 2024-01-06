@@ -1,4 +1,4 @@
-{% load static %} {% static "" as baseUrl %}
+  {% load static %} {% static "" as baseUrl %}
 
 <div class="container evento">
         <!-- Three columns of text below the carousel -->
@@ -6,6 +6,7 @@
           <div class="col-sm-12">
             <br><br>
             {% for value in mainCard %}  
+            <a class="" href="{%url 'torneo' value.slug %}">
             <div class="card mb-3 " >
               <div class="row g-0">
                 <div class="col-md-8">
@@ -32,6 +33,7 @@
                 </div>
               </div>
             </div>
+            </a>
             {% endfor %}
           </div>
         </div>

@@ -50,11 +50,12 @@ class Links(models.Model):
     tipo = models.CharField(max_length=20, choices=tipo_link, default="NA")  
     url = models.CharField(max_length=500, blank=False, default='#')
     order = models.IntegerField(default=0)
+    banner = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "Link"
         verbose_name_plural = "Links"
-        ordering = ["tipo","order"]
+        ordering = ["-banner","tipo","order"]
 
     def __str__(self):
         return self.titulo
@@ -62,7 +63,7 @@ class Links(models.Model):
 
 class LinksAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["titulo"]
-    list_display = ("titulo",'tipo', "order")
+    list_display = ("titulo","banner",'tipo', "order")
     list_per_page = 10  # No of records per page
 
 

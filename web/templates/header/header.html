@@ -43,6 +43,21 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'home'%}#links">LINKS DE INTERES</a>
           </li>
+          <li class="nav-item dropdown">
+            <button
+              class="btn dropdown-toggle nav-link active"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              LINKS
+            </button>
+            <ul class="dropdown-menu">
+              {% for value in linksMenu %}
+              <li><a class="dropdown-item menu"  href="{{ value.url}}" target="_blank">{{ value.titulo | upper}}</a></li>
+              {% endfor %}
+            </ul>
+          </li>
+
           <li class="nav-item">
             <a class="nav-link" href="{% url 'home'%}#contacto">CONTACTO</a>
           </li>

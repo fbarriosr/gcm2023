@@ -14,7 +14,21 @@
 {% block body %}
 
     {% include "banner/banner_torneo_resumen.html" %}
+        {% if secretario == 'Secretario' or secretario == 'Super Usuario' %}
+           <div class="row justify-content-end">
+                <div class="col-lg-2 dropdown">
+                  <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    SECRETARIO
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="../bus">BUS</a></li>
+                    <li><a class="dropdown-item" href="../auto">AUTO</a></li>
+                  </ul>
+                </div>
+            </div> 
+        {%endif%}
 
+    
     {% if solicitudEstado == 'P' %}
         <div class="container marketing" id="links">
         <!-- Three columns of text below the carousel -->
@@ -27,10 +41,9 @@
             </div>
         </div><!-- /.container -->
     {%elif solicitudEstado == 'A'%}
-                <div class="container marketing" id="links">
+        <div class="container marketing" id="links">
             <!-- Three columns of text below the carousel -->
             <div class="row">
-
                 <div class="col-lg-3">
                   <h6 ><a href="/media/{{bases}}"  target="_blank" style="color:#BF9D5E!important;">BASES </a></h6">
                 </div>
@@ -45,8 +58,7 @@
                   <h6 style="color:black!important;"><a href="{% url 'suspender'%}" style="color:#BF9D5E!important;">SUSPENDER</a></h6">
                 </div>
                 {%endif%}
-              </div>
-
+            </div>
             <div class="row">
               <div class="col-lg-12 context">
                 <h1> <img src="{% static '/web/assets/logos/ok.png' %}"> APROBADA</h1>
@@ -61,64 +73,52 @@
                     Saludos cordiales<br><br>
                     EL CAPITÁN
                 </p>
-                <h1> PARTICIPANTES </h1>
-            </div> 
-            <div class="row table-responsive" >
-              <table class="table table-striped ">
-                <thead>
-                  <tr>
-                    <th scope="col">Apellido</th>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Categorìa</th>
-                  </tr>
-                </thead>
-                <tbody>
-                {% for t in listadoAceptados %}
-                  <tr>
-                    <td>{{ t.usuario.apellido_paterno  | upper   }}</td>
-                    <td>{{ t.usuario.primer_nombre | upper  }}</td>
-                    <td>{{ t.usuario.get_categoria_display | upper  }}</td>
-                  <tr>
-                 {% endfor%}
-                </tbody>
-              </table>
-
-             </div>
+                
+               {% if listadoAceptados != ''%}
+                <h1> INSCRITOS </h1>
+                 <iframe id="inlineFrameExample" 
+                    title="Inline Frame Example" 
+                    width="100%" 
+                    height="800" 
+                    src= "../../../media/{{ listadoAceptados }}"> 
+                </iframe> 
+                {% endif %}
+              </div> 
             </div>
         </div><!-- /.container -->
     {%elif solicitudEstado == 'R'%}
         <div class="container marketing" id="links">
         <!-- Three columns of text below the carousel -->
-        <div class="row">
-          <div class="col-lg-12 context">
-            <h1> <img src="{% static '/web/assets/logos/rechazado.png' %}"> RECHAZADA </h1>
-            <p> Estimado<br><br>
+            <div class="row">
+              <div class="col-lg-12 context">
+                <h1> <img src="{% static '/web/assets/logos/rechazado.png' %}"> RECHAZADA </h1>
+                <p> Estimado<br><br>
 
-                Agradecemos enormemente tu interés en participar en nuestro torneo de golf. Lamentablemente, debido: <strong>"{{ solicitud.motivo }}".</strong> Esta vez, tu solicitud no ha sido seleccionada para el torneo.<br><br>
+                    Agradecemos enormemente tu interés en participar en nuestro torneo de golf. Lamentablemente, debido: <strong>"{{ solicitud.motivo }}".</strong> Esta vez, tu solicitud no ha sido seleccionada para el torneo.<br><br>
 
-                Queremos expresar nuestro agradecimiento por tu interés y te animamos a seguir participando en futuros eventos. Valoramos tu dedicación al golf y esperamos contar contigo en próximas oportunidades.<br><br>
+                    Queremos expresar nuestro agradecimiento por tu interés y te animamos a seguir participando en futuros eventos. Valoramos tu dedicación al golf y esperamos contar contigo en próximas oportunidades.<br><br>
 
-                Te deseamos mucho éxito en tus futuras actividades y esperamos verte pronto en otros eventos.<br><br>
+                    Te deseamos mucho éxito en tus futuras actividades y esperamos verte pronto en otros eventos.<br><br>
 
-                Atentamente.<br><br>
-                EL CAPITÁN
-            </p>
-          </div>
-        </div>
+                    Atentamente.<br><br>
+                    EL CAPITÁN
+                </p>
+              </div>
+            </div>
         </div><!-- /.container -->
     {%elif solicitudEstado == 'C'%}
         <div class="container marketing" id="links">
         <!-- Three columns of text below the carousel -->
-        <div class="row">
-          <div class="col-lg-12 context">
-            <h1> <img src="{% static '/web/assets/logos/rechazado.png' %}"> Torneo {{nombreTorneo}} Cerrado </h1>
-            <p> Estimado<br><br>
-                ¡Gracias a todos por el entusiasmo y la participación en nuestro torneo de golf!. Las inscripciones están oficialmente cerradas. Agradecemos a todos los jugadores por su interés y les deseamos lo mejor a aquellos que competirán. Manténganse atentos para futuros eventos y oportunidades de participar.<br><br>¡El golf nunca termina, así que estén listos para la próxima oportunidad!.<br><br>
-                Atentamente.<br><br>
-                EL CAPITÁN
-            </p>
-          </div>
-        </div>
+            <div class="row">
+              <div class="col-lg-12 context">
+                <h1> <img src="{% static '/web/assets/logos/rechazado.png' %}"> Torneo {{nombreTorneo}} Cerrado </h1>
+                <p> Estimado<br><br>
+                    ¡Gracias a todos por el entusiasmo y la participación en nuestro torneo de golf!. Las inscripciones están oficialmente cerradas. Agradecemos a todos los jugadores por su interés y les deseamos lo mejor a aquellos que competirán. Manténganse atentos para futuros eventos y oportunidades de participar.<br><br>¡El golf nunca termina, así que estén listos para la próxima oportunidad!.<br><br>
+                    Atentamente.<br><br>
+                    EL CAPITÁN
+                </p>
+              </div>
+            </div>
         </div><!-- /.container -->
 
     {%endif%}

@@ -31,8 +31,6 @@ from web.mixins import *
 from .forms import *
 from .utils import *
 from .choices import estado_cuota
-from datetime import datetime
-
 
 nameWeb = "CGM"
 
@@ -154,7 +152,7 @@ class torneos(SocioMixin,TemplateView):
         contexto["title"] = "torneo"
         mainCard = Torneo.objects.filter(activo=True).filter(proximo = True)
         torneoCard = Torneo.objects.filter(activo=True).filter(proximo= False).order_by('-fecha')
-        diccionario_fechas = list(Torneo.objects.filter(activo=True).filter(proximo= False).values('fecha'))
+        diccionario_fechas = list(Torneo.objects.filter(activo=True).values('fecha'))
 
         # Obtener los años de cada fecha en una lista
         anios = [elemento['fecha'].year for elemento in diccionario_fechas]
@@ -219,7 +217,8 @@ class torneo(DetailView):
         contexto['torneoInscritos']= dato[0].inscritos
         contexto['torneoCupos']= dato[0].cupos
         solicitud = Solicitud.objects.filter(usuario__email=self.request.user.email).filter(torneo__id=torneoid).order_by('-fecha') #ultima solicitud
-        
+        contexto['secretario']=self.request.user.perfil.perfil
+
         if (len(solicitud)==0 ): # no hay solicitud
             if (torneoEstado==False): #torneo Cerrado
                 contexto['solicitudEstado']= 'C'
@@ -231,7 +230,7 @@ class torneo(DetailView):
                 contexto['bases']= solicitud[0].torneo.bases
                 contexto['premiacion']= solicitud[0].torneo.premiacion
                 contexto['resultados']= solicitud[0].torneo.resultados
-                contexto['listadoAceptados'] = Solicitud.objects.filter(torneo__id=torneoid).filter(estado='A').order_by('usuario__apellido_paterno')
+                contexto['listadoAceptados'] = dato[0].list_inscritos
             elif (solicitud[0].estado == 'S'):
                 if (torneoEstado==False): #torneo Cerrado
                     contexto['solicitudEstado']= 'C'
@@ -279,7 +278,7 @@ class crearSolicitud(CreateView):
         contexto['torneo'] = torneo
         torneoTitulo = str(torneo.titulo).upper().replace('TORNEO','') 
         contexto['titulo'] = 'INSCRIPCIÓN  TORNEO '+ torneoTitulo
-
+        contexto['secretario']=self.request.user.perfil.perfil
      
         return contexto
 

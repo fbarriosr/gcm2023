@@ -63,6 +63,7 @@ class Torneo (models.Model):
     abierto         = models.BooleanField(default=True)
     slug            = AutoSlugField(populate_from=slugify_two_fields,  unique_with=['titulo','fecha'])
     bases           = models.FileField(upload_to="torneos/bases/", max_length=254, blank=True)
+    list_inscritos  = models.FileField(upload_to="torneos/inscritos/", max_length=254, blank=True, verbose_name="Listado de Inscritos")
     resultados      = models.FileField(upload_to="torneos/resultados/", max_length=254, blank=True)
     premiacion      = models.FileField(upload_to="torneos/premiacion/", max_length=254, blank=True)
 
@@ -96,6 +97,7 @@ class Solicitud (models.Model):
     deuda_socio     = models.IntegerField(default=0, null=False, verbose_name="Deuda Socio")
     cancela_deuda_socio  = models.BooleanField(default=False)
     recargo         = models.IntegerField(default=0, null=False, verbose_name="Recargo")
+    recargoInvitado = models.IntegerField(default=0, null=False, verbose_name="Recargo Invitado")
     cuota           = models.IntegerField(default=0, null=False, verbose_name="Cuota de Campeonato")
     monto           = models.IntegerField(default=0, null=False, verbose_name="Monto Pagado")
     estado          = models.CharField(max_length=50,choices= estado_solicitud, default= 'P', verbose_name="Estado")
