@@ -126,6 +126,7 @@ class CuotaAnual(models.Model):
     id              = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     año             = models.PositiveIntegerField(verbose_name="Año cuotas")
     monto_cuota     = (models.IntegerField())  # monto fijo anual aplicable a cada cuota del mes de dicho año.
+    periodo         = models.CharField(max_length=50, verbose_name="Periodo") # ejemplo 2024-2025
     order           = models.IntegerField(default=0)
 
     class Meta:
@@ -138,7 +139,7 @@ class CuotaAnual(models.Model):
 
 class CuotasAnualesAdmin(ImportExportModelAdmin, SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["año"]
-    list_display = ("año", "monto_cuota", "order")
+    list_display = ("año", "monto_cuota", "periodo", "order")
     list_per_page = 10
 
 
@@ -146,6 +147,7 @@ class CuotasAnualesAdmin(ImportExportModelAdmin, SearchAutoCompleteAdmin, admin.
 class Cuota(models.Model):
     id                      = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     mes                     = models.IntegerField()
+    numero_cuota            = models.IntegerField() 
     año                     = models.ForeignKey(CuotaAnual, blank=True, null=True, on_delete=models.CASCADE)  # monto fijo anual aplicable a cada cuota del mes de dicho año.
     usuario                 = models.ForeignKey(Usuario, blank=False, null=False, on_delete=models.CASCADE, verbose_name="socio club")
     monto_descuento         = models.PositiveIntegerField(blank=True, null=True)  # descuento que se podria aplicar a la cuota
@@ -158,7 +160,7 @@ class Cuota(models.Model):
     class Meta:
         verbose_name = "Cuota"
         verbose_name_plural = "Cuotas"
-        ordering = ["año",'mes']
+        ordering = ["año",'order']
 
     def nombre_mes(self):
         return timezone.datetime(self.año.año, self.mes, 1).strftime("%B")
@@ -173,8 +175,7 @@ class Cuota(models.Model):
 
 
 class CuotasAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
-    search_fields = ["mes"]
-    list_display = ('año', 'mes', 'order','usuario', 'estado_pago')
+    list_display = ('año', 'order', 'numero_cuota', 'mes','usuario', 'estado_pago')
     autocomplete_fields = ['usuario']
     list_filter = ('año','usuario')
-    list_per_page = 10
+    list_per_page = 12

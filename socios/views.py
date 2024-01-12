@@ -31,6 +31,7 @@ from web.mixins import *
 from .forms import *
 from .utils import *
 from .choices import estado_cuota
+import json
 
 nameWeb = "CGM"
 
@@ -423,7 +424,7 @@ class cuotas_admin(TemplateView, View):
 
         cuotas = Cuota.objects.all().select_related('usuario', 'año')
         front = Front.objects.filter(titulo="cuotas")
-        
+
         # Obtener los años de las cuotas del socio para el filtro por año en cuotas.html
         años_cuotas_socio = Cuota.objects.values('año__año').distinct().order_by('año__año')
         años_cuotas_socio = sorted([año['año__año'] for año in años_cuotas_socio], reverse=True)
@@ -435,12 +436,12 @@ class cuotas_admin(TemplateView, View):
                 nuevo_estado = estado_dict[cuota.usuario.estado]
                 cuota.usuario.estado_txt= nuevo_estado
                 cuota.save()
-                #print(f'estado cambiado a: {nuevo_estado}') 
+                #print(f'estado cambiado a: {nuevo_estado}')
 
         usuarios_con_cuotas = Usuario.objects.filter(cuota__isnull=False).distinct()
         listado_usuarios = usuarios_con_cuotas.values_list('email', flat=True).order_by('-email')
 
-        print(f'listado usuarios: {listado_usuarios}') 
+        print(f'listado usuarios: {listado_usuarios}')
 
         contexto['cuotas'] = cuotas
         contexto['front'] = list(front.values('titulo','img', 'contenido', 'order','file'))
@@ -475,15 +476,15 @@ class cuotas_admin_mod(TemplateView, View):
 
     def post(self, request, *args, **kwargs):
         filtro_cuota    = request.POST.get('filtro', '') # mantiene en la plantilla el filtro del tipo de cuota mostrada
-        id_cuota_modificar = request.POST.get('id_cuota_mod', None) 
+        id_cuota_modificar = request.POST.get('id_cuota_mod', None)
         valor_cuota_modificar           = request.POST.get('value', None)
-        print(f'filtro cuota: {filtro_cuota}') 
-        print(f'id cuota a modificar: {id_cuota_modificar}')   
-        print(f'valor de la cuota a modificar: {valor_cuota_modificar}')  
+        print(f'filtro cuota: {filtro_cuota}')
+        print(f'id cuota a modificar: {id_cuota_modificar}')
+        print(f'valor de la cuota a modificar: {valor_cuota_modificar}')
 
         if len(filtro_cuota)> 1:
-            filtro_cuota = dict((v, k) for k,v in estado_cuota).get(filtro_cuota, None)  
-            print(f'filtro cuota en formato texto, se cambió a: {filtro_cuota}')  
+            filtro_cuota = dict((v, k) for k,v in estado_cuota).get(filtro_cuota, None)
+            print(f'filtro cuota en formato texto, se cambió a: {filtro_cuota}')
         else:
             print(f'filtro cuota en formato letra, no se hace nada: {filtro_cuota}')
 
@@ -492,19 +493,19 @@ class cuotas_admin_mod(TemplateView, View):
             # print('se ejecutó la actualizacion de la cuota')
             cuota_seleccionada = Cuota.objects.get(id=id_cuota_modificar)
             cuota_seleccionada.estado_pago = valor_cuota_modificar
-            cuota_seleccionada.save()            
-            
+            cuota_seleccionada.save()
+
         contexto = self.get_context_data(filtro_cuota=filtro_cuota)
 
-        return self.render_to_response(contexto)   
-        
+        return self.render_to_response(contexto)
+
     def get_context_data(self, **kwargs):
         print('se ejecuto la vista cuotas_admin_mod')
         contexto =  super().get_context_data(**kwargs)
-        filtro_cuota = kwargs.get('filtro_cuota','')         
+        filtro_cuota = kwargs.get('filtro_cuota','')
         contexto['nameWeb'] = nameWeb
         contexto['title'] = 'cuotas_admin_mod'
-        
+
 
         front = Front.objects.filter(titulo="cuotas")
         cuotas = Cuota.objects.filter(estado_pago=filtro_cuota).select_related('usuario', 'año')
@@ -517,7 +518,7 @@ class cuotas_admin_mod(TemplateView, View):
         # Incluir el valor del estado del usuario/socio, reemplazando la letra por el nombre
         for cuota in cuotas:
             if cuota.usuario.estado in estado_dict:
-                cuota.usuario.estado_txt = estado_dict[cuota.usuario.estado]   
+                cuota.usuario.estado_txt = estado_dict[cuota.usuario.estado]
 
         # Obtener una lista ordenada de los socios con cuotas asignadas
         usuarios_con_cuotas = Usuario.objects.filter(cuota__isnull=False).distinct()
@@ -527,7 +528,7 @@ class cuotas_admin_mod(TemplateView, View):
         contexto['front'] = list(front.values('titulo','img', 'contenido', 'order','file'))
         contexto['años_cuotas_socio'] = años_cuotas_socio
         contexto['listado_usuarios'] = listado_usuarios
-        # print(f'valor filtro_cuota: {filtro_cuota}') 
+        # print(f'valor filtro_cuota: {filtro_cuota}')
         contexto['estado_cuota'] = dict(estado_cuota).get(filtro_cuota, None)
         return contexto
 
@@ -539,22 +540,13 @@ class cuotas(TemplateView, View):
     año_filtro = 2000
     is_contact = False
 
-    # Para cambiar el estado de variables que se modifican desde otras funciones
-    @classmethod
-    def set_año_filtro(cls, año):
-        cls.año_filtro = año
-
-    @classmethod
-    def get_año_filtro(cls):
-        return cls.año_filtro
-    
     @classmethod
     def set_contact(cls, contact):
         cls.is_contact = contact
 
-    @classmethod 
+    @classmethod
     def get_contact(cls):
-        return cls.is_contact 
+        return cls.is_contact
 
     def get(self, request, *args, **kwargs):
         # Obtener los años de las cuotas del socio para el filtro por año en cuotas.html
@@ -567,15 +559,10 @@ class cuotas(TemplateView, View):
         for campo in usuario._meta.fields:
             nombre_campo = campo.name
             valor_campo = getattr(usuario, nombre_campo)
-            #print(f"{nombre_campo}: {valor_campo}") 
+            #print(f"{nombre_campo}: {valor_campo}")
 
         self.rut = usuario.rut
 
-        # Obtén el año de la clase o usa el valor predeterminado
-        self.año_filtro = self.get_año_filtro()
-        if self.is_contact == False:
-            self.año_filtro = años_cuotas_socio[0] 
-            
         # Restablecer is_contact después de su uso
         self.is_contact = False
         self.set_contact(self.is_contact)
@@ -589,7 +576,7 @@ class cuotas(TemplateView, View):
 
         # Añadir el campo 'mes_datetime' a cada instancia de Cuota
         for cuota in cuotas:
-            cuota.mes_cuota = mes_cuota[cuota.mes - 1]   
+            cuota.mes_cuota = mes_cuota[cuota.mes - 1]
 
         # Crear el contexto de la vista con los datos a renderizar
         contexto = {
@@ -606,49 +593,73 @@ class cuotas(TemplateView, View):
             item["img"] = f"{item['img']}"
 
         return self.render_to_response(contexto)
-    
-    def post(self, request, *args, **kwargs): 
+
+    def post(self, request, *args, **kwargs):
         # Verificar que se haya ejecutado el metodo POST antes de procesar
         if request.method == 'POST':
+            estado_revision = next((code for code, value in estado_cuota if value == 'En Revision'), None)
 
             # Establecer las variables necesarias
-            email = request.POST.get('email')
-            mes = int(request.POST.get('mes'))
-            año = int(request.POST.get('año_seleccionado'))
-            usuario = Usuario.objects.filter(email=email).first()
-            año_contact = CuotaAnual.objects.filter(año=año).first()
-            
-            # Verificar que coincida el usuario
-            if usuario is None:
-                return f'Usuario no encontrado'
+            data_str = request.POST.get('data', '[]')
+            cuotasSeleccionadas = json.loads(data_str)
+            if cuotasSeleccionadas:
+                print('cuotas seleccionadas:', len(cuotasSeleccionadas))
+                # for cuota in cuotasSeleccionadas:
+                #     print('id_cuota:', cuota.get('id_cuota', -1))
+                #     print('email:', cuota.get('email', 'nico@gmail'))
+                #     print('mes:', cuota.get('mes', 3))
+                #     print('año:', cuota.get('año', 2000))
 
-            # Verificar que exista el año de la cuota
-            if año_contact is None:
-                return f'Año invalido o aún no se ha registrado el año actual'
-            
-            # Obtén el código de estado correspondiente al valor 'En Revision'
-            estado_revision = next((code for code, value in estado_cuota if value == 'En Revision'), None) 
-            filas_afectadas = Cuota.objects.filter(mes=mes, usuario=usuario, año__año=año).update(estado_pago= estado_revision)
-            
-            # Verificar que se haya actualizado la cuota antes de enviar el correo
-            if filas_afectadas > 0: 
+                filas_afectadas = 0
+                total_pagar = 0
+                for cuota in cuotasSeleccionadas:
+                    filas_afectadas += Cuota.objects.filter(id=cuota.get('id_cuota')).update(estado_pago=estado_revision)
+                    total_pagar += int(cuota.get('monto_cuota'))
+
+                if filas_afectadas > 0:
+                    print(f'se afectaron {filas_afectadas} filas') 
+                
+                if filas_afectadas >= 1:
+                    # Al menos un registro afectado, obtenemos información del primer elemento
+                    tipo = 'pago_cuota' if filas_afectadas == 1 else 'pago_cuotas'
+                    email = cuotasSeleccionadas[0]['email']
+                    mes = int(cuotasSeleccionadas[0]['mes'])
+                    año = int(cuotasSeleccionadas[0]['año'])
+
+                # print(f'enviando datos de cuotas a contact')
+                # print(f'tipo:{tipo}, email:{email}, año_contact:{año}, mes:{mes}')
+                #resultado = contact(tipo, email, año_contact, mes)
+                resultado = contact(tipo, email=email, total_pagar=total_pagar, mes=mes, año=año)
+            else:
+                email = request.POST.get('email', 'anonimo@gmail.com')
+                mes = int(request.POST.get('mes', 1))
+                año = int(request.POST.get('año_seleccionado', 1986))
+                usuario = Usuario.objects.filter(email=email).first()
+               
+                if usuario is None:
+                    return f'Usuario no encontrado'
+                filas_afectadas = Cuota.objects.filter(mes=mes, usuario=usuario, año__año=año).update(estado_pago= estado_revision)
+                # Verificar que se haya actualizado la cuota antes de enviar el correo
+                if filas_afectadas > 0:
+                    print(f'se afectaron {filas_afectadas} filas')
+
                 # Invocar a la funcion Contact para que envie el correo de aviso
                 tipo = 'pago_cuotas'
-                print(f'enviando datos de cuotas a contact')
-                print(f'tipo:{tipo}, email:{email}, año_contact:{año_contact}, mes:{mes}')
+                # print(f'enviando datos de cuotas a contact')
+                # print(f'tipo:{tipo}, email:{email}, año_contact:{año}, mes:{mes}')
                 #resultado = contact(tipo, email, año_contact, mes)
-                resultado = contact(tipo, email=email, año=año_contact, mes=mes) 
-            else:
-                resultado = 'No se realizaron actualizaciones. Puede que no haya coincidencia con los criterios de filtro'
-  
+                resultado = contact(tipo, email=email, año=año, mes=mes)
+        else:
+            resultado = 'No se realizaron actualizaciones. Puede que no haya coincidencia con los criterios de filtro'
+            print('no se afectaron filas')
+
             # Establecer un mensaje de aviso al volver a la plantilla html
             messages.success(request, resultado)
 
-            # Configurar el año en la clase Cuotas antes de redirigir
-            cuotas.set_año_filtro(año)
             # Avisamos que se ejecutó la función Contact para que no se pierda el año seleccionado al volver a la plantilla
-            cuotas.set_contact(True)
+            # cuotas.set_contact(True)
 
-            return redirect('cuotas')
+            #return redirect('cuotas')
 
-        return HttpResponse(f'algo anda mal')
+        #return HttpResponse(f'algo anda mal')
+        return redirect('cuotas')

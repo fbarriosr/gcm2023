@@ -26,9 +26,13 @@ def generar_cuotas_grupal(año, valor):
     usuarios = Usuario.objects.all()
     for usuario in usuarios:
         anual, created = CuotaAnual.objects.get_or_create(año=año, monto_cuota=valor)
-        for mes in range(1,13):
-            cuota, created = Cuota.objects.get_or_create(usuario=usuario, año=anual, mes=mes)
+        for num_cuota in range(1,13):
+            mes_cuota = num_cuota + 2 if num_cuota <= 10 else num_cuota - 10
+            cuota, created = Cuota.objects.get_or_create(usuario=usuario, año=anual, numero_cuota=num_cuota, mes=mes_cuota, order=num_cuota)
             cuota.save()
+        # for mes in range(1,13):
+        #     cuota, created = Cuota.objects.get_or_create(usuario=usuario, año=anual, mes=mes)
+        #     cuota.save()
     return 'GenerarCuotasAnual ejecutado con exito'
 
 
@@ -110,17 +114,21 @@ def actualiza_cuota(email, año, mes):
     
 
 # Función para realizar envios de correo
-def contact(tipo, nombre=None, asunto=None, mensaje=None, email=None, año=None, mes=None):
-  
-    if tipo == 'pago_cuotas':
+def contact(tipo, nombre=None, asunto=None, mensaje=None, email=None, año=None, mes=None, total_pagar=None):
+
+    if tipo == 'pago_cuota' or tipo == 'pago_cuotas':
         correo = email
         mes = mes
-        año = año
-        print(f'pago cuotas. correo:{correo}, mes:{mes}, año:{año}')   
+        año = año 
         mes_txt = mes_num_texto[mes]
+        total_pagar = total_pagar
 
         subject ='Aviso solicitud pago de cuota'
-        message = f'El usuario {correo} ha enviado una solicitud de pago para la cuota del mes de {mes_txt} del {año}'
+        if tipo == 'pago_cuota':
+            message = f'El usuario {correo} ha enviado una solicitud de pago para la cuota del mes de {mes_txt} del {año}'
+        else:
+            message = f'El usuario {correo} ha enviado una solicitud de pago de cuotas por un monto total de {total_pagar}.\n\n'
+            message += 'Para más detalle, diríjase a su menú de cuotas.'
         mensaje_ok = f' Se actualizó el estado de la cuota existente para el usuario {email}, año {año}, mes {mes_txt} a "En Revisión"'
    
         template = render_to_string('views/email_template.html', {
