@@ -72,6 +72,7 @@ class bus(SecretarioMixin, TemplateView):
         contexto["nameWeb"] = nameWeb
 
         contexto["title"] = "BUS"
+        contexto['rol'] = self.request.user.perfil.perfil
         front = Front.objects.filter(titulo="bus")
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         torneoid = self.request.COOKIES.get('torneo') 
@@ -90,6 +91,7 @@ class auto(SecretarioMixin, TemplateView):
 
         contexto["title"] = "AUTO"
         front = Front.objects.filter(titulo="auto")
+        contexto['rol'] = self.request.user.perfil.perfil
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         torneoid = self.request.COOKIES.get('torneo') 
         listado = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(auto= True).order_by('usuario__apellido_paterno')
