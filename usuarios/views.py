@@ -31,7 +31,7 @@ nameWeb = "CGM"
 # Create your views here.
 class Login(FormView):
     
-    template_name = 'views/login.html'
+    template_name = 'usuarios/views/login.html'
     form_class = FormularioLogin
     success_url = reverse_lazy('torneos')
     @method_decorator(csrf_protect)

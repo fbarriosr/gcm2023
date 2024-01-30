@@ -75,10 +75,94 @@ def borrar_cuotas_socio(request):
 
 
 
+class PasswordUsuario(UpdateView):
+    model = Usuario
+    form_class = FormularioUsuarioPassword
+    template_name = 'socio/views/password.html'
+
+    def get_context_data(self,**kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto['title'] =  "Usuario"
+        contexto['btnAction'] = 'Modificar'
+        contexto['titulo'] = 'Cambiar Password'
+        contexto['name'] = self.request.user.primer_nombre +' ' +self.request.user.apellido_paterno + ' | ' + self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil.perfil
+        return contexto
+        
+    def post(self,request,*args,**kwargs):     # comunicacion entre en form y python para notificaciones
+        if request.is_ajax():
+            form = self.form_class(request.POST,instance = self.get_object())
+            if form.is_valid():
+                form.save()
+                mensaje = 'La contraseña se ha actualizado' 
+                error = 'No hay error!'
+                response = JsonResponse({'mensaje': mensaje, 'error': error})
+                response.status_code = 201
+                return response
+            else:
+                mensaje = f'{self.model.__name__} no se ha podido actualizar!'
+                error = form.errors
+                response = JsonResponse({'mensaje': mensaje, 'error': error})
+                response.status_code = 400
+                return response
+        else:
+            return redirect('home')
+            
+    def get_object(self, **kwargs):
+        current_user =  Usuario.objects.get(rut=self.request.user.rut)
+        return current_user
+ 
+
+class perfil(UpdateView):
+
+    model = Usuario
+    form_class = FormularioPerfilUpdate
+    template_name = "socio/views/perfil.html"
+    
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto["nameWeb"] = nameWeb
+
+        contexto["title"] = "perfil"
+        contexto["titulo"] = "perfil"
+        contexto['name'] = self.request.user.primer_nombre +' ' +self.request.user.apellido_paterno + ' | ' + self.request.user.perfil.perfil
+
+        contexto['btnAction']   = 'ACTUALIZAR'
+        contexto['urlForm']     = self.request.path
+
+        contexto['rol'] = self.request.user.perfil.perfil
+
+        contexto['user']  = self.get_object()
+        return contexto
+
+    def get_object(self, **kwargs):
+        
+        current_user =  Usuario.objects.get(rut=self.request.user.rut)
+        return current_user
+    def post(self,request,*args,**kwargs):     # comunicacion entre en form y python para notificaciones
+        if request.is_ajax():
+            form = self.form_class(request.POST,instance = self.get_object())
+            if form.is_valid():
+                form.save()
+                mensaje = ' Actualizado correctamente!'
+                error = 'No hay error!'
+                response = JsonResponse({'mensaje': mensaje, 'error': error})
+                response.status_code = 201
+                return response
+            else:
+                mensaje = f'{self.model.__name__} no se ha podido actualizar!'
+                error = form.errors
+                response = JsonResponse({'mensaje': mensaje, 'error': error})
+                response.status_code = 400
+                return response
+        else:
+            return redirect('home')
+
+
 # Create your views here.
 class noticia(DetailView):
     model = Noticia
-    template_name = "views/noticia.html"
+    template_name = "socio/views/noticia.html"
    
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
@@ -103,6 +187,8 @@ class noticia(DetailView):
         contexto['imgs']= lista
         contexto['front']= [{'img': dato['img']}]
 
+        contexto['rol'] = self.request.user.perfil.perfil
+
         return contexto
 
     def get_object(self, **kwargs):
@@ -113,7 +199,7 @@ class noticia(DetailView):
 # Create your views here.
 class noticias(TemplateView):
     model = Noticia
-    template_name = "views/noticias.html"
+    template_name = "socio/views/noticias.html"
     
     def get_queryset(self):
         
@@ -142,10 +228,35 @@ class noticias(TemplateView):
             else:
                 contexto['down'] = False 
 
+        contexto['rol'] = self.request.user.perfil.perfil
+
         return contexto
 
+class eliminarNoticia(DeleteView):
+    model = Noticia
+    template_name = 'socio/views/eliminarNoticia.html'
+
+    def delete(self,request,*args,**kwargs):
+        if request.is_ajax():
+            citofono = self.get_object()
+            citofono.delete()
+            mensaje = f'{self.model.__name__} eliminado correctamente!'
+            error = 'No hay error!'
+            response = JsonResponse({'mensaje': mensaje, 'error': error})
+            response.status_code = 201
+            return response
+        else:
+            return redirect('listar_citofonos')
+    def get_object(self, **kwargs):
+        citofonoID= self.request.COOKIES.get('citofonoID') 
+        print('eliminarCitofonoID',citofonoID)
+        current_user = self.model.objects.get(pk=citofonoID)
+        #current_user = self.request.user
+        return current_user
+
+
 class torneos(SocioMixin,TemplateView):
-    template_name = "views/torneos.html"
+    template_name = "socio/views/torneos.html"
 
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
@@ -169,13 +280,14 @@ class torneos(SocioMixin,TemplateView):
         contexto['mainCard'] = mainCard
         contexto['torneoCard'] = torneoCard
         
+        contexto['rol'] = self.request.user.perfil.perfil
 
         return contexto
 
 # Create your views here.
 class torneo(DetailView):
     model = Torneo
-    template_name = "views/torneo.html"
+    template_name = "socio/views/torneo.html"
     
     def get(self, *args, **kwargs):
         dato =  self.get_object()
@@ -219,6 +331,7 @@ class torneo(DetailView):
         contexto['torneoCupos']= dato[0].cupos
         solicitud = Solicitud.objects.filter(usuario__email=self.request.user.email).filter(torneo__id=torneoid).order_by('-fecha') #ultima solicitud
         contexto['secretario']=self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil.perfil
 
         if (len(solicitud)==0 ): # no hay solicitud
             if (torneoEstado==False): #torneo Cerrado
@@ -250,7 +363,7 @@ class torneo(DetailView):
 class crearSolicitud(CreateView):
     model = Solicitud
     form_class = FormularioSolicitudView
-    template_name = "views/solicitud.html"
+    template_name = "socio/views/solicitud.html"
 
     def get_form(self, form_class=None):
 
@@ -263,8 +376,6 @@ class crearSolicitud(CreateView):
         form.fields['deuda_socio'].initial = deuda_socio
         form.fields['recargo'].initial = recargo
         form.fields['cuota'].initial = cuota
-
-
 
         return form
     
@@ -280,6 +391,7 @@ class crearSolicitud(CreateView):
         torneoTitulo = str(torneo.titulo).upper().replace('TORNEO','') 
         contexto['titulo'] = 'INSCRIPCIÓN  TORNEO '+ torneoTitulo
         contexto['secretario']=self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil.perfil
      
         return contexto
 
@@ -331,7 +443,7 @@ class crearSolicitud(CreateView):
 class crearSolicitudSuspender(CreateView):
     model = Solicitud
     form_class = FormularioSolicitudSuspenderCreate
-    template_name = "views/suspender.html"
+    template_name = "socio/views/suspender.html"
 
     def get_context_data(self,**kwargs):
         contexto = super().get_context_data(**kwargs)
@@ -344,6 +456,7 @@ class crearSolicitudSuspender(CreateView):
         contexto['torneo'] = torneo
         torneoTitulo = str(torneo.titulo).upper().replace('TORNEO','') 
         contexto['titulo'] = 'SOLICITUD DE SUSPENCION PARTICIPACIÓN '+ torneoTitulo
+        contexto['rol'] = self.request.user.perfil.perfil
      
         return contexto
 
@@ -400,7 +513,7 @@ class crearSolicitudSuspender(CreateView):
             return redirect('home')
 
 class ranking(TemplateView):
-    template_name = "views/ranking.html"
+    template_name = "socio/views/ranking.html"
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
@@ -408,6 +521,7 @@ class ranking(TemplateView):
         contexto["title"] = "ranking"
         front = Front.objects.filter(titulo="ranking")
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
+        contexto['rol'] = self.request.user.perfil.perfil
         
         return contexto
 
@@ -421,6 +535,7 @@ class cuotas_admin(TemplateView, View):
         contexto['nameWeb'] = nameWeb
         contexto['title'] = 'cuotas_admin'
         contexto['mensaje'] = 'holi'
+        contexto['rol'] = self.request.user.perfil.perfil
 
         cuotas = Cuota.objects.all().select_related('usuario', 'año')
         front = Front.objects.filter(titulo="cuotas")
@@ -451,7 +566,7 @@ class cuotas_admin(TemplateView, View):
 
 
 class cuotas_admin2(TemplateView, View):
-    template_name = "views/cuotas_admin2.html"
+    template_name = "socio/views/cuotas_admin2.html"
 
     def get_context_data(self, **kwargs):
         año_filtro = 2022
@@ -459,6 +574,7 @@ class cuotas_admin2(TemplateView, View):
         contexto['nameWeb'] = nameWeb
         contexto['title']   = 'cuotas_admin'
         front = Front.objects.filter(titulo="cuotas")
+        contexto['rol'] = self.request.user.perfil.perfil
 
         pendientes  = Cuota.objects.filter(estado_pago='P', año__año=año_filtro).count()
         aprobadas   = Cuota.objects.filter(estado_pago='E', año__año=año_filtro).count()
@@ -472,7 +588,7 @@ class cuotas_admin2(TemplateView, View):
         return contexto
 
 class cuotas_admin_mod(TemplateView, View):
-    template_name = "views/cuotas_admin_mod.html"
+    template_name = "socio/views/cuotas_admin_mod.html"
 
     def post(self, request, *args, **kwargs):
         filtro_cuota    = request.POST.get('filtro', '') # mantiene en la plantilla el filtro del tipo de cuota mostrada
@@ -505,6 +621,7 @@ class cuotas_admin_mod(TemplateView, View):
         filtro_cuota = kwargs.get('filtro_cuota','')
         contexto['nameWeb'] = nameWeb
         contexto['title'] = 'cuotas_admin_mod'
+        contexto['rol'] = self.request.user.perfil.perfil
 
 
         front = Front.objects.filter(titulo="cuotas")
@@ -535,7 +652,7 @@ class cuotas_admin_mod(TemplateView, View):
 #@login_required Si se usa con request, sin heredar de vistas
 @method_decorator(login_required, name='dispatch')
 class cuotas(TemplateView, View):
-    template_name = "views/cuotas.html"
+    template_name = "socio/views/cuotas.html"
     rut = None
     año_filtro = 2000
     is_contact = False
@@ -586,6 +703,7 @@ class cuotas(TemplateView, View):
             "cuotas": cuotas,
             "años_cuotas_socio": años_cuotas_socio,
             "año_filtro": self.año_filtro,
+            "rol":self.request.user.perfil.perfil
         }
 
         # Agregar barra inicial a la ruta de la imagen en el contexto

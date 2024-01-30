@@ -29,8 +29,41 @@ from datetime import datetime
 from web.models import *
 from socios.models import *
 from web.mixins import *
+import csv
+from django.core.paginator import Paginator
+
 
 nameWeb = "CGM"
+
+def export_csv_bus(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="listado_bus.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre'])
+
+    torneoid = request.COOKIES.get('torneo') 
+    sol = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(busCGM= True).order_by('usuario__apellido_paterno')
+       
+    for obj in sol:
+        writer.writerow([obj.usuario.apellido_paterno, obj.usuario.apellido_materno , obj.usuario.primer_nombre , obj.usuario.segundo_nombre ])
+
+    return response
+
+def export_csv_auto(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="listado_auto.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre', 'Patente'])
+
+    torneoid = request.COOKIES.get('torneo') 
+    sol = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(auto= True).order_by('usuario__apellido_paterno')
+       
+    for obj in sol:
+        writer.writerow([obj.usuario.apellido_paterno, obj.usuario.apellido_materno , obj.usuario.primer_nombre , obj.usuario.segundo_nombre , obj.patente ])
+
+    return response
 
 class bus(SecretarioMixin, TemplateView):
     template_name = "secretario/views/bus.html"
@@ -42,7 +75,11 @@ class bus(SecretarioMixin, TemplateView):
         front = Front.objects.filter(titulo="bus")
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         torneoid = self.request.COOKIES.get('torneo') 
-        contexto['listado'] = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(busCGM= True).order_by('usuario__apellido_paterno')
+        listado = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(busCGM= True).order_by('usuario__apellido_paterno')
+        paginator = Paginator(listado,1)
+        page = self.request.GET.get('page')
+        contexto['datos']= paginator.get_page(page)
+
         return contexto
 
 class auto(SecretarioMixin, TemplateView):
@@ -55,5 +92,8 @@ class auto(SecretarioMixin, TemplateView):
         front = Front.objects.filter(titulo="auto")
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         torneoid = self.request.COOKIES.get('torneo') 
-        contexto['listado'] = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(auto= True).order_by('usuario__apellido_paterno')
+        listado = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(auto= True).order_by('usuario__apellido_paterno')
+        paginator = Paginator(listado,1)
+        page = self.request.GET.get('page')
+        contexto['datos']= paginator.get_page(page)
         return contexto

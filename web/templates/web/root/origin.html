@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+{% load static %} {% static "" as baseUrl %}
+
+<html lang="en" data-bs-theme="auto">
+  <head>
+    
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta name="author" content="Fran" />
+    <meta name="generator" content="chile" />
+    <title>
+      {% block title %}
+      
+      {% endblock %}
+    </title>
+    
+    {% block fontIcon %} 
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/web/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/web/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/web/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    {% endblock %}
+
+    <link href="{% static 'web/css/bootstrap.min.css' %}" rel="stylesheet" />
+
+    <link href="{% static 'web/css/style.css' %}" rel="stylesheet" />
+
+    <!-- Custom styles for this template -->
+    <!-- <link href="./css/carousel.css" rel="stylesheet"> -->
+    <link href="{% static 'web/css/carousel.css' %}" rel="stylesheet" />
+    <link href="{% static 'web/css/sticky-footer-navbar.css' %}" rel="stylesheet" />
+    <link href="{% static 'web/css/links.css' %}"rel="stylesheet" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;900&display=swap"
+      rel="stylesheet"/>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    {% block appJsCss %} 
+    
+    {% endblock %}
+
+  </head>
+  <body class={{ loginClass }}>
+
+    {% block modal%}
+    
+    {% endblock %}
+
+    {% block header %} 
+
+      {% include "web/header/header.html" %}
+
+    {% endblock %}
+    
+    <main>
+      
+      {% block body %} 
+      
+      {% endblock %}
+      
+      <!-- FOOTER -->
+      {% block footer %}
+
+        {% include "web/footer/footer.html" %}
+        
+      {% endblock %}
+    </main>
+    <script src="{% static 'web/js/bootstrap.bundle.min.js' %}"></script>
+    {% block extraJs %} 
+    
+    {% endblock %}
+  </body>
+</html>

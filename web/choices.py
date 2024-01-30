@@ -56,3 +56,7 @@ tipo_link = (
     ('NA', 'NO APLICA'),
 )
 
+grupo = (
+    ('M', 'Miembros'),
+    ('D', 'Directores'),
+)

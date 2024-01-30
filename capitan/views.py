@@ -12,6 +12,7 @@ from django.views.generic import (
 from .models import *
 from web.models import *
 from socios.models import *
+from usuarios.models import *
 from django.core.paginator import Paginator
 
 from django.utils.decorators import method_decorator
@@ -31,37 +32,71 @@ from datetime import datetime
 #from .forms import *
 
 from datetime import datetime
+import csv
+import calendar
 
 
 nameWeb = "CGM"
 
-class torneos(TemplateView):
-    template_name = "views/torneosCapitan.html"
 
+def export_csv_cumpleanos(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="listado_cumpleanos.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre', 'Fecha', 'Grado', 
+        'Institucion', 'Fundador','Estado', 'Perfil','Telefono'])
+
+    sol = Usuario.objects.order_by('fecha_nacimiento__month', 'fecha_nacimiento__day')
+       
+    for obj in sol:
+        writer.writerow([ obj.apellido_paterno.capitalize(), obj.apellido_materno.capitalize() , obj.primer_nombre.capitalize() , obj.segundo_nombre.capitalize() , 
+            obj.fecha_nacimiento, obj.get_grado_display(), obj.get_institucion_display(), obj.fundador , obj.get_estado_display(), obj.perfil , obj.telefono ])
+
+    return response
+
+
+def export_csv_cumpleanos_mes(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="listado_cumpleanos.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre', 'Fecha', 'Grado', 
+        'Institucion', 'Fundador','Estado', 'Perfil','Telefono'])
+
+    fecha = datetime.now()
+    month = fecha.month
+
+    sol = Usuario.objects.filter( 
+                      fecha_nacimiento__month=month).order_by('fecha_nacimiento__day')
+       
+    for obj in sol:
+        writer.writerow([ obj.apellido_paterno.capitalize(), obj.apellido_materno.capitalize() , obj.primer_nombre.capitalize() , obj.segundo_nombre.capitalize() , 
+            obj.fecha_nacimiento, obj.get_grado_display(), obj.get_institucion_display(), obj.fundador , obj.get_estado_display(), obj.perfil , obj.telefono ])
+
+    return response
+
+
+class cumpleanos(TemplateView):
+    template_name = "capitan/views/cumpleanos.html"
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-        contexto["title"] = "torneo"
-        mainCard = Torneo.objects.filter(proximo = True)
-        torneoCard = Torneo.objects.filter(proximo= False).order_by('-fecha')
-        diccionario_fechas = list(Torneo.objects.filter(proximo= False).values('fecha'))
 
-        # Obtener los años de cada fecha en una lista
-        anios = [elemento['fecha'].year for elemento in diccionario_fechas]
+        contexto["title"] = "CUMPLEAÑOS"
+        front = Front.objects.filter(titulo="Cumpleaños")
+        contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
+        contexto['rol'] = self.request.user.perfil.perfil
+        fecha = datetime.now()
+        month = fecha.month
+        contexto['mes']= calendar.month_name[month]
 
-        # Encontrar el año mínimo y máximo en la lista de años
-        anio_minimo = min(anios)
-        anio_maximo = max(anios)
-
-        if anio_maximo != anio_minimo:
-            contexto['year'] = str(anio_minimo) +'-'+ str(anio_maximo)
-        else:
-        	contexto['year'] = str(anio_minimo)
-        contexto['mainCard'] = mainCard
-        contexto['torneoCard'] = torneoCard
+        listado = Usuario.objects.filter( 
+                      fecha_nacimiento__month=month).order_by('fecha_nacimiento__day')
         
-
+        paginator = Paginator(listado,1)
+        page = self.request.GET.get('page')
+        contexto['datos']= paginator.get_page(page)
         return contexto
-
 
 

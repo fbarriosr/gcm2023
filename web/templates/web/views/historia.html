@@ -1,0 +1,18 @@
+{% extends "web/root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block body %}
+
+  {% include "web/banner/banner2.html" %}
+  
+  <!-- /.container -->
+  {% include "web/front/front.html" %}
+
+  {% include "web/listado/listado_presidentes.html" %}
+<!-- /.container -->
+
+{% endblock %}

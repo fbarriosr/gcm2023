@@ -1,0 +1,27 @@
+{% load static %}
+{% static "" as baseUrl %}
+
+<div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="exampleModalLongTitle">Advertencia:</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      
+        <p>Se elimará toda la información. Esta acción <strong>No es Reversible.</strong> </p>
+        <form>
+          <div class="form-group">
+            <label for="recipient-name" class="col-form-label">Por favor escriba "Eliminar" para confirmar</label>
+            <input type="text" class="form-control" id="eliminarCitofonoConfirm" placeholder="Eliminar">
+          </div>
+      
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" onclick="eliminarCitofono('{{top_path}}')" style="color: white">Confirmar</button>
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,23 @@
+{% extends "web/root/origin.html" %}
+{% load static %}
+{% static "" as baseUrl %}
+
+{% block title %}
+    {{ nameWeb }} {{ title }}
+{% endblock %}
+
+{% block body %}
+
+     {% include "web/banner/banner4.html" %}
+
+    {% include "web/front/front.html" %}
+
+    {% include "web/listado/listado_miembros.html" %}
+
+    {% include "web/listado/listado_directorio.html" %}
+    
+
+
+
+{% endblock %}
+

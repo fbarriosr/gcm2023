@@ -120,6 +120,7 @@ class Listado (models.Model):
     id              = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     tipo            = models.ForeignKey(Tipo, blank=True, null=True, on_delete=models.CASCADE, verbose_name='Tipo')
     titulo          = models.CharField(max_length=200, blank= False, null = False)
+    grupo            = models.CharField(max_length=20, choices=grupo, default="M") 
     img             = models.ImageField(upload_to='listado/')
     order           = models.IntegerField(default=0)
     actual          = models.BooleanField(default= False)
@@ -128,7 +129,7 @@ class Listado (models.Model):
     class Meta:
         verbose_name = "Listado"
         verbose_name_plural = "Listados"
-        ordering = ["tipo", "order"]
+        ordering = ["grupo", "tipo"]
 
     def __str__(self):
         return self.titulo
@@ -137,7 +138,7 @@ class Listado (models.Model):
 class ListadosAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
 
     search_fields   = ['titulo']
-    list_display    =('titulo', 'order', 'tipo', 'actual')
+    list_display    =('titulo', 'grupo', 'tipo', 'actual')
     list_per_page   = 10 # No of records per page
 
 

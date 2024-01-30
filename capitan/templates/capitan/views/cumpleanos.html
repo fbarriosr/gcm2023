@@ -1,0 +1,150 @@
+{% extends "web/root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block header %} 
+
+      {% include "socio/header/header_socios.html" %}
+
+{% endblock %}
+
+{% block body %}
+
+ {% include "socio/banner/banner2.html" %}
+
+ {% include "web/front/front.html" %}
+  <!-- /.container -->
+
+  <div class="container">
+    <div class="row">
+      <div class="col align-self-end">
+        <div>
+          <a class="navbar-brand"  href="{% url 'export_csv_cumpleanos_mes'%}"
+            ><img src="{% static 'web/assets/logos/excel.png' %}"
+          width="70px" /></a>
+        </div>
+        <div>
+          <strong>{{mes}}</strong>
+        </div>
+      </div>
+      <div class="col align-self-end">
+        <div>
+          <a class="navbar-brand"  href="{% url 'export_csv_cumpleanos'%}"
+            ><img src="{% static 'web/assets/logos/excel.png' %}"
+          width="70px" /></a>
+        </div>
+        <div>
+          <strong>Todos</strong>
+        </div>
+          
+        
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="container marketing" id="links">
+      <div class="row table-responsive" >
+          <table class="table table-striped ">
+            <thead>
+              <tr>
+                <th scope="col">Fecha</th>
+                <th scope="col">Apellido Paterno</th>
+                <th scope="col">Primer Nombre</th>
+                <th scope="col">Grado</th>
+                <th scope="col">Institucion</th>
+                <th scope="col">Fundador</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Perfil</th>
+                <th scope="col">Telefóno</th>
+              </tr>
+            </thead>
+
+            <tbody>
+            {% for t in datos %}
+              <tr>
+                <td>{{ t.fecha_nacimiento | upper  }}</td>
+                <td>{{ t.apellido_paterno  | upper   }}</td>
+                <td>{{ t.primer_nombre | upper  }}</td>
+                <td>{{ t.get_grado_display | upper  }}</td>
+                <td>{{ t.get_institucion_display | upper  }}</td>
+                <td>{{ t.fundador | upper  }}</td>
+                <td>{{ t.get_estado_display| upper  }}</td>
+                <td>{{ t.perfil | upper  }}</td>
+                <td>{{ t.telefono | upper  }}</td>
+              <tr>
+             {% endfor%}
+            </tbody>
+          </table>
+
+       </div>
+      </div>
+  </div>
+
+  <div class="container marketing">      
+    <div class="row">
+      <div class="col align-self-end">
+        {% if datos %}
+        <nav class="navigation pagination" role="navigation">
+              <div class="nav-links">
+              {% if datos.has_previous %}
+                  <a class="prev page-numbers" href="?page={{ datos.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+                    <i class="fa fa-chevron-left"></i>
+                   </a>
+                  {% if datos.previous_page_number != 1%}
+
+                    <a class="page-numbers" href="?page=1{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}" class="btn btn-white">
+                        <span class="meta-nav screen-reader-text">Page </span>
+                        1
+                    </a>
+                {% endif %}
+                    {% if  down  %}
+                    <a class="page-numbers disable" >
+                      ...
+                  </a>
+                  {% endif %}
+                  <a class="prev page-numbers" href="?page={{ datos.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+                    {{ datos.previous_page_number }}
+                   </a>
+              
+              {% endif %}
+
+                <span class="page-numbers current">
+                    {{ datos.number }}
+                </span>
+               {% if datos.has_next %}
+
+                <a class="next page-numbers" href="?page={{ datos.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+                    {{ datos.next_page_number }}
+                </a>
+                {% if  up  %}
+                  <a class="page-numbers disable" >
+                    ...
+                </a>
+                {% endif %}
+
+                {% if datos.next_page_number != datos.paginator.num_pages %}
+                <a class="prev page-numbers" href="?page={{ datos.paginator.num_pages  }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+                  {{ datos.paginator.num_pages  }}
+                 </a>
+
+                {% endif %}
+                <a class="prev page-numbers" href="?page={{ datos.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}" >
+                  <i class="fa fa-chevron-right"></i>
+                 </a>
+
+
+                {% endif %}
+            </div>
+        </nav>
+        {% endif %}
+      </div>  
+    </div>
+  </div>
+
+<!-- /.container -->
+
+{% endblock %}

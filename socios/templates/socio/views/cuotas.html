@@ -1,0 +1,16 @@
+{% extends "web/root/origin.html" %}
+{% load static %}
+{% static "" as baseUrl %}
+
+{% block title %}
+    {{ nameWeb }} {{ title }}
+{% endblock %}
+
+{% block header %} 
+    {% include "socio/header/header_socios.html" %}
+{% endblock %}
+
+{% block body %}
+    {% include "socio/banner/banner2.html" %}
+    {% include "socio/form/form_cuotas.html" %}
+{% endblock %}

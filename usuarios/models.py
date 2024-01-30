@@ -65,7 +65,7 @@ class MyUserManager(BaseUserManager):
 
 
 class Usuario(AbstractBaseUser):
-    email                   = models.EmailField(verbose_name="email", max_length=255, unique=True)
+    email                   = models.EmailField(verbose_name="email", max_length=255, unique=False)
     is_active               = models.BooleanField(default=True)
     is_admin                = models.BooleanField(default=False)
     rut                     = models.CharField(max_length=12,  unique=True, verbose_name="Rut")

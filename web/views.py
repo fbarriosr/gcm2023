@@ -37,7 +37,7 @@ nameWeb = "CGM"
 
 # Create your views here.
 class home(TemplateView, View):
-    template_name = "views/home.html"
+    template_name = "web/views/home.html"
     
     def post(self, request, *args, **kwargs):
         if request.method == 'POST':
@@ -73,7 +73,7 @@ class home(TemplateView, View):
 
 # Create your views here.
 class historia(TemplateView):
-    template_name = "views/historia.html"
+    template_name = "web/views/historia.html"
     # template_name = "root/empty.html"
 
     def get_context_data(self, **kwargs):
@@ -82,7 +82,7 @@ class historia(TemplateView):
         contexto["title"] = "historia"
         front = Front.objects.filter(titulo="historia")
         
-        listado_p = Listado.objects.filter(tipo__tipo__in=['Presidentes']).filter(actual=False)
+        listado_p = Listado.objects.filter(tipo__tipo__in=['Presidente']).filter(actual=False)
 
 
         # contexto['front']  = list(front.values('titulo','img', 'contenido', 'order'))[0]
@@ -96,7 +96,7 @@ class historia(TemplateView):
         return contexto
 
 class notFound404(TemplateView):
-    template_name = "views/404.html"
+    template_name = "web/views/404.html"
 
     def get_context_data(self,**kwargs):
         contexto = super().get_context_data(**kwargs)
@@ -116,7 +116,7 @@ class notFound404(TemplateView):
         return contexto  
 
 class comite(TemplateView):
-    template_name = "views/comite.html"
+    template_name = "web/views/comite.html"
 
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
@@ -137,25 +137,22 @@ class comite(TemplateView):
 
 # Create your views here.
 class directorio(TemplateView):
-    template_name = "views/directorio.html"
+    template_name = "web/views/directorio.html"
 
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
         contexto["title"] = "directorio"
         front = Front.objects.filter(titulo="directorio")
-        listado_m = Listado.objects.filter(tipo__tipo__in=['Directorio'])
-        listado_cap = Listado.objects.filter(tipo__tipo__in=['Capitan']).filter(actual=True)
-        listado_p = Listado.objects.filter(tipo__tipo__in=['Presidentes']).filter(actual=True)
+        listado_d = Listado.objects.filter(grupo='D').filter(actual=True)
+        listado_m = Listado.objects.filter(grupo='M').filter(actual=True)
+       
 
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
-        contexto['listado_m'] = list(listado_m.values('titulo', 'img', 'order', 'tipo__tipo', 'order'))
-        contexto['listado_cap'] = list(listado_cap.values('titulo', 'img', 'order', 'tipo__tipo', 'order'))
-        contexto['listado_p'] = list(listado_p.values('titulo', 'img', 'order', 'tipo__tipo', 'order'))
+        contexto['listado_m'] = listado_m
+        contexto['listado_d'] = listado_d
+      
         
-        contexto['listado_pTitulo'] = 'Presidente Actual'
-        contexto['listado_capTitulo'] = 'Capitan Actual'
-
         linksMenu = Links.objects.filter(banner=False).order_by('tipo','order')
         contexto['linksMenu'] = list(linksMenu.values('url', 'titulo'))
 
@@ -163,7 +160,7 @@ class directorio(TemplateView):
 
 
 class estatutos(TemplateView):
-    template_name = "views/estatutos.html"
+    template_name = "web/views/estatutos.html"
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb

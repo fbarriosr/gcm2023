@@ -1,0 +1,47 @@
+{% extends "web/root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block header %} 
+
+      {% include "socio/header/header_socios.html" %}
+
+{% endblock %}
+
+{% block body %}
+
+   {% include "socio/banner/banner2.html" %}
+   
+       <div class="container marketing" id="links">
+        <!-- Three columns of text below the carousel -->
+        <div class="row">
+          <div class="col-lg-12 context">
+            <h1>NOTICIA</h1>
+            <p>{{ new.fecha }} -  {{ new.get_region_display }}
+              </p>
+            
+            {{ new.info|linebreaks }}
+
+            <h1>FOTOS</h1>
+          </div>
+          {% for value in imgs %}
+          <div class="col-sm-12 col-md-4 col-lg-3 fotos">
+            <a href="/media/{{ value }}" target="_blank">
+
+              <img src="/media/{{ value }}" class="img-thumbnail" alt="...">
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      </div><!-- /.container -->
+
+  
+
+
+
+<!-- /.container -->
+
+{% endblock %}

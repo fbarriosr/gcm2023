@@ -1,0 +1,15 @@
+{% extends "web/root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block body %}
+
+  {% include "web/banner/banner5.html" %}
+
+  {% include "web/listado/listado_comite.html" %}
+<!-- /.container -->
+
+{% endblock %}

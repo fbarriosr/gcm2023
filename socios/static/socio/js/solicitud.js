@@ -70,3 +70,21 @@ function crearSolicitud(){
     
 
 }
+
+function updatePerfil(){
+    var data = new FormData($('#form_edicion').get(0));
+    console.log(data)
+    $.ajax({
+        data: $('#form_edicion').serialize(),
+        url:  $('#form_edicion').attr('action'),
+        type: $('#form_edicion').attr('method'),
+        success: function (response) {
+            notificacionSuccessUrl('Actualizando', '../perfil')
+            console.log(response.mensaje)   
+        },
+        error: function (error) {
+            console.log(error)         
+        }
+    });
+ 
+}

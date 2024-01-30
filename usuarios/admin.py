@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 
 from usuarios.models import *
 
-
+from import_export.admin import ImportExportModelAdmin
 
 
 class UserCreationForm(forms.ModelForm):
@@ -64,7 +64,7 @@ class UserChangeForm(forms.ModelForm):
         return self.initial["password"]
 
 
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(ImportExportModelAdmin,BaseUserAdmin):
     # The forms to add and change user instances
     form = UserChangeForm
     add_form = UserCreationForm
