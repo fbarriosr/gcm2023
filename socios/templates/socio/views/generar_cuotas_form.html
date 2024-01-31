@@ -6,9 +6,17 @@
 {% endblock %} 
 
 {% block body %}
-  {% include "socio/banner/banner.html" %}
+  {% include "socio/banner/banner_general.html" %}
 
   <div class="container">
+
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
     
     <div class="row justify-content-md-center mb-4">
       <fieldset class="mb-3 col-6">
@@ -16,15 +24,43 @@
         <p for="">Genera los registros de las 12 cuotas mensuales 
           de todos los socios del club par el año que se sea ingresado
         </p>
-        <form action="{% url 'generar_cuotas' %}" method="post">
+        <form action="" method="post" class="form">
           {% csrf_token %}
           <div class="mb-3">
-            <label class="form-label" for="">Ingrese el año:</label>
-            <input class="form-control" type="number" name="año" id="" placeholder="2024" required>
+            <label class="form-label" for="{{ form.año.id_for_label }}">Ingrese el año:</label>
+            {{ form.año }}  
           </div>
           <div class="mb-3">
-            <label class="form-label" for="">Ingrese valor de la cuota:</label>
-            <input class="form-control" type="number" name="valor" id="" placeholder="15000" required>
+            <label class="form-label" for="{{ form.valor.id_for_label }}">Ingrese el valor de la cuota:</label>
+            {{ form.valor }}  
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="{{ form.descuento.id_for_label }}">Ingrese el descuento anual:</label>
+            {{ form.descuento }}  
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="{{ form.cargo.id_for_label }}">Ingrese el cargo por no pago:</label>
+            {{ form.cargo }}  
+          </div>
+          <input class="btn btn-dark" type="submit" value="Aceptar">
+        </form> 
+      </fieldset>
+    </div>
+
+    <div class="row justify-content-md-center mb-4">
+      <fieldset class="mb-3 col-6">
+        <legend>Restablecer Cuotas Anuales Nuevo Socio</legend>
+        <p for="">Selecciona el rut de un usuario y un año para restablecer sus cuotas a pendiente.
+        </p>
+        <form action="{% url 'restablecer_cuotas_socio' %}" method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label" for="">Ingrese rut socio:</label>
+            <input class="form-control" type="text" name="rut" id="" placeholder="9054566-K">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="">Ingrese el año:</label>
+            <input class="form-control" type="number" name="año" id="" placeholder="2024">
           </div>
           <input class="btn btn-dark" type="submit" value="Aceptar">
         </form>

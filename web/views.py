@@ -32,28 +32,43 @@ from .utils import *
 from django.shortcuts import HttpResponse
 from datetime import datetime
 from socios.utils import contact
+from .forms import FormHome
 
 nameWeb = "CGM"
 
 # Create your views here.
-class home(TemplateView, View):
+class home(TemplateView, View):  
     template_name = "web/views/home.html"
     
     def post(self, request, *args, **kwargs):
-        if request.method == 'POST':
-        # Obtener datos del formulario
-            nombre = request.POST.get('nombre')
-            email = request.POST.get('email')
-            asunto = request.POST.get('asunto')
-            mensaje = request.POST.get('mensaje')
-            tipo = 'formulario_contacto' 
-            print(f'enviando formulario_contacto: nombre{nombre}, email:{email}, asunto:{asunto}, mensaje:{mensaje}, tipo:{tipo}')
-            contact(tipo, nombre, asunto, mensaje, email)  
+        form = FormHome(request.POST)
+        
+        if form.is_valid():
+            print('formulario válido')
+            print(form.cleaned_data['captcha'])
 
-        contexto = self.get_context_data()
+            nombre = form.cleaned_data['nombre']
+            email = form.cleaned_data['email']
+            asunto = form.cleaned_data['asunto']
+            mensaje = form.cleaned_data['mensaje']
+            tipo = 'formulario_contacto'
 
-        return self.render_to_response(contexto)
-        #return render(request, 'views/home.html')
+            contact(tipo, nombre, asunto, mensaje, email)
+
+            return redirect("home")
+
+        # Si el formulario no es válido, rellenar con datos proporcionados por el usuario
+        form.initial = {
+            'nombre': request.POST.get('nombre', ''),
+            'email': request.POST.get('email', ''),
+            'asunto': request.POST.get('asunto', ''),
+            'mensaje': request.POST.get('mensaje', ''),
+            # Agrega otros campos según sea necesario
+        }
+
+        contexto = {'form': form}
+        return render(request, 'web/views/home.html', contexto)
+
 
 
     def get_context_data(self, **kwargs):
@@ -68,6 +83,11 @@ class home(TemplateView, View):
         contexto['galeria']  = list(galeria.values('titulo','img', 'order'))
         contexto['banner'] = list(banner)
         contexto['linksMenu'] = list(linksMenu.values('url', 'titulo'))
+        # contexto['form'] = FormHome()
+        
+        # Recuperar los datos del formulario de la sesión si existen
+        form_data = self.request.session.pop('form_data', {})
+        contexto['form'] = FormHome(initial=form_data)   
 
         return contexto
 

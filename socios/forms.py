@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django import forms
 from .models import *
 from datetime import datetime
+from django_recaptcha.fields import ReCaptchaField
 
 class FormularioSolicitudView(forms.ModelForm):
     class Meta:
@@ -332,3 +333,22 @@ class FormularioUsuarioPassword(forms.ModelForm):
             user.save()
         return user
         
+
+# Del formulario para generar_cuotas_form.html
+class GenerarCuotasForm(forms.Form):
+    año = forms.IntegerField(
+        label='Ingrese el año:',
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '2024'})
+    )
+    valor = forms.DecimalField(
+        label='Ingrese el valor de la cuota:',
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '8000'})
+    )
+    descuento = forms.DecimalField(
+        label='Ingrese el valor del descuento anual:',
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '15000'})
+    )
+    cargo = forms.DecimalField(
+        label='Ingrese el cargo por no pago:',
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '4000'})
+    )

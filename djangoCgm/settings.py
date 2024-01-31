@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'usuarios',
     'socios',
     'capitan',
-    'secretario'
+    'secretario',
+    'django_recaptcha',
 ]
 
 MIDDLEWARE = [
@@ -156,8 +157,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'nicolas.ep.dev@gmail.com'
-EMAIL_HOST_PASSWORD = 'hrub pukm aifq xbuo'
+EMAIL_HOST_PASSWORD = 'hutg pdkp pkcz xsbu'
 EMAIL_USE_TLS = True
 
+# DJANGO RECAPTCHA
+RECAPTCHA_PUBLIC_KEY = '6LdyiF4pAAAAAAG8kVF6-Po0Ec_0kDjyab2meCgT'
+RECAPTCHA_PRIVATE_KEY = '6LdyiF4pAAAAAAlNtzF98vZ-VN3v-hPDi84vr5Oe'
 
 

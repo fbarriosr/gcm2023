@@ -12,15 +12,19 @@
         {% endfor %}
       {% endif %}
     </div>
-
+    <!-- MENSAJE PROMOCIONAL -->
+     {% if mostrar_promocion %}
+        <div class="alert alert-success" role="alert"">
+            <p> Aprovecha nuestra promoción especial este mes.</p>
+        </div>
+    {% endif %}
     <div class="col-lg-6 context">
       {% if cuotas %}
         <h1>{{ cuotas.0.usuario.primer_nombre|upper }} {{ cuotas.0.usuario.apellido_paterno|upper }}</h1>
       {% endif %}
     </div>
-
     <div class="col-lg-6">
-      <h1>PERIODO {{ cuotas.0.año.año}}-{{ cuotas.0.año.año|add:1}}</h1>
+      <h1>PERIODO {{ cuotas.0.año.año}}-{{ cuotas.0.año.año|add:1}}</h1> 
     </div>
     <!-- ENCABEZADO PLANILLA DE DATOS DEL SOCIO -->
     <div class="col-lg-12">
@@ -38,7 +42,7 @@
             <th scope="col">Mes</th>
             <th scope="col">Periodo</th>
             <th scope="col">Valor</th>
-            <th scope="col">Pagar</th>
+            <th scope="col">Estado cuota</th>
           </tr>
         </thead>
         <!-- REGISTROS DE CUOTAS DEL SOCIO DE LA PLANILLA  -->
@@ -65,23 +69,21 @@
                 {{ elemento.año.monto_cuota }}
               </td>
               <td>
-                <!-- BOTONES DE CUOTA PARA CADA MES DEL AÑO -->
-                  {% if elemento.estado_pago == 'P' %}
-                    <form action="{% url 'cuotas' %}" method="POST">
-                      {% csrf_token %}
-                      <input type="hidden" name="email" value="{{ cuotas.0.usuario.email }}">
-                      <input type="hidden" name="mes" value="{{ elemento.mes }}">
-                      <input type="hidden" name="año_seleccionado" id="año_seleccionado" value="{{ elemento.año.año }}">
-                      <input type="submit" class="btn btn-primary btn-lg" name="" value="PAGAR CUOTA">
-                    </form>
-                  {% elif elemento.estado_pago == 'A' %}
-                    <a href="" class="btn btn-success btn-lg disabled">APROBADA</a>
-                  {% elif elemento.estado_pago == 'E' %}
-                    <a href="" class="btn btn-warning btn-lg disabled">EN REVISION</a>
-                  {% elif elemento.estado_pago == 'R' %}
-                    <a href="" class="btn btn-danger btn-lg disabled">RECHAZADA</a>
-                  {% endif %}
+                {% if elemento.estado_pago == 'P' %}
+                  <div class="align-items-center" style="color: green;">
+                     <p><i class="bi bi-coin" style="font-size: 25px;"></i> PENDIENTE</p>
+                  </div>
+                {% elif elemento.estado_pago == 'E' %}
+                  <div class="align-items-center" style="color: darkorange;">
+                     <p><i class="bi bi-stopwatch" style="font-size: 25px;"></i> EN REVISION</p>
+                  </div>
+                {% elif elemento.estado_pago == 'R' %}
+                <div class="align-items-center" style="color: crimson;">
+                     <p><i class="bi bi-stopwatch" style="font-size: 25px;"></i> RECHAZADA</p>
+                  </div>
+                {% endif %}
               </td>
+              
             </tr>
           {% endfor%}
 
@@ -117,20 +119,46 @@
       </table>
     </div>
     <div class="col-lg-6"></div>
-    <div class="col-lg-2 mt-4 mb-4">
+
+    <!-- MONTO DE DESCUENTO POR PROMOCION PAGO ANUAL -->
+    <div class="col-lg-12 mt-4 mb-4" id="descuentoPromocional" data-action="{% if mostrar_promocion %}mostrar{% else %}ocultar{% endif %}">
+      <p>Descuento: <span id="descuento" data-valor-descuento="{{ descuento_anual }}">$ {{ descuento_anual }}</span></p>
+    </div>
+
+    <div class="col-lg-6 mt-4 mb-4">
       <p>Total a pagar: <span id="totalPagar">$ 0.00</span></p>
     </div>
+    <div class="col-lg-12"></div>
     <div class="col-lg-4 mt-4 mb-4">
-      <div>
-        <input type="submit" class="btn btn-primary btn-lg ml-auto" id="btn-cuotas-seleccionadas" name="" value="PAGAR CUOTAS SELECCIONADAS">
+      <form >
+        {% csrf_token %}
+      </form>
+      <input type="submit" class="btn btn-primary btn-lg ml-auto" id="btn-cuotas-seleccionadas" name="" value="PAGAR CUOTAS SELECCIONADAS">
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="row align-items-center">
+      <div class="col-lg-4">
+        <p>{{ mostrar_promocion }}</p>
+      </div>
+      <div class="col-lg-4">
+        <p>hola</p>
+      </div>
+      <div class="col-lg-4">
+        <p>hola</p>
       </div>
     </div>
+  </div>
+
 </div>
 
 <script>
 
+// TAREA: CORREGIR ORDEN DE ELEMENTOS CON BOOSTRAP
+
   // Configuracion inicial
-  function init(cuotaRows, añoActual, deudaAcumuladaElement, checkboxes) {
+  function init(cuotaRows, añoActual, deudaAcumuladaElement, checkboxes, descuentoPromocional) {
     // Ocultar todas las filas de las cuotas
     cuotaRows.forEach(cuota => cuota.classList.add('hidden-row'));
   
@@ -144,13 +172,16 @@
       }
     });
 
+    descuentoPromocional.classList.add('hidden-row');
+
     // Carga en el subtotal la deuda acumulada de años anteriores
     sumarDeudaAcumulada(checkboxes, añoActual, deudaAcumuladaElement);
   }
 
   // Funcion para mostrar en una etiqueta, la suma de las cuotas seleccionadas
-  function actualizarSumaCuotas(checkboxes, checkboxDeuda, totalPagarElement, deudaAcumuladaElement, añoActual) {
+  function actualizarSumaCuotas(checkboxes, checkboxDeuda, totalPagarElement, deudaAcumuladaElement, añoActual, descuentoActivo) {
     var sumarCuotas = 0;
+    var sumarCuotasDescuento = 0;
     
     checkboxes.forEach((checkbox) => {
       var cuotaRow = checkbox.closest('[id^="registro-cuota-"]');
@@ -158,12 +189,21 @@
       if(cuotaRow){
         var commonValues = JSON.parse(cuotaRow.dataset.commonValues);
         
-        //console.log('checkbox.checked.', checkbox.checked, ' commonValues.año:', commonValues.año, ' añoActual:', añoActual)
         if(checkbox.checked && commonValues.año == añoActual) {
+          sumarCuotasDescuento++
           sumarCuotas += parseFloat(commonValues.monto_cuota);
         }
-      }
+      }  
     });
+
+    // Aplicar el descuento anual si selecciono las 12 cuotas del año a pagar
+    if(sumarCuotasDescuento == 12 && descuentoActivo) {
+      descuentoPromocional.classList.remove('hidden-row');
+      sumarCuotas = sumarCuotas - parseFloat(descuentoActivo.dataset.valorDescuento);
+    }
+    else {
+      descuentoPromocional.classList.add('hidden-row');
+    }
 
     // Si se selecciona la opción de deuda acumulada, agrega ese monto a la suma
     if (checkboxDeuda.checked) {
@@ -192,6 +232,7 @@
         }
       }
     });
+
     // Actualiza la etiqueta que muestra la deuda acumulada
     sumarDeudaAcumulada > 0 
     ? (deudaAcumuladaElement.textContent = sumarDeudaAcumulada)  
@@ -230,6 +271,7 @@
   document.addEventListener('DOMContentLoaded', ()=> {
     const switchCheckCuotas = document.getElementById('switchCheckCuotas');
     const checkboxes = document.querySelectorAll('[id*="flexCheckDefault-"]');
+    const descuentoPromocional = document.getElementById('descuentoPromocional');
     const checkboxDeuda = document.getElementById("flexCheckDeuda");
     const btnPagarCuotas = document.getElementById("btn-cuotas-seleccionadas");
     const totalPagarElement = document.querySelector('#totalPagar');
@@ -237,30 +279,40 @@
     const fechaActual = new Date();
     const añoActual = fechaActual.getFullYear();
     const cuotaRows = document.querySelectorAll('[id^="registro-cuota-"]');
+    const descuentoActivo = document.getElementById('descuento');
 
-    init(cuotaRows, añoActual, deudaAcumuladaElement, checkboxes);
+    init(cuotaRows, añoActual, deudaAcumuladaElement, checkboxes, descuentoPromocional);
 
     // Funcion para pagar las cuotas selecciondas por su checkbox
     btnPagarCuotas.addEventListener('click', ()=> {
+      
+      // Si el descuento esta activo obtenemos el valor de descuento que queremos aplicar
+      if (!descuentoPromocional.classList.contains('hidden-row') && descuentoActivo) {
+        var des = descuentoActivo ? parseFloat(descuentoActivo.dataset.valorDescuento) : null ;    
+      }
+
+      // Filtramos y obtenemos un arreglo con los datos de cuota asociado a cada registro con checkbox activo
       var cuotasSeleccionadas = Array.from(checkboxes)
       .filter(checkbox => checkbox.checked)
-      .map(checkbox => {
-        var cuotaRow = checkbox.closest('[id^="registro-cuota-"]');
+        .map(checkbox => {
+          var cuotaRow = checkbox.closest('[id^="registro-cuota-"]');
 
-        if(cuotaRow){
-          var commonValues = JSON.parse(cuotaRow.dataset.commonValues);
-          
-          return {
-            id_cuota: commonValues.id,
-            email: commonValues.email,
-            mes: commonValues.mes,
-            año: commonValues.año,
-            monto_cuota: parseInt(commonValues.monto_cuota),
-          };
-        }
+          if(cuotaRow){
+            var commonValues = JSON.parse(cuotaRow.dataset.commonValues);
+            
+            return {
+              id_cuota: commonValues.id,
+              email: commonValues.email,
+              mes: commonValues.mes,
+              año: commonValues.año,
+              monto_cuota: parseInt(commonValues.monto_cuota),
+              descuento: des,
+            };
+          }
         });
         
-        if(cuotasSeleccionadas && cuotasSeleccionadas.length > 0) {
+
+        if(cuotasSeleccionadas && cuotasSeleccionadas.length) {
           var formulario = crearFormulario(cuotasSeleccionadas);
           enviarFormulario(formulario);
         }
@@ -280,7 +332,7 @@
         }
       });
       // Actualiza la etiqueta que muestra los totales 
-      actualizarSumaCuotas(checkboxes, checkboxDeuda, totalPagarElement, deudaAcumuladaElement, añoActual);
+      actualizarSumaCuotas(checkboxes, checkboxDeuda, totalPagarElement, deudaAcumuladaElement, añoActual, descuentoActivo);
     });
 
     // Evento de cambio para cada checkbox individual
@@ -293,7 +345,7 @@
 
           // operacion ternaria
           commonValues.estado_pago === 'P'
-          ? actualizarSumaCuotas(checkboxes, checkboxDeuda, totalPagarElement, deudaAcumuladaElement, añoActual)
+          ? actualizarSumaCuotas(checkboxes, checkboxDeuda, totalPagarElement, deudaAcumuladaElement, añoActual, descuentoActivo)
           : (checkbox.checked = !checkbox.checked)
         }
       });
@@ -315,7 +367,7 @@
         });
 
       // Actualiza la etiqueta que muestra la suma de cuotas
-      actualizarSumaCuotas(checkboxes, checkboxDeuda, totalPagarElement, deudaAcumuladaElement, añoActual)
+      actualizarSumaCuotas(checkboxes, checkboxDeuda, totalPagarElement, deudaAcumuladaElement, añoActual, descuentoActivo)
     })
 
   });

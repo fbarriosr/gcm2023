@@ -26,7 +26,7 @@ from django.http import HttpResponseRedirect,HttpResponse,JsonResponse
 from django.contrib.auth.decorators import login_required
 
 from django.shortcuts import HttpResponse
-from datetime import datetime
+from datetime import datetime, date
 from web.mixins import *
 from .forms import *
 from .utils import *
@@ -35,18 +35,26 @@ import json
 
 nameWeb = "CGM"
 
-# Formulario con las opciones de Cuotas los socios del club.    
-def generar_cuotas_form(request):
-    return render(request,'views/generar_cuotas_form.html')
-
 #def generar_cuotas(request, año, valor):
 def generar_cuotas(request):
+    print('ingresando a generar_cuotas..')
     if request.method == 'POST':
-        año =   request.POST.get('año')
-        valor = request.POST.get('valor')
-        respuesta = generar_cuotas_grupal(año, valor)
-        return HttpResponse(respuesta)
-    return HttpResponse(f'algo anda mal')
+        form = GenerarCuotasForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            respuesta = generar_cuotas_grupal(data['año'], data['valor'], data['descuento'], data['cargo'])
+            print('respuesta:', respuesta)
+            if respuesta == 'Operacion exitosa':
+                messages.success(request, 'Las cuotas del año se generaron con éxito')
+                return HttpResponseRedirect(reverse('generar_cuotas_form'))
+            else:
+                messages.error(request, respuesta)
+                return render(request, 'error.html', {'mensaje_error': respuesta})
+    else:
+        form = GenerarCuotasForm()
+
+    print('saliendo de generar_cuotas..')
+    return render(request, 'socio/views/generar_cuotas_form.html', {'form': form})
 
 def generar_cuotas_socio(request):
     if request.method == 'POST':
@@ -72,6 +80,14 @@ def borrar_cuotas_socio(request):
         return HttpResponse(respuesta)
     return HttpResponse(f'algo anda mal')
     #return render(request,'views/generar_cuotas_form.html')
+
+def restablecer_cuotas_socio(request):
+    if request.method == 'POST':
+        rut = request.POST.get('rut')
+        año = request.POST.get('año')
+        respuesta = restablecer_cuotas_individual(rut, año)
+        return HttpResponse(respuesta)
+    return HttpResponse(f'algo anda mal')
 
 
 
@@ -528,14 +544,13 @@ class ranking(TemplateView):
 # LA ESTRUCTURA DE LAS CUOTAS DE LOS SOCIOS DEL CLUB CGM
 
 class cuotas_admin(TemplateView, View):
-    template_name = "views/cuotas_admin.html"
+    template_name = "socio/views/cuotas_admin.html"
 
     def get_context_data(self, **kwargs):
         contexto =  super().get_context_data(**kwargs)
         contexto['nameWeb'] = nameWeb
         contexto['title'] = 'cuotas_admin'
         contexto['mensaje'] = 'holi'
-        contexto['rol'] = self.request.user.perfil.perfil
 
         cuotas = Cuota.objects.all().select_related('usuario', 'año')
         front = Front.objects.filter(titulo="cuotas")
@@ -574,7 +589,6 @@ class cuotas_admin2(TemplateView, View):
         contexto['nameWeb'] = nameWeb
         contexto['title']   = 'cuotas_admin'
         front = Front.objects.filter(titulo="cuotas")
-        contexto['rol'] = self.request.user.perfil.perfil
 
         pendientes  = Cuota.objects.filter(estado_pago='P', año__año=año_filtro).count()
         aprobadas   = Cuota.objects.filter(estado_pago='E', año__año=año_filtro).count()
@@ -588,108 +602,119 @@ class cuotas_admin2(TemplateView, View):
         return contexto
 
 class cuotas_admin_mod(TemplateView, View):
+    
+    ''' Vista para la administración de cuotas de los Secretarios
+        ---------------------------------------------------------
+        desde esta vista se aprueban o rechazan las cuotas en estado
+        de 'En Revision', enviadas por los socios del club. 
+    '''
+
     template_name = "socio/views/cuotas_admin_mod.html"
 
-    def post(self, request, *args, **kwargs):
-        filtro_cuota    = request.POST.get('filtro', '') # mantiene en la plantilla el filtro del tipo de cuota mostrada
-        id_cuota_modificar = request.POST.get('id_cuota_mod', None)
-        valor_cuota_modificar           = request.POST.get('value', None)
-        print(f'filtro cuota: {filtro_cuota}')
-        print(f'id cuota a modificar: {id_cuota_modificar}')
-        print(f'valor de la cuota a modificar: {valor_cuota_modificar}')
-
-        if len(filtro_cuota)> 1:
-            filtro_cuota = dict((v, k) for k,v in estado_cuota).get(filtro_cuota, None)
-            print(f'filtro cuota en formato texto, se cambió a: {filtro_cuota}')
-        else:
-            print(f'filtro cuota en formato letra, no se hace nada: {filtro_cuota}')
-
-        # Actualizar el estado de la cuota
-        if id_cuota_modificar is not None and valor_cuota_modificar is not None:
-            # print('se ejecutó la actualizacion de la cuota')
-            cuota_seleccionada = Cuota.objects.get(id=id_cuota_modificar)
-            cuota_seleccionada.estado_pago = valor_cuota_modificar
-            cuota_seleccionada.save()
-
-        contexto = self.get_context_data(filtro_cuota=filtro_cuota)
-
-        return self.render_to_response(contexto)
-
     def get_context_data(self, **kwargs):
-        print('se ejecuto la vista cuotas_admin_mod')
+
         contexto =  super().get_context_data(**kwargs)
-        filtro_cuota = kwargs.get('filtro_cuota','')
         contexto['nameWeb'] = nameWeb
         contexto['title'] = 'cuotas_admin_mod'
-        contexto['rol'] = self.request.user.perfil.perfil
 
+        try:
+            front = Front.objects.filter(titulo="cuotas")
+            cuotas = Cuota.objects.filter(estado_pago='E').select_related('usuario', 'año')
 
-        front = Front.objects.filter(titulo="cuotas")
-        cuotas = Cuota.objects.filter(estado_pago=filtro_cuota).select_related('usuario', 'año')
+            # Crear una lista de objetos datetime para representar los meses del año 
+            mes_cuota = [date(2000, mes, 1) for mes in range(1, 13)]
 
-        # Obtener los años de las cuotas del socio para el filtro por año en cuotas.html
-        años_cuotas_socio = Cuota.objects.values('año__año').distinct().order_by('año__año')
-        años_cuotas_socio = sorted([año['año__año'] for año in años_cuotas_socio], reverse=True)
+            # Añadir el campo 'mes_datetime' a cada instancia de Cuota
+            for cuota in cuotas:
+                cuota.mes_cuota = mes_cuota[cuota.mes - 1]
 
-        estado_dict = dict(estado)
-        # Incluir el valor del estado del usuario/socio, reemplazando la letra por el nombre
-        for cuota in cuotas:
-            if cuota.usuario.estado in estado_dict:
-                cuota.usuario.estado_txt = estado_dict[cuota.usuario.estado]
+            # Obtener los años pertenecientes a las cuotas para el filtro de la plantilla.
+            años_cuotas_socio = Cuota.objects.values('año__año').distinct().order_by('año__año')
+            años_cuotas_socio = sorted([año['año__año'] for año in años_cuotas_socio], reverse=True)
 
-        # Obtener una lista ordenada de los socios con cuotas asignadas
-        usuarios_con_cuotas = Usuario.objects.filter(cuota__isnull=False).distinct()
-        listado_usuarios = usuarios_con_cuotas.values_list('email', flat=True).order_by('-email')
+            # Incluir el valor del estado del socio, reemplazando la letra por el nombre
+            estado_dict = dict(estado)
+            
+            for cuota in cuotas:
+                if cuota.usuario.estado in estado_dict:
+                    cuota.usuario.estado_txt = estado_dict[cuota.usuario.estado]
 
-        contexto['cuotas'] = cuotas
-        contexto['front'] = list(front.values('titulo','img', 'contenido', 'order','file'))
-        contexto['años_cuotas_socio'] = años_cuotas_socio
-        contexto['listado_usuarios'] = listado_usuarios
-        # print(f'valor filtro_cuota: {filtro_cuota}')
-        contexto['estado_cuota'] = dict(estado_cuota).get(filtro_cuota, None)
+            # Obtener la lista de socios para el filtro de la plantilla
+            usuarios_con_cuotas = Usuario.objects.filter(cuota__isnull=False).distinct()
+            listado_usuarios = usuarios_con_cuotas.values_list('email', flat=True).order_by('-email')  
+
+            contexto['cuotas'] = cuotas
+            contexto['front'] = list(front.values('titulo','img', 'contenido', 'order','file'))
+            contexto['años_cuotas_socio'] = años_cuotas_socio
+            contexto['listado_usuarios'] = listado_usuarios
+        
+        except Exception as e:
+            print(f"Error al obtener datos del contexto: {str(e)}")
+
         return contexto
+
+    def post(self, request, *args, **kwargs):
+
+        # Verificar que se haya ejecutado el metodo POST antes de procesar
+        if request.method == 'POST': 
+            
+            # Establecer las variables necesarias que vienen del formulario
+            data_str = request.POST.get('data', '[]')
+            cuotasSeleccionadas = json.loads(data_str)
+
+            # Comprobamos la informacion y actualizamos el estado de las cuotas de 'Pendiente' a 'En Revision'
+            if cuotasSeleccionadas:                 
+                # Comprobamos el estado de las cuotas y las actualizamos en la bd
+                mapeo_estados = {'Aprobada': 'A', 'Rechazada': 'R'}
+                cuotas_a_actualizar = []
+                
+                for cuota in cuotasSeleccionadas: 
+                    cuota_id = cuota.get('id_cuota', None)
+                    estado_cuota = cuota.get('estado_cuota', None)  
+                        
+                    if estado_cuota and estado_cuota in mapeo_estados:
+                        cuotas_a_actualizar.append(Cuota(id=cuota_id, estado_pago=mapeo_estados[estado_cuota]))
+                try:
+                    # Actualizamos el estado de la cuota en la bd.
+                    Cuota.objects.bulk_update(cuotas_a_actualizar, fields=['estado_pago'])    
+                except Exception as e:
+                    print(f"Error al actualizar las cuotas: {str(e)}")
+                
+            return redirect("cuotas_admin_mod") 
+
 
 #@login_required Si se usa con request, sin heredar de vistas
 @method_decorator(login_required, name='dispatch')
 class cuotas(TemplateView, View):
     template_name = "socio/views/cuotas.html"
-    rut = None
-    año_filtro = 2000
-    is_contact = False
-
-    @classmethod
-    def set_contact(cls, contact):
-        cls.is_contact = contact
-
-    @classmethod
-    def get_contact(cls):
-        return cls.is_contact
 
     def get(self, request, *args, **kwargs):
-        # Obtener los años de las cuotas del socio para el filtro por año en cuotas.html
-        años_cuotas_socio = Cuota.objects.values('año__año').distinct().order_by('año__año')
-        años_cuotas_socio = sorted([año['año__año'] for año in años_cuotas_socio], reverse=True)
+        
+        # Indicador de descuento de cuotas por promocion
+        mostrar_promocion = False
+        # Obtener el año y mes actual
+        año_actual = datetime.now().year
+        mes_actual = datetime.now().month
+        rut = self.request.user.rut
 
-        usuario = self.request.user
-        #print(f'usuario: {type(usuario)}')
+        # Verificar si el usuario tiene cuotas para el año actual
+        cuotas_usuario = Cuota.objects.filter(usuario=request.user, año__año=año_actual)
+    
+        # Obtener el rango de duracion (inicio y fin) de la promoción del presente año.
+        if cuotas_usuario.exists():
+            duracion_descuento = cuotas_usuario.first().año.descuento
 
-        for campo in usuario._meta.fields:
-            nombre_campo = campo.name
-            valor_campo = getattr(usuario, nombre_campo)
-            #print(f"{nombre_campo}: {valor_campo}")
-
-        self.rut = usuario.rut
-
-        # Restablecer is_contact después de su uso
-        self.is_contact = False
-        self.set_contact(self.is_contact)
+            # Obtenemos True si el mes actual esta en el rango de duracion del descuento
+            if duracion_descuento:
+                meses_descuento = list(range(duracion_descuento.periodo_des_inicio, duracion_descuento.periodo_des_fin + 1))
+                mostrar_promocion = mes_actual in meses_descuento
 
         # Establecer los QuerySet de front y Cuotas
         front = Front.objects.filter(titulo="cuotas")
-        cuotas = Cuota.objects.filter(usuario__rut=self.rut).select_related('usuario')
+        cuotas = Cuota.objects.filter(usuario__rut=rut).select_related('usuario')
 
         # Crear una lista de objetos datetime para representar los meses del año
-        mes_cuota = [datetime(self.año_filtro, mes, 1) for mes in range(1, 13)]
+        mes_cuota = [datetime(2000, mes, 1) for mes in range(1, 13)]
 
         # Añadir el campo 'mes_datetime' a cada instancia de Cuota
         for cuota in cuotas:
@@ -701,83 +726,65 @@ class cuotas(TemplateView, View):
             "title": "cuotas",
             "front": list(front.values('titulo', 'img', 'contenido', 'order','file')),
             "cuotas": cuotas,
-            "años_cuotas_socio": años_cuotas_socio,
-            "año_filtro": self.año_filtro,
-            "rol":self.request.user.perfil.perfil
+            "mostrar_promocion": mostrar_promocion,
+            "descuento_anual": duracion_descuento,
         }
-
-        # Agregar barra inicial a la ruta de la imagen en el contexto
-        for item in contexto["front"]:
-            item["img"] = f"{item['img']}"
 
         return self.render_to_response(contexto)
 
     def post(self, request, *args, **kwargs):
-        # Verificar que se haya ejecutado el metodo POST antes de procesar
-        if request.method == 'POST':
-            estado_revision = next((code for code, value in estado_cuota if value == 'En Revision'), None)
+        try:
+            # Verificar que se haya ejecutado el metodo POST antes de procesar
+            if request.method == 'POST':
+                estado_revision = next((code for code, value in estado_cuota if value == 'En Revision'), None)
 
-            # Establecer las variables necesarias
-            data_str = request.POST.get('data', '[]')
-            cuotasSeleccionadas = json.loads(data_str)
-            if cuotasSeleccionadas:
-                print('cuotas seleccionadas:', len(cuotasSeleccionadas))
-                # for cuota in cuotasSeleccionadas:
-                #     print('id_cuota:', cuota.get('id_cuota', -1))
-                #     print('email:', cuota.get('email', 'nico@gmail'))
-                #     print('mes:', cuota.get('mes', 3))
-                #     print('año:', cuota.get('año', 2000))
+                # Establecer las variables necesarias que vienen del formulario
+                data_str = request.POST.get('data', '[]')
+                cuotasSeleccionadas = json.loads(data_str)
 
-                filas_afectadas = 0
-                total_pagar = 0
-                for cuota in cuotasSeleccionadas:
-                    filas_afectadas += Cuota.objects.filter(id=cuota.get('id_cuota')).update(estado_pago=estado_revision)
-                    total_pagar += int(cuota.get('monto_cuota'))
+                # Comprobamos la informacion y actualizamos el estado de las cuotas de 'Pendiente' a 'En Revision'
+                if cuotasSeleccionadas:
+                    cuota_ids = [cuota.get('id_cuota') for cuota in cuotasSeleccionadas]
+                    filas_afectadas = Cuota.objects.filter(id__in=cuota_ids).update(estado_pago=estado_revision)
 
-                if filas_afectadas > 0:
-                    print(f'se afectaron {filas_afectadas} filas') 
-                
-                if filas_afectadas >= 1:
-                    # Al menos un registro afectado, obtenemos información del primer elemento
-                    tipo = 'pago_cuota' if filas_afectadas == 1 else 'pago_cuotas'
-                    email = cuotasSeleccionadas[0]['email']
-                    mes = int(cuotasSeleccionadas[0]['mes'])
-                    año = int(cuotasSeleccionadas[0]['año'])
+                    # Si se aplicó la actualizacion, obtenemos los datos a enviar por correo
+                    if filas_afectadas >= 1:
+                        tipo            = 'pago_cuota' if filas_afectadas == 1 else 'pago_cuotas'  
+                        email           = cuotasSeleccionadas[0]['email']
+                        mes             = int(cuotasSeleccionadas[0]['mes'])
+                        año             = int(cuotasSeleccionadas[0]['año'])
+                        
+                        if 'descuento' in cuotasSeleccionadas[0]:
+                            descuento_str   = cuotasSeleccionadas[0]['descuento']
+                            print(f'descuento activo?:{descuento_str}')
 
-                # print(f'enviando datos de cuotas a contact')
-                # print(f'tipo:{tipo}, email:{email}, año_contact:{año}, mes:{mes}')
-                #resultado = contact(tipo, email, año_contact, mes)
-                resultado = contact(tipo, email=email, total_pagar=total_pagar, mes=mes, año=año)
-            else:
-                email = request.POST.get('email', 'anonimo@gmail.com')
-                mes = int(request.POST.get('mes', 1))
-                año = int(request.POST.get('año_seleccionado', 1986))
-                usuario = Usuario.objects.filter(email=email).first()
-               
-                if usuario is None:
-                    return f'Usuario no encontrado'
-                filas_afectadas = Cuota.objects.filter(mes=mes, usuario=usuario, año__año=año).update(estado_pago= estado_revision)
-                # Verificar que se haya actualizado la cuota antes de enviar el correo
-                if filas_afectadas > 0:
-                    print(f'se afectaron {filas_afectadas} filas')
+                            # Verificamos si se debe aplicar un descuento a las cuotas antes de enviar el correo
+                            if descuento_str is None:
+                                descuento = None
+                            else:
+                                try:
+                                    descuento = int(descuento_str)
+                                except ValueError as e:
+                                    print('Error: el descuento no es un valor numérico o válido. Detalles: {e}') 
+                                    descuento = 0
+                        else:
+                            descuento = None
+                            print('Error: la variable descuento no esta en el diccionario') 
 
-                # Invocar a la funcion Contact para que envie el correo de aviso
-                tipo = 'pago_cuotas'
-                # print(f'enviando datos de cuotas a contact')
-                # print(f'tipo:{tipo}, email:{email}, año_contact:{año}, mes:{mes}')
-                #resultado = contact(tipo, email, año_contact, mes)
-                resultado = contact(tipo, email=email, año=año, mes=mes)
-        else:
-            resultado = 'No se realizaron actualizaciones. Puede que no haya coincidencia con los criterios de filtro'
-            print('no se afectaron filas')
 
-            # Establecer un mensaje de aviso al volver a la plantilla html
-            messages.success(request, resultado)
+                    # Sumamos el monto total de las cuotas a pagar y enviamos el correo.
+                    total_pagar = sum(int(cuota.get('monto_cuota')) for cuota in cuotasSeleccionadas)
+                    resultado = contact(tipo, email=email, total_pagar=total_pagar, mes=mes, año=año, descuento=descuento)
+                else:
+                    resultado = 'No se realizaron actualizaciones, compruebe los datos del fomulario.'
 
-            # Avisamos que se ejecutó la función Contact para que no se pierda el año seleccionado al volver a la plantilla
-            # cuotas.set_contact(True)
+                # Establecer un mensaje de aviso al volver a la plantilla html
+                messages.success(request, resultado)
 
-            #return redirect('cuotas')
+            return redirect('cuotas')
+        
+        except Exception as e:
+            print(f"Error en el proceso principal: {str(e)}")
+            messages.error(request, "Ocurrió un error en el proceso principal.")
 
-        #return HttpResponse(f'algo anda mal')
-        return redirect('cuotas')
+            return redirect('cuotas')

@@ -23,11 +23,13 @@ urlpatterns = [
     path('cuotas_admin_mod/', cuotas_admin_mod.as_view(), name='cuotas_admin_mod'),
 
     #path('generar_cuotas/<int:año>/<int:valor>', generar_cuotas, name='generar_cuotas'),
-    path('generar_cuotas/', generar_cuotas, name='generar_cuotas'),
-    path('generar_cuotas_form/', generar_cuotas_form, name='generar_cuotas_socio'),
+    path('generar_cuotas_form/', generar_cuotas, name='generar_cuotas_form'),
     path('generar_cuotas_socio/', generar_cuotas_socio, name='generar_cuotas_socio'),
     path('borrar_cuotas/', borrar_cuotas, name='borrar_cuotas'),
     path('borrar_cuotas_socio/', borrar_cuotas_socio, name='borrar_cuotas_socio'),
+    path('restablecer_cuotas_socio/', restablecer_cuotas_socio, name='restablecer_cuotas_socio'),
+
+    path('contact/', contact, name='contact'),
 
     path('contact/', contact, name='contact'),
 
