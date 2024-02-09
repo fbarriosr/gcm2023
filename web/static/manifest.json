@@ -1,0 +1,17 @@
+{
+  "name": "Club de Golf Militar",
+  "short_name": "CGM",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff",
+  "description": "Pagina web del club de golf",
+  "icons": [{
+    "src": "static/web/assets/favicon/favicon-32x32.png",
+    "sizes": "32x32",
+    "type": "image/png"
+  }, {
+    "src": "static/web/assets/favicon/favicon-32x32.png",
+    "sizes": "32x32",
+    "type": "image/png"
+  }]
+}

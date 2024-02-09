@@ -66,7 +66,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # 'DIRS': [],
-        'DIRS': ['usuarios/templates', 'web/templates', 'socios/templates'],
+        'DIRS': ['usuarios/templates', 'web/templates', 'socios/templates', 'tesorero/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,9 +126,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = "usuarios.Usuario"
 
-LANGUAGE_CODE = 'es'
+LANGUAGE_CODE = 'es-es'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Santiago'
 
 USE_I18N = True
 
@@ -149,6 +149,7 @@ STATIC_ROOT =[
                 os.path.join(BASE_DIR, 'web/static'),
                 os.path.join(BASE_DIR, 'socios/static'),
                 os.path.join(BASE_DIR, 'capitan/static'),
+                os.path.join(BASE_DIR, 'tesorero/static'),
                 ]
 
 MEDIA_ROOT = os.path.join(BASE_DIR,'media/')

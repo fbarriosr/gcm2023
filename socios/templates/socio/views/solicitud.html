@@ -25,19 +25,31 @@
             <img src="{% static 'web/assets/logos/laurelDorado.png' %}  " style="padding-bottom: 0px!important;" />
             <h1 class="text-center">{{ titulo }}</h1>
           </div>
-          {% if secretario == 'Secretario' or secretario == 'Super Usuario' %}
-           <div class="row justify-content-end">
-                <div class="col-lg-2 dropdown">
-                  <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    SECRETARIO
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="bus">BUS</a></li>
-                    <li><a class="dropdown-item" href="auto">AUTO</a></li>
-                  </ul>
-                </div>
-            </div> 
-        {%endif%}
+         <div class="row justify-content-end" style="padding-bottom:30px; padding-top: -5px;">
+
+          {% if rol == 'Secretario' or rol == 'Super Usuario' %}
+              <div class="col-lg-2 dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  SECRETARIO
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="../bus">BUS</a></li>
+                  <li><a class="dropdown-item" href="../auto">AUTO</a></li>
+                  <li><a class="dropdown-item" href="{% url 'torneoUpdate'%}">EDITAR</a></li>
+                </ul>
+              </div>
+          {%endif%}
+          {% if rol == 'Tesorero' or rol == 'Super Usuario' %}
+              <div class="col-lg-2 dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  TESORERO
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="{% url 'solicitudes'%}">SOLICITUDES</a></li>
+                </ul>
+              </div>
+          {%endif%}
+          </div> 
           <div class="col-lg-8">
             <h4> <p>Lugar:</p><strong> {{ torneo.direccion }}, {{ torneo.get_region_display}}.</strong> </h4>
           </div> 
@@ -148,9 +160,6 @@
       </div>
 
      
-
-
-
 
 {% endblock %}
 

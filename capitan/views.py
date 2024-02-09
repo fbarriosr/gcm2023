@@ -34,7 +34,9 @@ from datetime import datetime
 from datetime import datetime
 import csv
 import calendar
-
+from socios.mixins import *
+from django.utils import timezone
+from .choices import *
 
 nameWeb = "CGM"
 
@@ -55,7 +57,6 @@ def export_csv_cumpleanos(request):
 
     return response
 
-
 def export_csv_cumpleanos_mes(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="listado_cumpleanos.csv"'
@@ -64,11 +65,12 @@ def export_csv_cumpleanos_mes(request):
     writer.writerow(['Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre', 'Fecha', 'Grado', 
         'Institucion', 'Fundador','Estado', 'Perfil','Telefono'])
 
-    fecha = datetime.now()
-    month = fecha.month
+    fecha_actual = datetime.now()
+    month = fecha_actual.month
+    next_month = fecha_actual.replace(month=month % 12 + 1, day=1)
 
     sol = Usuario.objects.filter( 
-                      fecha_nacimiento__month=month).order_by('fecha_nacimiento__day')
+                      fecha_nacimiento__month__in=[month, next_month.month]).order_by('fecha_nacimiento__day')
        
     for obj in sol:
         writer.writerow([ obj.apellido_paterno.capitalize(), obj.apellido_materno.capitalize() , obj.primer_nombre.capitalize() , obj.segundo_nombre.capitalize() , 
@@ -76,27 +78,67 @@ def export_csv_cumpleanos_mes(request):
 
     return response
 
+def export_csv_listado(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="listado_de Jugadores.csv"'
 
-class cumpleanos(TemplateView):
-    template_name = "capitan/views/cumpleanos.html"
+    writer = csv.writer(response)
+    writer.writerow(['Listado','Fecha','Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre',
+     'Categoria', 'Indice', 'Carro', 'Acompañante'
+       ])
+
+    torneo= request.COOKIES.get('torneo') 
+    current = Torneo.objects.get(id= torneo)
+
+    sol = Solicitud.objects.filter(torneo=current).filter(estado='A').order_by('fecha')
+       
+    for indice, obj in enumerate(sol, start=1):
+        writer.writerow([indice, obj.fecha, obj.usuario.apellido_paterno.capitalize(), obj.usuario.apellido_materno.capitalize(),
+                     obj.usuario.primer_nombre.capitalize(), obj.usuario.segundo_nombre.capitalize(),
+                     obj.usuario.get_categoria_display(), obj.indice, obj.carro, obj.acompanantes])
+    return response
+
+class salida( CapitanMixin, TemplateView):
+    template_name = "capitan/views/salida.html"
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
 
-        contexto["title"] = "CUMPLEAÑOS"
-        front = Front.objects.filter(titulo="Cumpleaños")
-        contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
+        contexto["title"] = "SALIDA"
         contexto['rol'] = self.request.user.perfil.perfil
-        fecha = datetime.now()
-        month = fecha.month
-        contexto['mes']= calendar.month_name[month]
-
-        listado = Usuario.objects.filter( 
-                      fecha_nacimiento__month=month).order_by('fecha_nacimiento__day')
+        front = Front.objects.filter(titulo="salida")
+        contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
+        torneoid = self.request.COOKIES.get('torneo') 
         
-        paginator = Paginator(listado,1)
-        page = self.request.GET.get('page')
-        contexto['datos']= paginator.get_page(page)
         return contexto
 
+class cumpleanos(CapitanMixin,TemplateView):
+    template_name = "capitan/views/cumpleanos.html"
 
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto["nameWeb"] = nameWeb
+        contexto["title"] = "CUMPLEAÑOS"
+        front = Front.objects.filter(titulo="cumpleaños")
+        contexto['front'] = list(front.values('titulo', 'img', 'contenido', 'order', 'file'))
+        contexto['rol'] = self.request.user.perfil.perfil
+
+        fecha_actual = datetime.now()
+        month = fecha_actual.month
+        next_month = fecha_actual.replace(month=month % 12 + 1, day=1)
+
+        # Obtener el nombre del mes actual y del próximo utilizando los choices
+        nombre_mes_actual = dict(MESES)[month]
+        nombre_mes_proximo = dict(MESES)[next_month.month]
+
+        contexto['mes'] = f"{nombre_mes_actual} - {nombre_mes_proximo}"
+
+        # Filtrar los cumpleaños solo para el mes actual y el próximo mes
+        listado = Usuario.objects.filter(
+            fecha_nacimiento__month__in=[month, next_month.month]
+        ).order_by('fecha_nacimiento__day')
+
+        paginator = Paginator(listado, 10)
+        page = self.request.GET.get('page')
+        contexto['datos'] = paginator.get_page(page)
+        return contexto

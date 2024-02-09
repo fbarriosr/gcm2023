@@ -1,4 +1,3 @@
-
 $(document).ready(function () {
    $("#patente").parent().hide() 
    $("#acompanantes").parent().hide()
@@ -59,11 +58,10 @@ function crearSolicitud(){
         type: $('#form_edicion').attr('method'),
         success: function (response) {
             notificacionSuccessUrl(response.mensaje, '../torneos')
-            //notificacionSuccess(response.mensaje)
             console.log(response.mensaje)  
         },
         error: function (error) {
-            console.log(error.responseJSON.error)
+            console.log(error) 
 
         }
     });
@@ -87,4 +85,311 @@ function updatePerfil(){
         }
     });
  
+}
+
+function updateRanking(){
+    var data = new FormData($('#form_edicion').get(0));
+    console.log(data)
+    $.ajax({
+        url:  $('#form_edicion').attr('action'),
+        method: $('#form_edicion').attr('method'),
+        type: $('#form_edicion').attr('method'),
+        mimeType: $('#form_edicion').attr('enctype'),
+        processData : false,
+        contentType: false,
+        cache: false,
+        data: data,
+        success: function (response) {
+            notificacionSuccessUrl('Actualizando', 'ranking')
+            console.log(response.mensaje)   
+        },
+        error: function (error) {
+            console.log(error)         
+        }
+    });
+ 
+}
+function updateNoticia(){
+    var data = new FormData($('#form_edicion2').get(0));
+    console.log(data)
+    $.ajax({
+        url:  $('#form_edicion2').attr('action'),
+        method: $('#form_edicion2').attr('method'),
+        type: $('#form_edicion2').attr('method'),
+        mimeType: $('#form_edicion2').attr('enctype'),
+        processData : false,
+        contentType: false,
+        cache: false,
+        data: data,
+        success: function (response) {
+            notificacionSuccessUrl('Actualizando', 'noticias')
+            console.log(response.mensaje)   
+        },
+        error: function (error) {
+            console.log(error)         
+        }
+    });
+ 
+}
+
+function createNoticia(){
+    var data = new FormData($('#form_edicion2').get(0));
+    console.log('data')
+    console.log(data)
+    $.ajax({
+        url:  $('#form_edicion2').attr('action'),
+        method: $('#form_edicion2').attr('method'),
+        type: $('#form_edicion2').attr('method'),
+        mimeType: $('#form_edicion2').attr('enctype'),
+        processData : false,
+        contentType: false,
+        cache: false,
+        data: data,
+        success: function (response) {
+            notificacionSuccessUrl('Actualizando', 'noticias')
+            console.log(response.mensaje)   
+        },
+        error: function (error) {
+            if (error.responseText){
+                mensaje= error.responseText
+                obj = $.parseJSON(mensaje);
+                if(obj.error.titulo){
+                    m = 'Titulo: '+ obj.error.titulo
+                    notificacionError(m)
+                }
+                if(obj.error.fecha){
+                    m = 'Fecha: '+ obj.error.fecha
+                    notificacionError(m)
+                }
+                if(obj.error.resumen){
+                    m = 'Resumen: '+ obj.error.resumen
+                    notificacionError(m)
+                }
+                if(obj.error.info){
+                    m = 'Información: '+ obj.error.info
+                    notificacionError(m)
+                }
+                console.log(obj.error)
+            }else{
+                console.log(error) 
+                notificacionError(error)
+            }
+
+                    
+        }
+    });
+ 
+}
+
+function eliminarNoticia(){
+    confirmEliminar= $('#eliminarNoticiaConfirm').val();
+    console.log('Eliminando'); 
+    if (confirmEliminar == 'Eliminar'){
+       console.log('Eliminado'); 
+       $.ajax({
+            data:{
+                csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val()
+            },
+            url: '/noticiaDelete',
+            type: 'post',
+            success: function (response) {
+                Cookies.remove('noticiaId');
+                notificacionSuccessUrl(response.mensaje,'noticias')             
+            },
+            error: function (error) {
+                console.log(error) 
+                notificacionError(error);
+            }
+        });
+       
+    }
+}
+function abrir_modal_eliminacion(url) {
+    id = '#'+url
+    var newURL = window.location.protocol + "//" + window.location.host + "/" + url;
+    console.log('id:', id)  
+    console.log(newURL)
+
+    $(id).load(newURL, function () {
+        $(this).modal('show');
+    });
+
+}
+
+
+function createTorneo(){
+    var data = new FormData($('#form_edicion2').get(0));
+    console.log('data')
+    console.log(data)
+    $.ajax({
+        url:  $('#form_edicion2').attr('action'),
+        method: $('#form_edicion2').attr('method'),
+        type: $('#form_edicion2').attr('method'),
+        mimeType: $('#form_edicion2').attr('enctype'),
+        processData : false,
+        contentType: false,
+        cache: false,
+        data: data,
+        success: function (response) {
+            notificacionSuccessUrl('Actualizando', 'torneos')
+            console.log(response.mensaje)   
+        },
+        error: function (error) {
+            if (error.responseText){
+                mensaje= error.responseText
+                obj = $.parseJSON(mensaje);
+                if(obj.error.titulo){
+                    m = 'Titulo: '+ obj.error.titulo
+                    notificacionError(m)
+                }
+                if(obj.error.fecha){
+                    m = 'Fecha: '+ obj.error.titulo
+                    notificacionError(m)
+                }
+                if(obj.error.direccion){
+                    m = 'Dirección: '+ obj.error.direccion
+                    notificacionError(m)
+                }
+                if(obj.error.img){
+                    m = 'Imagen: '+ obj.error.img
+                    notificacionError(m)
+                }
+                console.log(obj.error)
+            }else{
+                console.log(error) 
+                notificacionError(error)
+            }
+        
+        }
+    });
+ 
+}
+
+function updateTorneo(){
+    var data = new FormData($('#form_edicion2').get(0));
+    console.log(data)
+    $.ajax({
+        url:  $('#form_edicion2').attr('action'),
+        method: $('#form_edicion2').attr('method'),
+        type: $('#form_edicion2').attr('method'),
+        mimeType: $('#form_edicion2').attr('enctype'),
+        processData : false,
+        contentType: false,
+        cache: false,
+        data: data,
+        success: function (response) {
+            notificacionSuccessUrl('Actualizando', 'torneos')
+            console.log(response.mensaje)   
+        },
+        error: function (error) {
+            console.log(error)         
+        }
+    });
+ 
+}
+
+function eliminarTorneo(){
+    confirmEliminar= $('#eliminarTorneoConfirm').val();
+    console.log('Eliminando'); 
+    if (confirmEliminar == 'Eliminar'){
+       console.log('Eliminado'); 
+       $.ajax({
+            data:{
+                csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val()
+            },
+            url: '/torneoDelete',
+            type: 'post',
+            success: function (response) {
+                Cookies.remove('torneoId');
+                notificacionSuccessUrl(response.mensaje,'torneos')             
+            },
+            error: function (error) {
+                console.log(error) 
+                notificacionError(error);
+            }
+        });
+       
+    }
+}
+
+function solicitudId(id,url){
+   console.log('solicitudId:',id); 
+   console.log('url:',url); 
+   Cookies.set('solicitudId', id);
+   location.href = url
+}
+
+function setId(id,url,varname){
+   console.log('Id:',id); 
+   console.log('url:',url); 
+   Cookies.set(varname, id);
+   location.href = url
+}
+
+
+function updateSolicitud(){
+    var data = new FormData($('#form_edicion2').get(0));
+    console.log(data)
+    $.ajax({
+        url:  $('#form_edicion2').attr('action'),
+        method: $('#form_edicion2').attr('method'),
+        type: $('#form_edicion2').attr('method'),
+        mimeType: $('#form_edicion2').attr('enctype'),
+        processData : false,
+        contentType: false,
+        cache: false,
+        data: data,
+        success: function (response) {
+            notificacionSuccessUrl('Actualizando', 'solicitudes')
+            console.log(response.mensaje)   
+        },
+        error: function (error) {
+            console.log(error)         
+        }
+    });
+ 
+}
+
+function updateUsuario(){
+    var data = new FormData($('#form_edicion').get(0));
+    console.log(data)
+    $.ajax({
+        url:  $('#form_edicion').attr('action'),
+        method: $('#form_edicion').attr('method'),
+        type: $('#form_edicion').attr('method'),
+        mimeType: $('#form_edicion').attr('enctype'),
+        processData : false,
+        contentType: false,
+        cache: false,
+        data: data,
+        success: function (response) {
+            notificacionSuccessUrl('Actualizando', 'listarUsuarios')
+            console.log(response.mensaje)   
+        },
+        error: function (error) {
+            console.log(error)         
+        }
+    });
+ 
+}
+
+function crearUsuario(){
+
+    var data = new FormData($('#form_edicion2').get(0));
+    console.log(data);
+    $.ajax({
+        data: $('#form_edicion').serialize(),
+        url:  $('#form_edicion').attr('action'),
+        type: $('#form_edicion').attr('method'),
+        success: function (response) {
+            notificacionSuccessUrl(response.mensaje, 'listarUsuarios')
+            console.log(response.mensaje)  
+        },
+        error: function (error) {
+            console.log(error) 
+
+        }
+    });
+    
+
 }

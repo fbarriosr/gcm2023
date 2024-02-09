@@ -27,12 +27,13 @@ from django.urls import reverse_lazy
 from django.shortcuts import render,redirect
 from django.http import HttpResponseRedirect,HttpResponse,JsonResponse
 
-from .mixins import *
 from .utils import *
 from django.shortcuts import HttpResponse
 from datetime import datetime
 from socios.utils import contact
 from .forms import FormHome
+from django.http import JsonResponse
+
 
 nameWeb = "CGM"
 
@@ -186,10 +187,31 @@ class estatutos(TemplateView):
         contexto["nameWeb"] = nameWeb
 
         contexto["title"] = "Estatutos"
-        front = Front.objects.filter(titulo="Estatutos")
+        front = Front.objects.filter(titulo="estatutos")
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         
         linksMenu = Links.objects.filter(banner=False).order_by('tipo','order')
         contexto['linksMenu'] = list(linksMenu.values('url', 'titulo'))
 
         return contexto
+
+def manifest(request):
+    data = {
+        "name": "Club de Golf Militar",
+        "short_name": "CGM",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#fff",
+        "description": "Pagina web del club de golf",
+        "icons": [{
+            "src": "static/web/assets/favicon/favicon-32x32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        }, {
+            "src": "static/web/assets/favicon/favicon-32x32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        }]
+    }
+    
+    return JsonResponse(data)

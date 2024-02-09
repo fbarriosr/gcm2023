@@ -1,0 +1,36 @@
+{% extends "web/root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block header %} 
+
+      {% include "socio/header/header_socios.html" %}
+
+{% endblock %}
+
+{% block body %}
+
+ {% include "web/banner/banner2.html" %}
+
+ {% include "web/front/front.html" %}
+  <!-- /.container -->
+
+  <div class="container">
+    <div class="row">
+      <div class="col align-self-end">
+        <a class="navbar-brand"  href="{% url 'export_csv_listado'%}"
+            ><img src="{% static 'web/assets/logos/excel.png' %}"
+          width="70px" /></a>
+      </div>
+    </div>
+  </div>
+
+  
+  
+
+<!-- /.container -->
+
+{% endblock %}

@@ -1,13 +1,13 @@
   {% load static %} {% static "" as baseUrl %}
 
-<div class="container evento">
+<div class="container evento" >
         <!-- Three columns of text below the carousel -->
         <div class="row  ">
-          <div class="col-sm-12">
+          <div class="col-sm-12" style="padding-top: 30px;">
             <br><br>
             {% for value in mainCard %}  
             <a class="" href="{%url 'torneo' value.slug %}">
-            <div class="card mb-3 " >
+            <div class="card mb-3 "  >
               <div class="row g-0">
                 <div class="col-md-8">
                   <img src="media/{{ value.img }}" class="img-fluid rounded-start torneo" alt="...">

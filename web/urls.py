@@ -10,5 +10,7 @@ urlpatterns = [
     path('comite', comite.as_view(), name="comite"),
     path('estatutos', estatutos.as_view(), name='estatutos'),
     path('404', notFound404.as_view(), name= '404'),
+    path('site.webmanifest', manifest, name= 'manifest'),
+
 
 ]

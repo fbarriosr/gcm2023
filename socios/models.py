@@ -15,24 +15,19 @@ def slugify_two_fields(self):
 class Noticia (models.Model):
     id              = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     titulo          = models.CharField(max_length = 200, blank = False, null = False)
-    img             = models.ImageField(upload_to='noticias/')
     fecha           = models.DateField()
+    direccion       = models.CharField(max_length = 200, blank = True, null = False)
+    region          = models.CharField(max_length=50,choices= regiones, default= 'XIII', verbose_name="Region")
     resumen         = models.CharField(max_length = 200, blank = False, null = False)
     info            = models.TextField()
-    slug            = AutoSlugField(populate_from=slugify_two_fields,  unique_with=['titulo','fecha'])
-    is_active       = models.BooleanField('Activo',default = False)
-    is_aprobado     = models.BooleanField('Aprobado',default = False)
-    is_pendiente    = models.BooleanField('Pendiente',default = True)
+    img             = models.ImageField(upload_to='noticias/',blank = True)
     img1            = models.ImageField(upload_to='noticias/',blank = True)
     img2            = models.ImageField(upload_to='noticias/',blank = True)
     img3            = models.ImageField(upload_to='noticias/',blank = True)
     img4            = models.ImageField(upload_to='noticias/',blank = True)
     img5            = models.ImageField(upload_to='noticias/',blank = True)
-    direccion       = models.CharField(max_length = 200, blank = True, null = False)
-    region          = models.CharField(max_length=50,choices= regiones, default= 'XIII', verbose_name="Region")
- 
-    comentario      = models.TextField(default='Sin comentario')
-
+    slug            = AutoSlugField(populate_from=slugify_two_fields,  unique_with=['titulo','fecha'])
+    is_active       = models.BooleanField('Activo',default = True)
     class Meta:
         verbose_name = "Noticia"
         verbose_name_plural = "Noticias"
@@ -44,18 +39,19 @@ class Noticia (models.Model):
 
 class NoticiaAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["titulo"]
-    list_display = ("titulo", "fecha", "resumen")
+    list_display = ( "fecha", "titulo", "resumen", 'is_active')
     list_per_page = 10  # No of records per page
+    list_filter = ('is_active',)
 
 # ADMINISTRA LOS CARDS DE TORNEO
 class Torneo (models.Model):
     id              = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     titulo          = models.CharField(max_length=200, blank=False, null= False, verbose_name="Titulo")
+    fecha           = models.DateField(null=False)
     direccion       = models.CharField(max_length=200, blank=False, null= False, verbose_name="Direccion")
     region          = models.CharField(max_length=50,choices= regiones, default= 'XIII', verbose_name="Region")
     descripcion     = models.TextField(blank=True)
     img             = models.ImageField(upload_to='torneo/')
-    fecha           = models.DateField(null=False)
     cupos           = models.IntegerField(default=100)
     inscritos       = models.IntegerField(default=0)
     activo          = models.BooleanField(default=True)
@@ -89,10 +85,10 @@ class Solicitud (models.Model):
     fecha           = models.DateTimeField(null=False)
     auto            = models.BooleanField(default=False)
     patente         = models.CharField(max_length=12, blank= True , verbose_name="Patente")
-    busCGM          = models.BooleanField(default=False)
     carro           = models.BooleanField(default=False)
-    indice          = models.IntegerField(blank=True, null=True, verbose_name="Indice")
     acompanantes    = models.TextField(blank=True, verbose_name='¿Con quién va?')
+    busCGM          = models.BooleanField(default=False)
+    indice          = models.IntegerField(blank=True, null=True, verbose_name="Indice")
     descripcion     = models.TextField(blank=True, verbose_name='Solicitud')
     deuda_socio     = models.IntegerField(default=0, null=False, verbose_name="Deuda Socio")
     cancela_deuda_socio  = models.BooleanField(default=False)

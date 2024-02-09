@@ -27,7 +27,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.shortcuts import HttpResponse
 from datetime import datetime, date
-from web.mixins import *
+from .mixins import *
 from .forms import *
 from .utils import *
 from .choices import estado_cuota
@@ -89,9 +89,7 @@ def restablecer_cuotas_socio(request):
         return HttpResponse(respuesta)
     return HttpResponse(f'algo anda mal')
 
-
-
-class PasswordUsuario(UpdateView):
+class PasswordUsuario(SocioMixin,UpdateView):
     model = Usuario
     form_class = FormularioUsuarioPassword
     template_name = 'socio/views/password.html'
@@ -128,8 +126,7 @@ class PasswordUsuario(UpdateView):
         current_user =  Usuario.objects.get(rut=self.request.user.rut)
         return current_user
  
-
-class perfil(UpdateView):
+class perfil(SocioMixin,UpdateView):
 
     model = Usuario
     form_class = FormularioPerfilUpdate
@@ -176,10 +173,17 @@ class perfil(UpdateView):
 
 
 # Create your views here.
-class noticia(DetailView):
+class noticia(SocioMixin,DetailView):
     model = Noticia
     template_name = "socio/views/noticia.html"
    
+    def get(self, *args, **kwargs):
+        dato =  self.get_object()
+        noticiaId = dato[0].id
+        response = super().get( *args, **kwargs)
+        response.set_cookie('noticiaId', noticiaId )
+        return response
+
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
@@ -213,14 +217,17 @@ class noticia(DetailView):
         return slug
 
 # Create your views here.
-class noticias(TemplateView):
+class noticias(SocioMixin,TemplateView):
     model = Noticia
     template_name = "socio/views/noticias.html"
     
     def get_queryset(self):
-        
-        lNoticia = self.model.objects.filter(is_active=True).filter(is_aprobado=True).order_by('fecha')
-        paginator = Paginator(lNoticia,3)
+        rol = self.request.user.perfil.perfil
+        if rol =='Secretario' or rol =='Super Usuario':
+            lNoticia = self.model.objects.order_by('fecha')
+        else:
+            lNoticia = self.model.objects.filter(is_active=True).order_by('fecha')
+        paginator = Paginator(lNoticia,9)
         page = self.request.GET.get('page')
         lNoticia = paginator.get_page(page)
             
@@ -248,27 +255,8 @@ class noticias(TemplateView):
 
         return contexto
 
-class eliminarNoticia(DeleteView):
-    model = Noticia
-    template_name = 'socio/views/eliminarNoticia.html'
 
-    def delete(self,request,*args,**kwargs):
-        if request.is_ajax():
-            citofono = self.get_object()
-            citofono.delete()
-            mensaje = f'{self.model.__name__} eliminado correctamente!'
-            error = 'No hay error!'
-            response = JsonResponse({'mensaje': mensaje, 'error': error})
-            response.status_code = 201
-            return response
-        else:
-            return redirect('listar_citofonos')
-    def get_object(self, **kwargs):
-        citofonoID= self.request.COOKIES.get('citofonoID') 
-        print('eliminarCitofonoID',citofonoID)
-        current_user = self.model.objects.get(pk=citofonoID)
-        #current_user = self.request.user
-        return current_user
+
 
 
 class torneos(SocioMixin,TemplateView):
@@ -280,19 +268,24 @@ class torneos(SocioMixin,TemplateView):
         contexto["title"] = "torneo"
         mainCard = Torneo.objects.filter(activo=True).filter(proximo = True)
         torneoCard = Torneo.objects.filter(activo=True).filter(proximo= False).order_by('-fecha')
+        
         diccionario_fechas = list(Torneo.objects.filter(activo=True).values('fecha'))
 
-        # Obtener los años de cada fecha en una lista
-        anios = [elemento['fecha'].year for elemento in diccionario_fechas]
+        if len(diccionario_fechas)>0:
 
-        # Encontrar el año mínimo y máximo en la lista de años
-        anio_minimo = min(anios)
-        anio_maximo = max(anios)
+            # Obtener los años de cada fecha en una lista
+            anios = [elemento['fecha'].year for elemento in diccionario_fechas]
 
-        if anio_maximo != anio_minimo:
-            contexto['year'] = str(anio_minimo) +'-'+ str(anio_maximo)
+            # Encontrar el año mínimo y máximo en la lista de años
+            anio_minimo = min(anios)
+            anio_maximo = max(anios)
+
+            if anio_maximo != anio_minimo:
+                contexto['year'] = str(anio_minimo) +'-'+ str(anio_maximo)
+            else:
+            	contexto['year'] = str(anio_minimo)
         else:
-        	contexto['year'] = str(anio_minimo)
+            contexto['year'] = 'SIN FECHAS'
         contexto['mainCard'] = mainCard
         contexto['torneoCard'] = torneoCard
         
@@ -301,34 +294,34 @@ class torneos(SocioMixin,TemplateView):
         return contexto
 
 # Create your views here.
-class torneo(DetailView):
+class torneo(SocioMixin,DetailView):
     model = Torneo
     template_name = "socio/views/torneo.html"
     
     def get(self, *args, **kwargs):
         dato =  self.get_object()
-        torneoid = dato[0].id
+        torneoId = dato[0].id
         torneoEstado = dato[0].abierto
-        solicitud = Solicitud.objects.filter(usuario__email=self.request.user.email).filter(torneo__id=torneoid).order_by('-fecha')
+        solicitud = Solicitud.objects.filter(usuario__email=self.request.user.email).filter(torneo__id=torneoId).order_by('-fecha')
         
         if (torneoEstado==True): #torneo abierto
 
             if (len(solicitud)==0 ): # solicitud
                 response = redirect('solicitud') # para inscribir
-                response.set_cookie('torneo', torneoid)
+                response.set_cookie('torneoId', torneoId)
                 return response
             else:
                 if(solicitud[0].estado =='S'): #arrependido
                     response = redirect('solicitud') # para inscribir
-                    response.set_cookie('torneo', torneoid)
+                    response.set_cookie('torneoId', torneoId)
                     return response 
                 else: 
                     response = super().get( *args, **kwargs)
-                    response.set_cookie('torneo', torneoid)
+                    response.set_cookie('torneoId', torneoId)
                     return response  
         else: 
             response = super().get( *args, **kwargs)
-            response.set_cookie('torneo', torneoid)
+            response.set_cookie('torneoId', torneoId)
             return response
         
        
@@ -346,7 +339,6 @@ class torneo(DetailView):
         contexto['torneoInscritos']= dato[0].inscritos
         contexto['torneoCupos']= dato[0].cupos
         solicitud = Solicitud.objects.filter(usuario__email=self.request.user.email).filter(torneo__id=torneoid).order_by('-fecha') #ultima solicitud
-        contexto['secretario']=self.request.user.perfil.perfil
         contexto['rol'] = self.request.user.perfil.perfil
 
         if (len(solicitud)==0 ): # no hay solicitud
@@ -376,7 +368,7 @@ class torneo(DetailView):
         return slug
 
 
-class crearSolicitud(CreateView):
+class crearSolicitud(SocioMixin,CreateView):
     model = Solicitud
     form_class = FormularioSolicitudView
     template_name = "socio/views/solicitud.html"
@@ -406,13 +398,12 @@ class crearSolicitud(CreateView):
         contexto['torneo'] = torneo
         torneoTitulo = str(torneo.titulo).upper().replace('TORNEO','') 
         contexto['titulo'] = 'INSCRIPCIÓN  TORNEO '+ torneoTitulo
-        contexto['secretario']=self.request.user.perfil.perfil
         contexto['rol'] = self.request.user.perfil.perfil
      
         return contexto
 
     def get_object(self, **kwargs):
-        torneo= self.request.COOKIES.get('torneo') 
+        torneo= self.request.COOKIES.get('torneoId') 
         current = Torneo.objects.get(id= torneo)
         return current 
 
@@ -456,7 +447,7 @@ class crearSolicitud(CreateView):
             return redirect('home')
 
 
-class crearSolicitudSuspender(CreateView):
+class crearSolicitudSuspender(SocioMixin,CreateView):
     model = Solicitud
     form_class = FormularioSolicitudSuspenderCreate
     template_name = "socio/views/suspender.html"
@@ -528,7 +519,7 @@ class crearSolicitudSuspender(CreateView):
         else:
             return redirect('home')
 
-class ranking(TemplateView):
+class ranking(SocioMixin,TemplateView):
     template_name = "socio/views/ranking.html"
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
@@ -540,10 +531,16 @@ class ranking(TemplateView):
         contexto['rol'] = self.request.user.perfil.perfil
         
         return contexto
+    def get(self, *args, **kwargs):
+        rankingId = Front.objects.filter(titulo="ranking")
+        response = super().get( *args, **kwargs)
+        response.set_cookie('rankingId', rankingId[0].id)
+        return response
+
 
 # LA ESTRUCTURA DE LAS CUOTAS DE LOS SOCIOS DEL CLUB CGM
 
-class cuotas_admin(TemplateView, View):
+class cuotas_admin(SocioMixin,TemplateView, View):
     template_name = "socio/views/cuotas_admin.html"
 
     def get_context_data(self, **kwargs):
@@ -580,7 +577,7 @@ class cuotas_admin(TemplateView, View):
         return contexto
 
 
-class cuotas_admin2(TemplateView, View):
+class cuotas_admin2(SocioMixin,TemplateView, View):
     template_name = "socio/views/cuotas_admin2.html"
 
     def get_context_data(self, **kwargs):
@@ -601,7 +598,7 @@ class cuotas_admin2(TemplateView, View):
 
         return contexto
 
-class cuotas_admin_mod(TemplateView, View):
+class cuotas_admin_mod(SocioMixin,TemplateView, View):
     
     ''' Vista para la administración de cuotas de los Secretarios
         ---------------------------------------------------------
@@ -685,7 +682,7 @@ class cuotas_admin_mod(TemplateView, View):
 
 #@login_required Si se usa con request, sin heredar de vistas
 @method_decorator(login_required, name='dispatch')
-class cuotas(TemplateView, View):
+class cuotas(SocioMixin,TemplateView, View):
     template_name = "socio/views/cuotas.html"
 
     def get(self, request, *args, **kwargs):

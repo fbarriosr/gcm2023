@@ -48,5 +48,6 @@ urlpatterns = [
     path('',include('socios.urls')),
     path('',include('capitan.urls')),
     path('',include('secretario.urls')),
+    path('',include('tesorero.urls')),
 
 ] 

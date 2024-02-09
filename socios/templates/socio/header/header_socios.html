@@ -31,6 +31,12 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'torneos'%}">TORNEOS</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'noticias'%} ">NOTICIAS</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'ranking'%}">RANKING</a>
+          </li>
           <li class="nav-item dropdown">
             <button
               class="btn dropdown-toggle nav-link active"
@@ -44,13 +50,6 @@
               <li><a class="dropdown-item menu" href="">NORMAS Y REGLAMENTOS</a></li>
               <li><a class="dropdown-item menu" href="">MEMORIAS Y BALANCE</a></li>
             </ul>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'ranking'%}">RANKING</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'noticias'%} ">NOTICIAS</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'cuotas'%} ">VER MIS CUOTAS</a>
@@ -91,6 +90,10 @@
               {% if rol == 'Super Usuario' or rol == 'Capitan' %}
               <li><a class="dropdown-item menu" href="{% url 'cumpleanos'%}">Cumpleaños</a></li>
               {% endif %}
+              {% if rol == 'Super Usuario' or rol == 'Secretario' %}
+              <li><a class="dropdown-item menu" href="{% url 'listarUsuarios'%}">Admin Usuarios</a></li>
+              {% endif %}
+
               <li><a class="dropdown-item menu" href="{% url 'logout'%}">Salir</a></li>
             </ul>
           </li>

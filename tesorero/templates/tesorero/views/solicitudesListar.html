@@ -1,0 +1,178 @@
+{% extends "web/root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block header %} 
+
+      {% include "socio/header/header_socios.html" %}
+
+{% endblock %}
+
+{% block body %}
+
+
+  {%if datos%}
+
+  <div class="container marketing" id="links">
+      <div class="row table-responsive" >
+          <h2>{{ title}}</h2>
+          <h3>{{ subtitle}}</h3>
+          <form method="get" > 
+            <div class="row m-b-sm m-t-sm">
+                    <div class="col-md-9">
+                         <div class="input-group">
+                             <input type="text"  class="form-control-sm form-control" placeholder="Buscar..." name="buscar" dato = "{{ request.GET.buscar }}">
+                        </div>
+                   </div>
+                    <div class="col-md-3">
+                        <div style="text-align: right">
+                           <span class="input-group-btn">
+                            <input type="hidden" name="estado" value="{{estado}}"> <!-- Agregar campo oculto -->
+                               <button type="submit" class="btn btn-primary"><i>Buscar</i></button> 
+                           </span> 
+                        </div>
+                    </div>
+            </div>
+         </form>
+          <table class="table table-striped ">
+            <thead>
+              <tr>
+                <th scope="col">Fecha</th>
+                <th scope="col">Rut</th>
+                <th scope="col">Apellido</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Deudas</th>
+                <th scope="col">Recargo</th>
+                <th scope="col">Cuota</th>
+                <th scope="col">Cancela Deuda socio (NO/SI)</th>
+                <th scope="col">TOTAL</th>
+                <th scope="col">ACCION</th>
+
+              </tr>
+            </thead>
+
+            <tbody>
+            {% for t in datos %}
+            
+              <tr>
+                <td>{{ t.fecha  | date:"m-d-Y h:i:s A"  }}</td>
+                <td>{{ t.usuario.rut  | upper   }}</td>
+                <td>{{ t.usuario.apellido_paterno  | upper   }}</td>
+                <td>{{ t.usuario.primer_nombre | upper  }}</td>
+                <td>{{ t.deuda_socio | upper  }}</td>
+                <td>{{ t.recargo | upper  }}</td>
+                <td>{{ t.cuota | upper  }}</td>
+                <td>{{ t.cancela_deuda_socio| upper  }}</td>
+                <td>{{ t.monto | upper  }}</td>
+                <td>
+                  {{ t.estado | upper  }}
+                  {% if t.get_estado_display == 'Aprobado' %}
+                  <a type="button" onclick="solicitudId('{{ t.id }}','{% url 'solicitudUpdate'%}' )" class="btn btn-white btn-sm"> <img src="{% static 'web/assets/logos/ok.png' %} " style="padding: 0px !important; width: 30px!important;"></a>
+                  {% elif t.get_estado_display == 'Pendidente' %}
+                  <a type="button" onclick="solicitudId('{{ t.id }}','{% url 'solicitudUpdate'%}' )" class="btn btn-white btn-sm"> <img src="{% static 'web/assets/logos/pendiente.png' %} " style="padding: 0px !important; width: 30px!important;"></a>
+                  {% elif t.get_estado_display == 'Rechazado' %}
+                  <a type="button" onclick="solicitudId('{{ t.id }}','{% url 'solicitudUpdate'%}' )" class="btn btn-white btn-sm"> <img src="{% static 'web/assets/logos/rechazado.png' %} " style="padding: 0px !important; width: 30px!important;"></a>
+                  {% elif t.get_estado_display == 'Suspender' %}
+                  <a type="button" onclick="solicitudId('{{ t.id }}','{% url 'solicitudUpdate'%}' )" class="btn btn-white btn-sm"> <img src="{% static 'web/assets/logos/suspendido.png' %} " style="padding: 0px !important; width: 30px!important;"></a>
+                  {%endif%}
+                </td>
+
+              <tr>
+            
+             {% endfor%}
+            </tbody>
+          </table>
+
+       </div>
+      </div>
+  </div>
+  {%else%}
+  <div class="container marketing" id="links">
+    <div class="row" style="padding: 50px;">
+      <div class="col-lg-5 " >
+        <h2>{{ title}}</h2>
+        <h3>{{ subtitle}}</h3>
+        <h4 style="padding-top:50px !important">{{msmEmpty}}</h4>
+      </div>
+    </div>
+
+  </div>  
+  {%endif%}
+
+  <div class="container marketing">      
+    <div class="row">
+      <div class="col align-self-end">
+        {% if datos %}
+        <nav class="navigation pagination" role="navigation">
+              <div class="nav-links">
+              {% if datos.has_previous %}
+                  <a class="prev page-numbers" href="?page={{ datos.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+                    <i class="fa fa-chevron-left"></i>
+                   </a>
+                  {% if datos.previous_page_number != 1%}
+
+                    <a class="page-numbers" href="?page=1{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}" class="btn btn-white">
+                        <span class="meta-nav screen-reader-text">Page </span>
+                        1
+                    </a>
+                {% endif %}
+                    {% if  down  %}
+                    <a class="page-numbers disable" >
+                      ...
+                  </a>
+                  {% endif %}
+                  <a class="prev page-numbers" href="?page={{ datos.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+                    {{ datos.previous_page_number }}
+                   </a>
+              
+              {% endif %}
+
+                <span class="page-numbers current">
+                    {{ datos.number }}
+                </span>
+               {% if datos.has_next %}
+
+                <a class="next page-numbers" href="?page={{ datos.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+                    {{ datos.next_page_number }}
+                </a>
+                {% if  up  %}
+                  <a class="page-numbers disable" >
+                    ...
+                </a>
+                {% endif %}
+
+                {% if datos.next_page_number != datos.paginator.num_pages %}
+                <a class="prev page-numbers" href="?page={{ datos.paginator.num_pages  }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+                  {{ datos.paginator.num_pages  }}
+                 </a>
+
+                {% endif %}
+                <a class="prev page-numbers" href="?page={{ datos.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}" >
+                  <i class="fa fa-chevron-right"></i>
+                 </a>
+
+
+                {% endif %}
+            </div>
+        </nav>
+        {% endif %}
+      </div>  
+    </div>
+  </div>
+
+
+
+<!-- /.container -->
+
+{% endblock %}
+
+{% block extraJs %} 
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script> 
+<script src="{% static 'socio/js/toastr.min.js' %}"></script> 
+<script src="{% static 'socio/js/notificaciones.js' %}"></script>
+<script src="{% static 'socio/js/solicitud.js' %}"></script>  
+
+{% endblock %}

@@ -1,0 +1,415 @@
+from django.contrib.auth.password_validation import validate_password
+from django.core import validators
+from django.contrib.auth.forms import AuthenticationForm
+from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
+from django import forms
+from .models import *
+from socios.models import *
+from usuarios.choices import grados, instituciones
+from web.models import *
+from datetime import datetime
+from django_recaptcha.fields import ReCaptchaField
+
+from socios.choices import regiones
+
+class FormularioRankingUpdate(forms.ModelForm):
+    class Meta:
+        model = Front
+        fields = ['contenido','file']
+        labels = {
+            'contenido':'Contenido',
+            'file': 'Archivo'
+        }
+        widgets = {
+            'contenido': forms.Textarea(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'descripcion',
+                    'style': "height: 200px",
+                }                
+            ),
+            'file': forms.FileInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'file',
+                }                
+            ),
+        }
+
+    def save(self,commit = True):
+        user = super().save(commit = False)
+        if commit:
+            user.save()
+        return user
+
+
+
+class FormularioNoticiaCreate(forms.ModelForm):
+    class Meta:
+        model = Noticia
+        fields = ['titulo','fecha',
+                 'resumen','info',
+                 'direccion','region',
+                 'img','img1','img2','img3','img4',
+                 'is_active']
+        labels = {
+            'titulo': 'Titulo (requerido) ',
+            'fecha': 'Fecha (requerido)',
+            'direccion': 'Dirección',
+            'region':'Region (requerido)',
+            'resumen': 'Resumen (requerido)',
+            'info': 'Información (requerido)',
+            'img': 'Imagen Principal',
+            'img1': 'Imagen 1',
+            'img2': 'Imagen 2',
+            'img3': 'Imagen 3',
+            'img4': 'Imagen 4',
+            'is_active':'Activar',
+        }
+        widgets = {
+            'titulo': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'titulo',
+                }                
+            ),
+            'fecha':forms.DateInput(
+                format=('%Y-%m-%d'),
+                attrs={'class': 'form-control', 
+                       'placeholder': 'Select a date',
+                       'type': 'date'
+                      }
+            ),
+            'region': forms.Select(
+                attrs={
+                    'class': 'form-control ',
+                    'choices': regiones,
+                    'id': 'region',
+                }
+            ),
+            'direccion': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'direccion',
+                }                
+            ),
+            'resumen': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'resumen',              
+                }                
+            ),
+            'info': forms.Textarea(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'info',
+                    'style': "height: 200px",
+                }                
+            ),
+            'img': forms.FileInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'img',
+                }                
+            ),
+            'img1': forms.FileInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'img1',
+                }                
+            ),
+            'img2': forms.FileInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'img2',
+                }                
+            ),
+            'img3': forms.FileInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'img3',
+                }                
+            ),
+            'img4': forms.FileInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'img4',
+                }                
+            ), 
+            'is_active': forms.CheckboxInput(
+                attrs = {
+                    'class': 'form-check-input switch',
+                    'id': 'is_active',
+                    'type':'checkbox',
+                    'rol': 'switch'
+
+                }                
+            )
+
+        }
+
+
+class FormularioNoticiaUpdate(FormularioNoticiaCreate):
+    def save(self,commit = True):
+        user = super().save(commit = False)
+        if commit:
+            user.save()
+        return user
+
+
+
+
+class FormularioTorneoCreate(forms.ModelForm):
+    class Meta:
+        model = Torneo
+        fields = [ 'titulo','fecha' ,'direccion','region',         
+                    'descripcion','img',             
+                    'cupos','inscritos','activo','proximo','abierto',
+                    'bases','list_inscritos','resultados',     
+                    'premiacion' ]
+        labels = {
+            'titulo'        : 'Titulo (requerido) ',
+            'fecha'         : 'Fecha (requerido)',        
+            'direccion'     : 'Dirección (requerido)',       
+            'region'        : 'Región (requerido)',      
+            'descripcion'   : 'Descripción', 
+            'img'           : 'Imagen (requerido)',   
+            'cupos'         : 'Cupos (requerido)',
+            'inscritos'     : 'Inscritos (requerido)', 
+            'activo'        : 'Activo', 
+            'proximo'       : 'Próximo',  
+            'abierto'       : 'Abierto',   
+            'bases'         : 'Bases', 
+            'list_inscritos': 'Listado de Inscritos',
+            'resultados'    : 'Resultados',
+            'premiacion'    : 'Premiación',
+        }
+        widgets = {
+            'titulo': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'titulo',
+                }                
+            ),
+            'fecha':forms.DateInput(
+                format=('%Y-%m-%d'),
+                attrs={'class': 'form-control', 
+                       'placeholder': 'Select a date',
+                       'type': 'date'
+                      }
+            ),
+            'direccion': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'direccion',
+                }                
+            ),
+            'region': forms.Select(
+                attrs={
+                    'class': 'form-control ',
+                    'choices': regiones,
+                    'id': 'region',
+                }
+            ),
+
+            'descripcion': forms.Textarea(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'descripcion',
+                    'style': "height: 200px",
+                }                
+            ),
+            'img': forms.FileInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'img',
+                }                
+            ),
+            'cupos': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'cupos',
+                }                
+            ),
+            'inscritos': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'inscritos',
+                }                
+            ),
+
+            'activo': forms.CheckboxInput(
+                attrs = {
+                    'class': 'form-check-input switch',
+                    'id': 'activo',
+                    'type':'checkbox',
+                    'rol': 'switch'
+
+                }                
+            ),
+            'proximo': forms.CheckboxInput(
+                attrs = {
+                    'class': 'form-check-input switch',
+                    'id': 'proximo',
+                    'type':'checkbox',
+                    'rol': 'switch'
+
+                }                
+            ),
+            'abierto': forms.CheckboxInput(
+                attrs = {
+                    'class': 'form-check-input switch',
+                    'id': 'abierto',
+                    'type':'checkbox',
+                    'rol': 'switch'
+
+                }                
+            ),
+            'bases': forms.FileInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'bases',
+                }                
+            ),
+            'list_inscritos': forms.FileInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'list_inscritos',
+                }                
+            ),
+            'resultados': forms.FileInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'resultados',
+                }                
+            ),
+            'premiacion': forms.FileInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'premiacion',
+                }                
+            ),
+
+        }
+
+
+class FormularioTorneoUpdate(FormularioTorneoCreate):
+    def save(self,commit = True):
+        user = super().save(commit = False)
+        if commit:
+            user.save()
+        return user
+
+    
+class FormularioUsuariosView(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',
+                    'rut','email','telefono', 'fecha_nacimiento',
+                    'institucion','grado','profesion' ]
+        labels = {
+            'primer_nombre':'Primer Nombre',
+            'segundo_nombre': 'Segundo Nombre',
+            'apellido_paterno': 'Apellido Paterno',
+            'apellido_materno': 'Apellido Materno',
+            'rut':  'RUT',
+            'email': 'Correo electrónico',
+            'telefono':'Telefono',
+            'fecha_nacimiento': 'Fecha de nacimiento',
+            'institucion': 'Institucion',
+            'grado':'Grado',
+            'profesion':'Profesion'
+        }
+        widgets = {
+
+            'primer_nombre': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'primer_nombre',
+                }                
+            ),
+            'segundo_nombre': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'segundo_nombre',
+                }                
+            ),
+            'apellido_paterno': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'apellido_paterno',
+                }                
+            ),
+            'apellido_materno': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'apellido_materno'
+                }                
+            ),
+
+            'rut': forms.TextInput(
+                attrs={
+                    'class': 'form-control ',
+                    'id': 'rut',
+                    'readonly':''
+                }
+            ),
+           
+            'fecha_nacimiento': forms.DateInput(
+                format=('%Y-%m-%d'),
+                attrs={'class': 'form-control', 
+                       'placeholder': 'Select a date',
+                       'type': 'date'
+                      }
+            ),
+
+            'email': forms.EmailInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'email',
+                    'value':'@wtos.cl',
+                }
+            ),
+            'telefono': forms.TextInput(
+                attrs={
+                    'class': 'form-control ',
+                    'id': 'telefono',
+                }
+            ),
+            'institucion': forms.Select(
+                attrs={
+                    'class': 'form-control ',
+                    'choices': instituciones,
+                    'id': 'institucion',
+                    'disabled':'disabled'
+                }
+            ),
+            'grado':  forms.Select(
+                attrs={
+                    'class': 'form-control ',
+                    'choices': grados,
+                    'id': 'grados',
+                    'disabled':'disabled'
+                }),
+
+            'profesion': forms.TextInput(
+                attrs={
+                    'class': 'form-control ',
+                    'id': 'profesion',
+                }
+            ),
+        }
+
+    def save(self,commit = True):
+        user = super().save(commit = False)
+        if commit:
+            user.save()
+        return user
+
+    def save(self,commit = True):
+        user = super().save(commit = False)
+        if commit:
+            user.save()
+        return user   
+

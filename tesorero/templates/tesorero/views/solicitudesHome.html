@@ -1,0 +1,51 @@
+{% extends "web/root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block header %} 
+
+      {% include "socio/header/header_socios.html" %}
+
+{% endblock %}
+
+{% block body %}
+
+<div class="container marketing" id="links">
+  <!-- Three columns of text below the carousel -->
+  
+    <div class="row" style="padding: 50px;">
+      <div class="col-lg-5 context solicitud" >
+        <a href="{% url 'listarSolicitudes'%}?estado=P" style="color:#1A1A1A; ">
+        <h1 > {{ pendientes }}</h1>
+        <p > PENDIENTES</p>
+        </a>
+      </div>
+      <div class="col-lg-5 context solicitud" >
+        <a href="{% url 'listarSolicitudes'%}?estado=A" style="color: #63AD70; ">
+        <h1 > {{ aprobadas }}</h1>
+        <p> APROBADAS</p>
+        </a>
+      </div>
+      <div class="col-lg-5 context solicitud" >
+        <a href="{% url 'listarSolicitudes'%}?estado=R" style="color: #E44061;">
+        <h1 > {{ rechazadas}}</h1>
+        <p> RECHAZADAS</p>
+        </a>
+      </div>
+      <div class="col-lg-5 context solicitud" >
+        <a href="{% url 'listarSolicitudes'%}?estado=S" style="color: #BD9A59;">
+        <h1 > {{ suspendidas }}</h1>
+        <p> SUSPENDIDAS</p>
+        </a>
+      </div>
+    </div>
+
+</div>
+
+
+<!-- /.container -->
+
+{% endblock %}

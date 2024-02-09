@@ -5,6 +5,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django import forms
 from .models import *
+from web.models import *
+from usuarios.choices import grados, instituciones
 from datetime import datetime
 from django_recaptcha.fields import ReCaptchaField
 
@@ -12,7 +14,8 @@ class FormularioSolicitudView(forms.ModelForm):
     class Meta:
         model = Solicitud
         fields = ['indice','auto','patente','busCGM','carro','descripcion',
-                    'acompanantes','deuda_socio','recargo','cuota','monto','cancela_deuda_socio']
+                    'acompanantes','deuda_socio','recargo','cuota','monto','cancela_deuda_socio',
+                    'estado', 'motivo','suspende', 'motivoSuspencion']
         labels = {
             'usuario':'Usuario',
             'torneo': 'Torneo',
@@ -28,8 +31,11 @@ class FormularioSolicitudView(forms.ModelForm):
             'recargo':'Recargo',
             'cuota': 'Cuota de Campeonato',
             'cancela_deuda_socio': 'Cancela Deuda socio (NO/SI)',
-            'monto': 'TOTAL'
-
+            'monto': 'TOTAL',
+            'estado': 'Estado',
+            'motivo': 'Motivo',
+            'suspende': 'Suspende',
+            'motivoSuspencion': 'Motivo Suspención'
         }
         widgets = {
 
@@ -147,6 +153,34 @@ class FormularioSolicitudView(forms.ModelForm):
                     'style':'font-weight: bolder; font-size: 24px;',
                     'readonly':''
                 }                
+            ), 
+            'estado': forms.Select(
+                attrs={
+                    'class': 'form-control ',
+                    'choices': estado_solicitud,
+                    'id': 'estado',
+                }
+            ),
+            'motivo': forms.Textarea(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'motivo',
+                }                
+            ),
+            'suspende': forms.CheckboxInput(
+                attrs = {
+                    'class': 'form-check-input switch',
+                    'id': 'suspende',
+                    'type':'checkbox',
+                    'rol': 'switch'
+
+                }                
+            ),
+            'motivoSuspencion': forms.Textarea(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'motivoSuspencion',
+                }                
             ),
         }
 
@@ -231,12 +265,12 @@ class FormularioPerfilUpdate(forms.ModelForm):
                 }
             ),
            
-            'fecha_nacimiento': forms.TextInput(
-                attrs={
-                    'class': 'form-control ',
-                    'id': 'fecha_nacimiento',
-                    'readonly':''
-                }
+            'fecha_nacimiento': forms.DateInput(
+                format=('%Y-%m-%d'),
+                attrs={'class': 'form-control', 
+                       'placeholder': 'Select a date',
+                       'type': 'date'
+                      }
             ),
 
             'email': forms.EmailInput(
@@ -250,23 +284,24 @@ class FormularioPerfilUpdate(forms.ModelForm):
                 attrs={
                     'class': 'form-control ',
                     'id': 'telefono',
-                    'readonly':''
                 }
             ),
-            'institucion': forms.TextInput(
+            'institucion': forms.Select(
                 attrs={
                     'class': 'form-control ',
+                    'choices': instituciones,
                     'id': 'institucion',
-                    'readonly':''
+                    'disabled':'disabled'
                 }
             ),
-            'grado': forms.TextInput(
+            'grado':  forms.Select(
                 attrs={
                     'class': 'form-control ',
-                    'id': 'grado',
-                    'readonly':''
-                }
-            ),
+                    'choices': grados,
+                    'id': 'grados',
+                    'disabled':'disabled'
+                }),
+
             'profesion': forms.TextInput(
                 attrs={
                     'class': 'form-control ',
@@ -334,6 +369,7 @@ class FormularioUsuarioPassword(forms.ModelForm):
         return user
         
 
+
 # Del formulario para generar_cuotas_form.html
 class GenerarCuotasForm(forms.Form):
     año = forms.IntegerField(
@@ -352,3 +388,7 @@ class GenerarCuotasForm(forms.Form):
         label='Ingrese el cargo por no pago:',
         widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '4000'})
     )
+
+
+
+

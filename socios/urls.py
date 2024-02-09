@@ -5,13 +5,10 @@ from socios.views import *
 urlpatterns = [   
     path('torneos', torneos.as_view(), name= 'torneos'),
     path('torneo/<slug:slug>/', torneo.as_view(), name='torneo'),
-
     path('noticias', noticias.as_view(), name = 'noticias'),
     path('noticia/<slug:slug>/' , noticia.as_view(), name = 'noticia'),
-    #path('editar_noticia/'        , editarNoticia.as_view()       , name = 'editarNoticia'),
-    path('eliminar_noticia/'        , eliminarNoticia.as_view()       , name = 'eliminarNoticia'),
-    
     path('ranking', ranking.as_view(), name= 'ranking'),
+    
     path('torneo/solicitud', crearSolicitud.as_view(), name= 'solicitud'),
     path('torneo/suspender', crearSolicitudSuspender.as_view(), name= 'suspender'),
 

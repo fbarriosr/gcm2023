@@ -13,7 +13,7 @@
 
 {% block body %}
 
- {% include "socio/banner/banner2.html" %}
+ {% include "web/banner/banner2.html" %}
 
  {% include "web/front/front.html" %}
   <!-- /.container -->
@@ -46,8 +46,11 @@
     </div>
   </div>
 
+  {%if datos%}
+
   <div class="container marketing" id="links">
       <div class="row table-responsive" >
+        <h3>Cumpleaños de {{mes}} </h3>
           <table class="table table-striped ">
             <thead>
               <tr>
@@ -83,6 +86,12 @@
        </div>
       </div>
   </div>
+
+  {%else%}
+  <div class="container marketing" id="links">
+    <h3>No hay cumpleaños este mes</h3>
+  </div>  
+  {%endif%}
 
   <div class="container marketing">      
     <div class="row">

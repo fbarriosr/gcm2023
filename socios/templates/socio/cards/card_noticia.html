@@ -4,7 +4,7 @@
    <div class="d-flex justify-content-end">
       {% if rol == 'Super Usuario' or rol == 'Secretario' %}
       <div class="col-lg-3 context">
-         <a href="#" class="btn btn-circle">+</a>
+         <a href="{%url 'noticiaCreate'%}" class="btn btn-circle">+</a>
       </div>
       {% endif %}
    </div>
@@ -24,7 +24,11 @@
                <small class="text-body-secondary"> <img src="static/web/assets/logos/calendario.png" style="padding: 10px;">{{ value.fecha }}
                {% if rol == 'Super Usuario' or rol == 'Secretario' %}
                <a href="" style="padding-right: 20px;padding-left: 30px;">
-               <img src="static/web/assets/logos/edit.png" style="width: 15px;">
+                  {% if value.is_active %}
+                     <img src="static/web/assets/logos/activo.png" style="width: 15px;">
+                  {%else %}
+                     <img src="static/web/assets/logos/noActivo.png" style="width: 15px;">
+                  {%endif %}
                </a>
                {%endif %}
                </small>
