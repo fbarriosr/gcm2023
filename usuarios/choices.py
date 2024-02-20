@@ -49,3 +49,14 @@ condicion =  (
     ('A', 'ACTIVO'),
     ('NI', 'NO INFORMAR'),
 )
+
+perfil  =  (
+    ('S', 'Socio'),
+    ('I', 'Invitado'),
+    ('T', 'Tesorero'),
+    ('SECR', 'Secretario'),
+    ('CAP', 'Capitan'),
+    ('SUPER', 'Super Usuario'),
+)
+
+

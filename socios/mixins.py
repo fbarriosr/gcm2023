@@ -13,21 +13,21 @@ class SocioMixin(object):
 
 class SecretarioMixin(object):
     def dispatch(self, request, *args, **kwargs):
-        if request.user.perfil.perfil == "Secretario" or request.user.perfil.perfil == "Super Usuario" :
+        if request.user.perfil == "SECR" or request.user.perfil == "SUPER" :
             return super().dispatch(request, *args, **kwargs)
         else:
             return redirect('login')
 
 class CapitanMixin(object):
     def dispatch(self, request, *args, **kwargs):
-        if request.user.perfil.perfil == "Capitan" or request.user.perfil.perfil == "Super Usuario" :
+        if request.user.perfil == "CAP" or request.user.perfil == "SUPER" :
             return super().dispatch(request, *args, **kwargs)
         else:
             return redirect('login')
 
 class TesoreroMixin(object):
     def dispatch(self, request, *args, **kwargs):
-        if request.user.perfil.perfil == "Tesorero" or request.user.perfil.perfil == "Super Usuario" :
+        if request.user.perfil == "T" or request.user.perfil == "SUPER" :
             return super().dispatch(request, *args, **kwargs)
         else:
             return redirect('login')

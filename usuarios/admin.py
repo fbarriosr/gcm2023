@@ -72,7 +72,7 @@ class UserAdmin(ImportExportModelAdmin,BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ['email','rut','apellido_paterno','primer_nombre',"email",]
+    list_display = ['rut','apellido_paterno','primer_nombre',"email",'institucion','grado']
     list_filter = ["is_admin"]
     fieldsets = [
         ('Principal', {"fields": ["rut",'password']}),
@@ -97,7 +97,6 @@ class UserAdmin(ImportExportModelAdmin,BaseUserAdmin):
 
 # Now register the new UserAdmin...
 admin.site.register(Usuario, UserAdmin )
-admin.site.register(Perfil, PerfilAdmin )
 # ... and, since we're not using Django's built-in permissions,
 # unregister the Group model from admin.
 admin.site.unregister(Group)

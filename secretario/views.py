@@ -75,7 +75,7 @@ class bus(SecretarioMixin, TemplateView):
         contexto["nameWeb"] = nameWeb
 
         contexto["title"] = "BUS"
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
         front = Front.objects.filter(titulo="bus")
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         torneoid = self.request.COOKIES.get('torneo') 
@@ -106,7 +106,7 @@ class rankingUpdate(SecretarioMixin,UpdateView):
         contexto['btnAction']   = 'ACTUALIZAR'
         contexto['urlForm']     = self.request.path
 
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
 
         return contexto
 
@@ -140,7 +140,7 @@ class auto(SecretarioMixin, TemplateView):
 
         contexto["title"] = "AUTO"
         front = Front.objects.filter(titulo="auto")
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         torneoid = self.request.COOKIES.get('torneo') 
         listado = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(auto= True).order_by('usuario__apellido_paterno')
@@ -170,7 +170,7 @@ class noticiaUpdate(SecretarioMixin,UpdateView):
         contexto['btnAction']   = 'ACTUALIZAR'
         contexto['urlForm']     = self.request.path
 
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
 
         return contexto
 
@@ -209,7 +209,7 @@ class noticiaCreate(SecretarioMixin,CreateView):
         contexto['urlForm']     = self.request.path
 
         contexto['titulo'] = 'CREAR NOTICIA'
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
      
         return contexto
 
@@ -279,7 +279,7 @@ class torneoCreate(SecretarioMixin,CreateView):
         contexto['urlForm']     = self.request.path
 
         contexto['titulo'] = 'CREAR TORNEO'
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
      
         return contexto
 
@@ -344,7 +344,7 @@ class torneoUpdate(SecretarioMixin,UpdateView):
         contexto['btnAction']   = 'ACTUALIZAR'
         contexto['urlForm']     = self.request.path
 
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
 
         return contexto
 
@@ -427,7 +427,7 @@ class listarUsuarios(SecretarioMixin, View):
         contexto['form']      = self.form_class
         contexto['datos']     = self.get_queryset()
 
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
 
         
         if contexto['datos'].paginator.num_pages > 1 and contexto['datos'].number != contexto['datos'].paginator.num_pages : # tiene un next
@@ -470,7 +470,7 @@ class usuarioUpdate(SecretarioMixin,UpdateView):
         contexto['btnAction']   = 'ACTUALIZAR'
         contexto['urlForm']     = self.request.path
 
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
 
         return contexto
 
@@ -508,7 +508,7 @@ class usuarioCreate(SecretarioMixin,CreateView):
         contexto['urlForm']     = self.request.path
 
         contexto['titulo'] = 'CREAR USUARIO'
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
      
         return contexto
 
@@ -520,10 +520,30 @@ class usuarioCreate(SecretarioMixin,CreateView):
                 usuario = Usuario(
                     rut                 = form.cleaned_data.get('rut'),
                     primer_nombre       = form.cleaned_data.get('primer_nombre'),
+                    segundo_nombre       = form.cleaned_data.get('segundo_nombre'),
                     apellido_paterno    = form.cleaned_data.get('apellido_paterno'),
+                    apellido_materno    = form.cleaned_data.get('apellido_materno'),
+                    email               = form.cleaned_data.get('email'),
+                    telefono            = form.cleaned_data.get('telefono'),
+                    fecha_nacimiento    = form.cleaned_data.get('fecha_nacimiento'),
+                    estado              = form.cleaned_data.get('estado'),
+                    categoria           = form.cleaned_data.get('categoria'),
+                    sexo                = form.cleaned_data.get('sexo'),
+                    eCivil              = form.cleaned_data.get('eCivil'),
+                    perfil              = form.cleaned_data.get('perfil'),
+                    situacionEspecial   = form.cleaned_data.get('situacionEspecial'),
+                    fundador            = form.cleaned_data.get('fundador'),
+                    is_admin            = form.cleaned_data.get('is_admin'),
+                    is_active           = form.cleaned_data.get('is_active'),
+                    institucion         = form.cleaned_data.get('institucion'),
+                    grado               = form.cleaned_data.get('grado'),
+                    profesion           = form.cleaned_data.get('profesion'),
+                    condicion           = form.cleaned_data.get('condicion'),
+                    fecha_incorporacion = form.cleaned_data.get('fecha_incorporacion'),
                 )
+                usuario.set_password(form.cleaned_data.get('rut'))
                 usuario.save()
-                mensaje = 'Noticia Enviada'
+                mensaje = 'Usuario Creado'
                 error = 'No hay error!'
                 response = JsonResponse({'mensaje': mensaje, 'error': error})
                 response.status_code = 201

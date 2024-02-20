@@ -105,7 +105,7 @@ class salida( CapitanMixin, TemplateView):
         contexto["nameWeb"] = nameWeb
 
         contexto["title"] = "SALIDA"
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
         front = Front.objects.filter(titulo="salida")
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         torneoid = self.request.COOKIES.get('torneo') 
@@ -121,7 +121,7 @@ class cumpleanos(CapitanMixin,TemplateView):
         contexto["title"] = "CUMPLEAÑOS"
         front = Front.objects.filter(titulo="cumpleaños")
         contexto['front'] = list(front.values('titulo', 'img', 'contenido', 'order', 'file'))
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
 
         fecha_actual = datetime.now()
         month = fecha_actual.month

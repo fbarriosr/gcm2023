@@ -2,7 +2,7 @@
 <div class="container ">
    <h1 class=" ">TEMPORADA {{ year }}</h1>
    <div class="d-flex justify-content-end">
-      {% if rol == 'Super Usuario' or rol == 'Secretario' %}
+      {% if rol == 'SUPER' or rol == 'SECR' %}
       <div class="col-lg-3 context">
          <a href="{%url 'torneoCreate' %}" class="btn btn-circle">+</a>
 

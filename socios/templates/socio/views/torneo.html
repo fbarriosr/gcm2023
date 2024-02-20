@@ -16,19 +16,19 @@
     {% include "socio/banner/banner_torneo.html" %}
         
    <div class="row justify-content-end" style="padding-bottom:30px; padding-top: -5px;">
-    {% if rol == 'Secretario' or rol == 'Super Usuario' %}
+    {% if rol == 'SECRE' or rol == 'SUPER' %}
         <div class="col-lg-2 dropdown">
           <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             SECRETARIO
           </button>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="../bus">BUS</a></li>
-            <li><a class="dropdown-item" href="../auto">AUTO</a></li>
+            <li><a class="dropdown-item" href="{% url 'bus'%}">BUS</a></li>
+            <li><a class="dropdown-item" href="{% url 'auto'%}">AUTO</a></li>
             <li><a class="dropdown-item" href="{% url 'torneoUpdate'%}">EDITAR</a></li>
           </ul>
         </div>
     {%endif%}
-    {% if rol == 'Tesorero' or rol == 'Super Usuario' %}
+    {% if rol == 'T' or rol == 'SUPER' %}
         <div class="col-lg-2 dropdown">
           <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             TESORERO
@@ -138,6 +138,5 @@
 
 {% block extraJs %} 
 
-<script src="{% static 'web/js/solicitud.js' %}"></script>   
 <script src="{% static 'socio/js/solicitud.js' %}"></script>    
 {% endblock %}

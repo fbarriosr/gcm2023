@@ -44,7 +44,7 @@ class solicitudHome(TesoreroMixin, TemplateView):
         contexto["nameWeb"] = nameWeb
 
         contexto["title"] = "Solicitudes"
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
 
         torneoId = self.request.COOKIES.get('torneoId') 
         pendientes 	= Solicitud.objects.filter(torneo__id=torneoId).filter(estado='P')
@@ -112,7 +112,7 @@ class listarSolicitudes(TesoreroMixin, View):
         
         contexto['form']      = self.form_class
         contexto['datos']     = self.get_queryset()
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
 
 
         
@@ -163,7 +163,7 @@ class solicitudUpdate(TesoreroMixin,UpdateView):
         contexto['urlForm']     = self.request.path
 
 
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
 
         return contexto
 

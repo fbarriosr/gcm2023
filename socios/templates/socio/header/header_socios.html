@@ -64,22 +64,22 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              {% if rol == 'Super Usuario' %}
+              {% if rol == 'SUPER' %}
               <img src="{% static '/web/assets/logos/iconAdmin.png' %}" style="padding: 10px;"> 
               {% endif %}
-              {% if rol == 'Secretario' %}
+              {% if rol == 'SECR' %}
               <img src="{% static '/web/assets/logos/iconSecretario.png' %}" style="padding: 10px;"> 
               {% endif %}
-              {% if rol == 'Capitan' %}
+              {% if rol == 'CAP' %}
               <img src="{% static '/web/assets/logos/iconCapitan.png' %}" style="padding: 10px;"> 
               {% endif %}
-              {% if rol == 'Tesorero' %}
+              {% if rol == 'T' %}
               <img src="{% static '/web/assets/logos/iconTesorero.png' %}" style="padding: 10px;"> 
               {% endif %}
-              {% if rol == 'Invitado' %}
+              {% if rol == 'I' %}
               <img src="{% static '/web/assets/logos/iconInvitado.png' %}" style="padding: 10px;"> 
               {% endif %}
-              {% if rol == 'Socio' %}
+              {% if rol == 'S' %}
               <img src="{% static '/web/assets/logos/iconSocio.png' %}" style="padding: 10px;"> 
               {% endif %}
 
@@ -87,10 +87,10 @@
             <ul class="dropdown-menu">
               <li><a class="dropdown-item menu" href="{% url 'perfil' %}">Perfil</a></li>
               <li><a class="dropdown-item menu" href="{% url 'cambiar_password' %}">Contraseña</a></li>
-              {% if rol == 'Super Usuario' or rol == 'Capitan' %}
+              {% if rol == 'SUPER' or rol == 'CAP' %}
               <li><a class="dropdown-item menu" href="{% url 'cumpleanos'%}">Cumpleaños</a></li>
               {% endif %}
-              {% if rol == 'Super Usuario' or rol == 'Secretario' %}
+              {% if rol == 'SUPER' or rol == 'SECR' %}
               <li><a class="dropdown-item menu" href="{% url 'listarUsuarios'%}">Admin Usuarios</a></li>
               {% endif %}
 

@@ -27,62 +27,127 @@
     </div>
   </div>
 <!-- Three columns of text below the carousel -->
-  <form enctype="multipart/form-data" id="form_edicion2" class="contact-form c-mb-30 c-gutter-30 col-lg-12" action= "{{urlForm}}"  method="POST" enctype="multipart/form-data">{% csrf_token %}
+  <form enctype="multipart/form-data" id="form_edicion" class="contact-form c-mb-30 c-gutter-30 col-lg-12" action= "{{urlForm}}"  method="POST" enctype="multipart/form-data">{% csrf_token %}
     <div class="row">
+          <div col-lg-12> <h1>Principal</h1></div>
+          <div class="col-lg-3 form-floating">
+            {{form.rut}}
+            <label> {{form.rut.label}}</label>
+          </div>
+          <div col-lg-12> <h1>Datos</h1></div>
+
           <div class="col-lg-2 form-floating">
-                  {{form.primer_nombre}}
-                  <label> {{form.primer_nombre.label}}</label>
-                </div>
-                 <div class="col-lg-2 form-floating">
-                  {{form.segundo_nombre}}
-                  <label> {{form.segundo_nombre.label}}</label>
-                </div>
-                 <div class="col-lg-2 form-floating">
-                  {{form.apellido_paterno}}
-                  <label> {{form.apellido_paterno.label}}</label>
-                </div>
-                 <div class="col-lg-2 form-floating">
-                  {{form.apellido_materno}}
-                  <label> {{form.apellido_materno.label}}</label>
-                </div>
-                <div class="col-lg-3 form-floating">
-                  {{form.email}}
-                  <label> {{form.email.label}}</label>
-                </div>
-                <div class="col-lg-3 form-floating">
-                  {{form.telefono}}
-                  <label> {{form.telefono.label}}</label>
-                </div>
-                <div class="col-lg-3 form-floating">
-                  {{form.fecha_nacimiento}}
-                  <label> {{form.fecha_nacimiento.label}}</label>
-                </div>
-                
-                <div class="col-lg-3 form-floating">
-                  {{form.profesion}}
-                  <label> {{form.profesion.label}}</label>
-                </div>
+            {{form.primer_nombre}}
+            <label> {{form.primer_nombre.label}}</label>
+          </div>
+           <div class="col-lg-2 form-floating">
+            {{form.segundo_nombre}}
+            <label> {{form.segundo_nombre.label}}</label>
+          </div>
+           <div class="col-lg-2 form-floating">
+            {{form.apellido_paterno}}
+            <label> {{form.apellido_paterno.label}}</label>
+          </div>
+           <div class="col-lg-2 form-floating">
+            {{form.apellido_materno}}
+            <label> {{form.apellido_materno.label}}</label>
+          </div>
+          <div class="col-lg-3 form-floating">
+            {{form.email}}
+            <label> {{form.email.label}}</label>
+          </div>
+         
+          <div class="col-lg-3 form-floating">
+            {{form.fecha_nacimiento}}
+            <label> {{form.fecha_nacimiento.label}}</label>
+          </div>
+          
+          <div col-lg-12> <h1>Info</h1></div>
+          <div class="col-lg-3 form-floating">
+            {{form.telefono}}
+            <label> {{form.telefono.label}}</label>
+          </div>
+          <div class="col-lg-3 form-floating">
+            {{form.sexo}}
+            <label> {{form.sexo.label}}</label>
+          </div>
+          <div class="col-lg-3 form-floating">
+            {{form.eCivil}}
+            <label> {{form.eCivil.label}}</label>
+          </div>
+          
+          <div class="col-lg-3 form-floating">
+            {{form.estado}}
+            <label> {{form.estado.label}}</label>
+          </div>
+          <div class="col-lg-3 form-floating">
+            {{form.categoria}}
+            <label> {{form.categoria.label}}</label>
+          </div>
+          <div class="col-lg-3 form-floating">
+            {{form.perfil}}
+            <label> {{form.perfil.label}}</label>
+          </div>
+          <div class="col-lg-12">
+          </div>
+          <div class="col-lg-3">
+             {{form.situacionEspecial.label}}
+          </div>
+          <div class="col-lg-3 form-check form-switch">
+             {{form.situacionEspecial }}
+          </div>
 
-  
-                <div col-lg-12> <h1>No Editables</h1></div>
-                <div class="col-lg-3 form-floating">
-                  {{form.rut}}
-                  <label> {{form.rut.label}}</label>
-                </div>
+          <div class="col-lg-3">
+             {{form.fundador.label}}
+          </div>
+          <div class="col-lg-3 form-check form-switch">
+             {{form.fundador }}
+          </div>
+
+          <div col-lg-12> <h1>Permisos</h1></div>
+
+          <div class="col-lg-3">
+             {{form.is_admin.label}}
+          </div>
+          <div class="col-lg-3 form-check form-switch">
+             {{form.is_admin }}
+          </div>
+
+          <div class="col-lg-3">
+             {{form.is_active.label}}
+          </div>
+          <div class="col-lg-3 form-check form-switch">
+             {{form.is_active }}
+          </div>
 
 
-                <div class="col-lg-3 form-floating">
-                  {{form.institucion }}
-                  <label> {{form.institucion.label}}</label>
-                </div>
-                <div class="col-lg-3 form-floating">
-                  {{form.grado}}
-                  <label> {{form.grado.label}}</label>
-                </div>
+          <div col-lg-12> <h1>Personal Uniformado</h1></div>
+          
+
+          <div class="col-lg-3 form-floating">
+            {{form.institucion }}
+            <label> {{form.institucion.label}}</label>
+          </div>
+          <div class="col-lg-3 form-floating">
+            {{form.grado}}
+            <label> {{form.grado.label}}</label>
+          </div>
+          <div class="col-lg-3 form-floating">
+            {{form.condicion}}
+            <label> {{form.condicion.label}}</label>
+          </div>
+          <div class="col-lg-3 form-floating">
+            {{form.profesion}}
+            <label> {{form.profesion.label}}</label>
+          </div>
+          <div class="col-lg-3 form-floating">
+            {{form.fecha_incorporacion}}
+            <label> {{form.fecha_incorporacion.label}}</label>
+          </div>
     </div>
     <div class="row justify-content-end" style="padding-top:30px">
         <div class="col-lg-3">
-            <button type="button" onclick="createUsuario()"  class="btn btn-primary"><strong>{{ btnAction }}</strong></button>
+            <button type="button" onclick="crearUsuario()"  class="btn btn-primary"><strong>{{ btnAction }}</strong></button>
         </div>
  
     </div>

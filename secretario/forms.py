@@ -12,6 +12,7 @@ from datetime import datetime
 from django_recaptcha.fields import ReCaptchaField
 
 from socios.choices import regiones
+from usuarios.choices import *
 
 class FormularioRankingUpdate(forms.ModelForm):
     class Meta:
@@ -307,7 +308,9 @@ class FormularioUsuariosView(forms.ModelForm):
         model = Usuario
         fields = ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',
                     'rut','email','telefono', 'fecha_nacimiento',
-                    'institucion','grado','profesion' ]
+                    'estado','categoria','sexo','eCivil','perfil','situacionEspecial','fundador',
+                    "is_admin",'is_active',
+                    'institucion','grado','profesion', 'condicion','fecha_incorporacion' ]
         labels = {
             'primer_nombre':'Primer Nombre',
             'segundo_nombre': 'Segundo Nombre',
@@ -316,10 +319,21 @@ class FormularioUsuariosView(forms.ModelForm):
             'rut':  'RUT',
             'email': 'Correo electrónico',
             'telefono':'Telefono',
+            'sexo': 'Sexo',
+            'eCivil': 'Estado Civil',
+            'perfil': 'Perfil',
             'fecha_nacimiento': 'Fecha de nacimiento',
+            'estado' :'Estado',
+            'situacionEspecial': 'Situacion Especial',
+            'fundador':'Fundador',
+            "is_admin": 'is_admin',
+            'is_active': 'is_active',
+            'categoria': 'Categoria',
             'institucion': 'Institucion',
             'grado':'Grado',
-            'profesion':'Profesion'
+            'profesion':'Profesion',
+            'condicion': 'Condicion',
+            'fecha_incorporacion': 'Fecha de Incorporacion'
         }
         widgets = {
 
@@ -352,7 +366,7 @@ class FormularioUsuariosView(forms.ModelForm):
                 attrs={
                     'class': 'form-control ',
                     'id': 'rut',
-                    'readonly':''
+                   
                 }
             ),
            
@@ -368,21 +382,94 @@ class FormularioUsuariosView(forms.ModelForm):
                 attrs = {
                     'class': 'form-control ',
                     'id': 'email',
-                    'value':'@wtos.cl',
+                    'value':'@gmail.com',
                 }
             ),
             'telefono': forms.TextInput(
                 attrs={
                     'class': 'form-control ',
                     'id': 'telefono',
+                    'value':'+56 9 ',
                 }
+            ),
+            'sexo': forms.Select(
+                attrs={
+                    'class': 'form-control ',
+                    'choices': sexos,
+                    'id': 'sexo',
+                }
+            ),
+            'eCivil': forms.Select(
+                attrs={
+                    'class': 'form-control ',
+                    'choices': civil,
+                    'id': 'eCivil',
+                }
+            ),
+            'estado': forms.Select(
+                attrs={
+                    'class': 'form-control ',
+                    'choices': estado,
+                    'id': 'estado',
+                }
+            ),
+            'perfil': forms.Select(
+                attrs={
+                    'class': 'form-control ',
+                 
+                    'id': 'perfil',
+                }
+            ),
+            'categoria': forms.Select(
+                attrs={
+                    'class': 'form-control ',
+                    'choices': categoria,
+                    'id': 'categoria',
+                }
+            ),
+            'fundador': forms.CheckboxInput(
+                attrs = {
+                    'class': 'form-check-input switch',
+                    'id': 'fundador',
+                    'type':'checkbox',
+                    'rol': 'switch'
+
+                }                
+            ),
+            'situacionEspecial': forms.CheckboxInput(
+                attrs = {
+                    'class': 'form-check-input switch',
+                    'id': 'situacionEspecial',
+                    'type':'checkbox',
+                    'rol': 'switch'
+
+                }                
+            ),
+
+            'is_active': forms.CheckboxInput(
+                attrs = {
+                    'class': 'form-check-input switch',
+                    'id': 'is_active',
+                    'type':'checkbox',
+                    'rol': 'switch'
+
+                }                
+            ),
+            'is_admin': forms.CheckboxInput(
+                attrs = {
+                    'class': 'form-check-input switch',
+                    'id': 'is_admin',
+                    'type':'checkbox',
+                    'rol': 'switch'
+
+                }                
             ),
             'institucion': forms.Select(
                 attrs={
                     'class': 'form-control ',
                     'choices': instituciones,
                     'id': 'institucion',
-                    'disabled':'disabled'
+                
                 }
             ),
             'grado':  forms.Select(
@@ -390,14 +477,27 @@ class FormularioUsuariosView(forms.ModelForm):
                     'class': 'form-control ',
                     'choices': grados,
                     'id': 'grados',
-                    'disabled':'disabled'
+                
                 }),
-
+            'condicion': forms.Select(
+                attrs={
+                    'class': 'form-control ',
+                    'choices': condicion,
+                    'id': 'condicion',
+                }
+            ),
             'profesion': forms.TextInput(
                 attrs={
                     'class': 'form-control ',
                     'id': 'profesion',
                 }
+            ),
+            'fecha_incorporacion': forms.DateInput(
+                format=('%Y-%m-%d'),
+                attrs={'class': 'form-control', 
+                       'placeholder': 'Select a date',
+                       'type': 'date'
+                      }
             ),
         }
 

@@ -366,8 +366,20 @@ function updateUsuario(){
             notificacionSuccessUrl('Actualizando', 'listarUsuarios')
             console.log(response.mensaje)   
         },
-        error: function (error) {
-            console.log(error)         
+         error: function (error) {
+            if (error.responseText){
+                mensaje= error.responseText
+                obj = $.parseJSON(mensaje);
+                if(obj.error.rut){
+                    m = 'Rut: '+ obj.error.rut
+                    notificacionError(m)
+                }
+                console.log(obj.error)
+            }else{
+                console.log(error) 
+                notificacionError(error)
+            }
+        
         }
     });
  
@@ -375,7 +387,7 @@ function updateUsuario(){
 
 function crearUsuario(){
 
-    var data = new FormData($('#form_edicion2').get(0));
+    var data = new FormData($('#form_edicion').get(0));
     console.log(data);
     $.ajax({
         data: $('#form_edicion').serialize(),
@@ -386,8 +398,19 @@ function crearUsuario(){
             console.log(response.mensaje)  
         },
         error: function (error) {
-            console.log(error) 
-
+            if (error.responseText){
+                mensaje= error.responseText
+                obj = $.parseJSON(mensaje);
+                if(obj.error.rut){
+                    m = 'Rut: '+ obj.error.rut
+                    notificacionError(m)
+                }
+                console.log(obj.error)
+            }else{
+                console.log(error) 
+                notificacionError(error)
+            }
+        
         }
     });
     

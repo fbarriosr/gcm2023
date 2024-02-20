@@ -6,31 +6,6 @@ from search_admin_autocomplete.admin import SearchAutoCompleteAdmin
 from .choices import *
 import datetime
 
-class Perfil(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    perfil = models.CharField(
-        max_length=30, blank=False, null=False, verbose_name="Perfil de usuario"
-    )
-    descripcion = models.TextField(
-        blank=True, null=True, verbose_name="Descripcion del perfil"
-    )
-    order = models.IntegerField(default=0)
-
-    class Meta:
-        verbose_name = "Perfil"
-        verbose_name_plural = "Perfiles"
-        ordering = ["order"]
-
-    def __str__(self):
-        return self.perfil
-
-
-class PerfilAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
-    search_fields = ["perfil"]
-    list_display = ("perfil", "order")
-    list_per_page = 10
-
-
 class MyUserManager(BaseUserManager):
     def create_user(self, email, date_of_birth, password):
         """
@@ -77,7 +52,7 @@ class Usuario(AbstractBaseUser):
     telefono                = models.IntegerField(blank=True, null=True, verbose_name="Celular")
     sexo                    = models.CharField(max_length=1, choices=sexos, default="M", verbose_name="Genero")
     eCivil                  = models.CharField(max_length=30, choices=civil, default="NI", verbose_name="Estado Civil")  
-    perfil                  = models.ForeignKey(Perfil, blank=True, null=True, on_delete=models.CASCADE, verbose_name="Perfil de usuario")  # ej. socio,invitado, capitan, tesorero...
+    perfil                  = models.CharField(max_length=20, choices=perfil, default="S") # ej. socio,invitado, capitan, tesorero...
     estado                  = models.CharField(max_length=20, choices=estado, default="A")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
     categoria               = models.CharField(max_length=20, choices=categoria, default="N")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
     situacionEspecial       = models.BooleanField(default=False, verbose_name="Situación Especial")

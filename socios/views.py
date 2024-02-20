@@ -99,8 +99,8 @@ class PasswordUsuario(SocioMixin,UpdateView):
         contexto['title'] =  "Usuario"
         contexto['btnAction'] = 'Modificar'
         contexto['titulo'] = 'Cambiar Password'
-        contexto['name'] = self.request.user.primer_nombre +' ' +self.request.user.apellido_paterno + ' | ' + self.request.user.perfil.perfil
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['name'] = self.request.user.primer_nombre +' ' +self.request.user.apellido_paterno + ' | ' + self.request.user.get_perfil_display()
+        contexto['rol'] = self.request.user.perfil
         return contexto
         
     def post(self,request,*args,**kwargs):     # comunicacion entre en form y python para notificaciones
@@ -138,12 +138,12 @@ class perfil(SocioMixin,UpdateView):
 
         contexto["title"] = "perfil"
         contexto["titulo"] = "perfil"
-        contexto['name'] = self.request.user.primer_nombre +' ' +self.request.user.apellido_paterno + ' | ' + self.request.user.perfil.perfil
+        contexto['name'] = self.request.user.primer_nombre +' ' +self.request.user.apellido_paterno + ' | ' + self.request.user.get_perfil_display()
 
         contexto['btnAction']   = 'ACTUALIZAR'
         contexto['urlForm']     = self.request.path
 
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
 
         contexto['user']  = self.get_object()
         return contexto
@@ -207,7 +207,7 @@ class noticia(SocioMixin,DetailView):
         contexto['imgs']= lista
         contexto['front']= [{'img': dato['img']}]
 
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
 
         return contexto
 
@@ -222,8 +222,8 @@ class noticias(SocioMixin,TemplateView):
     template_name = "socio/views/noticias.html"
     
     def get_queryset(self):
-        rol = self.request.user.perfil.perfil
-        if rol =='Secretario' or rol =='Super Usuario':
+        rol = self.request.user.perfil
+        if rol =='SECR' or rol =='SUPER':
             lNoticia = self.model.objects.order_by('fecha')
         else:
             lNoticia = self.model.objects.filter(is_active=True).order_by('fecha')
@@ -251,7 +251,7 @@ class noticias(SocioMixin,TemplateView):
             else:
                 contexto['down'] = False 
 
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
 
         return contexto
 
@@ -289,7 +289,7 @@ class torneos(SocioMixin,TemplateView):
         contexto['mainCard'] = mainCard
         contexto['torneoCard'] = torneoCard
         
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
 
         return contexto
 
@@ -300,8 +300,8 @@ class torneo(SocioMixin,DetailView):
     
     def get(self, *args, **kwargs):
         dato =  self.get_object()
-        torneoId = dato[0].id
-        torneoEstado = dato[0].abierto
+        torneoId = dato.id
+        torneoEstado = dato.abierto
         solicitud = Solicitud.objects.filter(usuario__email=self.request.user.email).filter(torneo__id=torneoId).order_by('-fecha')
         
         if (torneoEstado==True): #torneo abierto
@@ -330,21 +330,21 @@ class torneo(SocioMixin,DetailView):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
         dato =  self.get_object()
-        torneoid = dato[0].id
-        torneoEstado = dato[0].abierto
+        torneoid = dato.id
+        torneoEstado = dato.abierto
         contexto['torneoEstado'] = torneoEstado
-        contexto['torneoImg']= dato[0].img
-        contexto['torneoFecha']= str(dato[0].fecha)
-        contexto['torneoLugar']= dato[0].direccion+'-' + dato[0].region
-        contexto['torneoInscritos']= dato[0].inscritos
-        contexto['torneoCupos']= dato[0].cupos
+        contexto['torneoImg']= dato.img
+        contexto['torneoFecha']= str(dato.fecha)
+        contexto['torneoLugar']= dato.direccion+'-' + dato.region
+        contexto['torneoInscritos']= dato.inscritos
+        contexto['torneoCupos']= dato.cupos
         solicitud = Solicitud.objects.filter(usuario__email=self.request.user.email).filter(torneo__id=torneoid).order_by('-fecha') #ultima solicitud
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
 
         if (len(solicitud)==0 ): # no hay solicitud
             if (torneoEstado==False): #torneo Cerrado
                 contexto['solicitudEstado']= 'C'
-                contexto['nombreTorneo'] = dato[0].titulo
+                contexto['nombreTorneo'] = dato.titulo
         else:  # si hay solictud
             contexto['solicitud']= solicitud[0]
             contexto['solicitudEstado']=solicitud[0].estado
@@ -352,20 +352,20 @@ class torneo(SocioMixin,DetailView):
                 contexto['bases']= solicitud[0].torneo.bases
                 contexto['premiacion']= solicitud[0].torneo.premiacion
                 contexto['resultados']= solicitud[0].torneo.resultados
-                contexto['listadoAceptados'] = dato[0].list_inscritos
+                contexto['listadoAceptados'] = dato.list_inscritos
             elif (solicitud[0].estado == 'S'):
                 if (torneoEstado==False): #torneo Cerrado
                     contexto['solicitudEstado']= 'C'
-                    contexto['nombreTorneo'] = dato[0].titulo
+                    contexto['nombreTorneo'] = dato.titulo
 
         return contexto
 
     
 
     def get_object(self, **kwargs):
-        print('slug', self.kwargs.get('slug', None))
-        slug =  self.model.objects.filter(slug = self.kwargs.get('slug', None))
-        return slug
+        torneo= self.request.COOKIES.get('torneoId') 
+        current = Torneo.objects.get(id= torneo)
+        return current 
 
 
 class crearSolicitud(SocioMixin,CreateView):
@@ -398,7 +398,7 @@ class crearSolicitud(SocioMixin,CreateView):
         contexto['torneo'] = torneo
         torneoTitulo = str(torneo.titulo).upper().replace('TORNEO','') 
         contexto['titulo'] = 'INSCRIPCIÓN  TORNEO '+ torneoTitulo
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
      
         return contexto
 
@@ -463,7 +463,7 @@ class crearSolicitudSuspender(SocioMixin,CreateView):
         contexto['torneo'] = torneo
         torneoTitulo = str(torneo.titulo).upper().replace('TORNEO','') 
         contexto['titulo'] = 'SOLICITUD DE SUSPENCION PARTICIPACIÓN '+ torneoTitulo
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
      
         return contexto
 
@@ -528,7 +528,7 @@ class ranking(SocioMixin,TemplateView):
         contexto["title"] = "ranking"
         front = Front.objects.filter(titulo="ranking")
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
-        contexto['rol'] = self.request.user.perfil.perfil
+        contexto['rol'] = self.request.user.perfil
         
         return contexto
     def get(self, *args, **kwargs):
