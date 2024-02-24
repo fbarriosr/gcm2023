@@ -256,13 +256,11 @@ class noticias(SocioMixin,TemplateView):
         return contexto
 
 
-
-
-
 class torneos(SocioMixin,TemplateView):
     template_name = "socio/views/torneos.html"
 
     def get_context_data(self, **kwargs):
+        
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
         contexto["title"] = "torneo"
@@ -284,8 +282,10 @@ class torneos(SocioMixin,TemplateView):
                 contexto['year'] = str(anio_minimo) +'-'+ str(anio_maximo)
             else:
             	contexto['year'] = str(anio_minimo)
+        
         else:
             contexto['year'] = 'SIN FECHAS'
+
         contexto['mainCard'] = mainCard
         contexto['torneoCard'] = torneoCard
         
@@ -541,64 +541,6 @@ class ranking(SocioMixin,TemplateView):
 # LA ESTRUCTURA DE LAS CUOTAS DE LOS SOCIOS DEL CLUB CGM
 
 class cuotas_admin(SocioMixin,TemplateView, View):
-    template_name = "socio/views/cuotas_admin.html"
-
-    def get_context_data(self, **kwargs):
-        contexto =  super().get_context_data(**kwargs)
-        contexto['nameWeb'] = nameWeb
-        contexto['title'] = 'cuotas_admin'
-        contexto['mensaje'] = 'holi'
-
-        cuotas = Cuota.objects.all().select_related('usuario', 'año')
-        front = Front.objects.filter(titulo="cuotas")
-
-        # Obtener los años de las cuotas del socio para el filtro por año en cuotas.html
-        años_cuotas_socio = Cuota.objects.values('año__año').distinct().order_by('año__año')
-        años_cuotas_socio = sorted([año['año__año'] for año in años_cuotas_socio], reverse=True)
-
-        # Incluir el valor del estado de la cuota, reemplazando la letra por el nombre
-        estado_dict = dict(estado)
-        for cuota in cuotas:
-            if cuota.usuario.estado in estado_dict:
-                nuevo_estado = estado_dict[cuota.usuario.estado]
-                cuota.usuario.estado_txt= nuevo_estado
-                cuota.save()
-                #print(f'estado cambiado a: {nuevo_estado}')
-
-        usuarios_con_cuotas = Usuario.objects.filter(cuota__isnull=False).distinct()
-        listado_usuarios = usuarios_con_cuotas.values_list('email', flat=True).order_by('-email')
-
-        print(f'listado usuarios: {listado_usuarios}')
-
-        contexto['cuotas'] = cuotas
-        contexto['front'] = list(front.values('titulo','img', 'contenido', 'order','file'))
-        contexto['años_cuotas_socio'] = años_cuotas_socio
-        contexto['listado_usuarios'] = listado_usuarios
-        return contexto
-
-
-class cuotas_admin2(SocioMixin,TemplateView, View):
-    template_name = "socio/views/cuotas_admin2.html"
-
-    def get_context_data(self, **kwargs):
-        año_filtro = 2022
-        contexto =  super().get_context_data(**kwargs)
-        contexto['nameWeb'] = nameWeb
-        contexto['title']   = 'cuotas_admin'
-        front = Front.objects.filter(titulo="cuotas")
-
-        pendientes  = Cuota.objects.filter(estado_pago='P', año__año=año_filtro).count()
-        aprobadas   = Cuota.objects.filter(estado_pago='E', año__año=año_filtro).count()
-        rechazadas  = Cuota.objects.filter(estado_pago='R', año__año=año_filtro).count()
-
-        contexto['pendientes']  = pendientes
-        contexto['aprobadas']   = aprobadas
-        contexto['rechazadas']  = rechazadas
-        contexto['front'] = list(front.values('titulo','img', 'contenido', 'order','file'))
-
-        return contexto
-
-class cuotas_admin_mod(SocioMixin,TemplateView, View):
     
     ''' Vista para la administración de cuotas de los Secretarios
         ---------------------------------------------------------
@@ -606,7 +548,7 @@ class cuotas_admin_mod(SocioMixin,TemplateView, View):
         de 'En Revision', enviadas por los socios del club. 
     '''
 
-    template_name = "socio/views/cuotas_admin_mod.html"
+    template_name = "socio/views/cuotas_admin.html"
 
     def get_context_data(self, **kwargs):
 
@@ -644,6 +586,7 @@ class cuotas_admin_mod(SocioMixin,TemplateView, View):
             contexto['front'] = list(front.values('titulo','img', 'contenido', 'order','file'))
             contexto['años_cuotas_socio'] = años_cuotas_socio
             contexto['listado_usuarios'] = listado_usuarios
+            contexto['rol'] = self.request.user.perfil
         
         except Exception as e:
             print(f"Error al obtener datos del contexto: {str(e)}")
@@ -689,6 +632,7 @@ class cuotas(SocioMixin,TemplateView, View):
         
         # Indicador de descuento de cuotas por promocion
         mostrar_promocion = False
+        
         # Obtener el año y mes actual
         año_actual = datetime.now().year
         mes_actual = datetime.now().month
@@ -699,7 +643,7 @@ class cuotas(SocioMixin,TemplateView, View):
     
         # Obtener el rango de duracion (inicio y fin) de la promoción del presente año.
         if cuotas_usuario.exists():
-            duracion_descuento = cuotas_usuario.first().año.descuento
+            duracion_descuento = cuotas_usuario.first().año
 
             # Obtenemos True si el mes actual esta en el rango de duracion del descuento
             if duracion_descuento:
@@ -717,6 +661,7 @@ class cuotas(SocioMixin,TemplateView, View):
         for cuota in cuotas:
             cuota.mes_cuota = mes_cuota[cuota.mes - 1]
 
+        print(f"valor del descuento: {duracion_descuento.descuento}") 
         # Crear el contexto de la vista con los datos a renderizar
         contexto = {
             "nameWeb": nameWeb,
@@ -724,7 +669,8 @@ class cuotas(SocioMixin,TemplateView, View):
             "front": list(front.values('titulo', 'img', 'contenido', 'order','file')),
             "cuotas": cuotas,
             "mostrar_promocion": mostrar_promocion,
-            "descuento_anual": duracion_descuento,
+            "descuento_anual": duracion_descuento.descuento,
+            "rol": self.request.user.perfil
         }
 
         return self.render_to_response(contexto)
@@ -732,56 +678,66 @@ class cuotas(SocioMixin,TemplateView, View):
     def post(self, request, *args, **kwargs):
         try:
             # Verificar que se haya ejecutado el metodo POST antes de procesar
-            if request.method == 'POST':
-                estado_revision = next((code for code, value in estado_cuota if value == 'En Revision'), None)
+            if request.method != 'POST':
+                raise ValueError("Invalid request method")
+            
+            estado_revision = next((code for code, value in estado_cuota if value == 'En Revision'), None)
 
-                # Establecer las variables necesarias que vienen del formulario
-                data_str = request.POST.get('data', '[]')
-                cuotasSeleccionadas = json.loads(data_str)
+            # Establecer las variables necesarias que vienen del formulario
+            data_str = request.POST.get('data', '[]')
+            cuotasSeleccionadas = json.loads(data_str)
 
-                # Comprobamos la informacion y actualizamos el estado de las cuotas de 'Pendiente' a 'En Revision'
-                if cuotasSeleccionadas:
-                    cuota_ids = [cuota.get('id_cuota') for cuota in cuotasSeleccionadas]
-                    filas_afectadas = Cuota.objects.filter(id__in=cuota_ids).update(estado_pago=estado_revision)
+            # Comprobamos la informacion y actualizamos el estado de las cuotas de 'Pendiente' a 'En Revision'
+            if not cuotasSeleccionadas:
+                raise ValueError("No se encontraron cuotas seleccionadas")
 
-                    # Si se aplicó la actualizacion, obtenemos los datos a enviar por correo
-                    if filas_afectadas >= 1:
-                        tipo            = 'pago_cuota' if filas_afectadas == 1 else 'pago_cuotas'  
-                        email           = cuotasSeleccionadas[0]['email']
-                        mes             = int(cuotasSeleccionadas[0]['mes'])
-                        año             = int(cuotasSeleccionadas[0]['año'])
-                        
-                        if 'descuento' in cuotasSeleccionadas[0]:
-                            descuento_str   = cuotasSeleccionadas[0]['descuento']
-                            print(f'descuento activo?:{descuento_str}')
+            cuota_ids = [cuota.get('id_cuota') for cuota in cuotasSeleccionadas]
+            filas_afectadas = Cuota.objects.filter(id__in=cuota_ids).update(estado_pago=estado_revision)
 
-                            # Verificamos si se debe aplicar un descuento a las cuotas antes de enviar el correo
-                            if descuento_str is None:
-                                descuento = None
-                            else:
-                                try:
-                                    descuento = int(descuento_str)
-                                except ValueError as e:
-                                    print('Error: el descuento no es un valor numérico o válido. Detalles: {e}') 
-                                    descuento = 0
-                        else:
-                            descuento = None
-                            print('Error: la variable descuento no esta en el diccionario') 
+            # Si se aplicó la actualizacion, obtenemos los datos a enviar por correo
+            if filas_afectadas < 1:
+                raise ValueError("No se realizaron actualizaciones, compruebe los datos datos del formulario.")
 
+            tipo='pago_cuota' if filas_afectadas == 1 else 'pago_cuotas'  
+            email=cuotasSeleccionadas[0]['email']
+            mes=int(cuotasSeleccionadas[0]['mes'])
+            año=int(cuotasSeleccionadas[0]['año'])
+            
+            if 'descuento' in cuotasSeleccionadas[0]:
+                descuento_str   = cuotasSeleccionadas[0]['descuento']
+                print(f'descuento activo?:{descuento_str}')
 
-                    # Sumamos el monto total de las cuotas a pagar y enviamos el correo.
-                    total_pagar = sum(int(cuota.get('monto_cuota')) for cuota in cuotasSeleccionadas)
-                    resultado = contact(tipo, email=email, total_pagar=total_pagar, mes=mes, año=año, descuento=descuento)
+                # Verificamos si se debe aplicar un descuento a las cuotas antes de enviar el correo
+                if descuento_str is None:
+                    descuento = None
                 else:
-                    resultado = 'No se realizaron actualizaciones, compruebe los datos del fomulario.'
+                    try:
+                        descuento = int(descuento_str)
+                    except ValueError as e:
+                        # print('Error: el descuento no es un valor numérico o válido. Detalles: {e}') 
+                        descuento = 0
+            else:
+                descuento = None
+                print('Error: la variable descuento no esta en el diccionario') 
 
-                # Establecer un mensaje de aviso al volver a la plantilla html
-                messages.success(request, resultado)
+            # Sumamos el monto total de las cuotas a pagar y enviamos el correo.
+            total_pagar = sum(int(cuota.get('monto_cuota')) for cuota in cuotasSeleccionadas)
+            resultado = contact(tipo, email=email, total_pagar=total_pagar, mes=mes, año=año, descuento=descuento)
+            
+            # Establecer un mensaje de aviso al volver a la plantilla html
+            messages.success(request, resultado)
 
             return redirect('cuotas')
         
+        except ValueError as ve:
+            print(f"Error en el proceso principal: {str(ve)}")
+
+        except json.JSONDecodeError as jde:
+            print(f"Error al decodificar JSON: {str(jde)}")
+            messages.error(request, "Ocurrió un error al decodificar JSON.")
+
         except Exception as e:
             print(f"Error en el proceso principal: {str(e)}")
             messages.error(request, "Ocurrió un error en el proceso principal.")
 
-            return redirect('cuotas')
+        return redirect('cuotas')

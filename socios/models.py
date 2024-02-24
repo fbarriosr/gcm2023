@@ -117,59 +117,6 @@ class SolicitudAdmin (SearchAutoCompleteAdmin, admin.ModelAdmin):
     autocomplete_fields = ['usuario','torneo']
 
 
-# LOS CARGOS QUE SE PUEDEN APLICAR A LAS CUOTAS, COMO PENALIZACION POR NO PAGO
-class CargoCuota(models.Model):
-    id                      = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    monto_cargo             = models.PositiveIntegerField(blank=True, null=True)
-    descripcion             = models.CharField(max_length=255, blank=True, null=True)
-    order                   = models.IntegerField(default=0)
-
-    class Meta:
-        verbose_name = "CargoCuota"
-        verbose_name_plural = "CargoCuotas"
-        ordering = ["order"]
-
-    def __str__(self):
-        return str(self.monto_cargo)
-
-
-class CargoCuotasAdmin(ImportExportModelAdmin, SearchAutoCompleteAdmin, admin.ModelAdmin):
-    search_fields = ["monto_cargo"]
-    list_display = ("order", "descripcion", "monto_cargo")
-    list_per_page = 10
-
-
-
-# EL DESCUENTO QUE SE APLICA EL PRIMER PERIODO DEL AÑO SI SE CANCELAN TODAS LAS CUOTAS POR ANTICIPADO
-class DescuentoCuota(models.Model):
-    
-    PERIODO_CHOICES         = [(num, mes) for num, mes in mes_num_texto.items()]
-    id                      = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    monto_descuento         = models.PositiveIntegerField(blank=True, null=True)
-    descuento_activo        = models.BooleanField(default=False,verbose_name="activo")
-    periodo_des_inicio      = models.IntegerField(choices=PERIODO_CHOICES, default=3)
-    periodo_des_fin         = models.IntegerField(choices=PERIODO_CHOICES, default=3)
-    order                   = models.IntegerField(default=0)
-
-    class Meta:
-        verbose_name = "DescuentoCuota"
-        verbose_name_plural = "DescuentoCuotas"
-        ordering = ["order"]
-
-    def __str__(self):
-        inicio = mes_num_texto.get(self.periodo_des_inicio, '')
-        fin    = mes_num_texto.get(self.periodo_des_fin, '')
-
-        # return str(self.año)
-        # return f"Descuento . {inicio} a {fin}"
-        return str(self.monto_descuento)
-
-class DescuentoCuotasAdmin(ImportExportModelAdmin, SearchAutoCompleteAdmin, admin.ModelAdmin):
-    search_fields = ["periodo_desc_inicio", "periodo_des_fin"]
-    list_display = ("order", "periodo_des_inicio", "periodo_des_fin", "monto_descuento")
-    list_per_page = 10
-
-
 
 # LA ESTRUCTURA DE LAS CUOTAS ANUALES DE LOS SOCIOS DEL CLUB CGM
 class CuotaAnual(models.Model):
@@ -177,8 +124,13 @@ class CuotaAnual(models.Model):
     año             = models.PositiveIntegerField(verbose_name="Año cuotas")
     monto_cuota     = models.PositiveIntegerField(default=0)  # monto fijo anual aplicable a cada cuota del mes de dicho año.
     periodo         = models.CharField(max_length=50, verbose_name="Periodo") # ejemplo 2024-2025
-    descuento       = models.ForeignKey(DescuentoCuota, blank=True, null=True, on_delete=models.SET_NULL) # descuento que se podria aplicar a la cuota
-    cargo           = models.ForeignKey(CargoCuota, blank=True, null=True, on_delete=models.SET_NULL)  # monto extra por atraso, castigo..
+    cargo           = models.PositiveIntegerField(blank=True, null=True)  # monto extra por atraso, castigo..
+    
+    descuento       = models.PositiveIntegerField(blank=True, null=True) # descuento que se podria aplicar a la cuota
+    PERIODO_CHOICES         = [(num, mes) for num, mes in mes_num_texto.items()]
+    descuento_activo        = models.BooleanField(default=False,verbose_name="activo")
+    periodo_des_inicio      = models.IntegerField(choices=PERIODO_CHOICES, default=3)
+    periodo_des_fin         = models.IntegerField(choices=PERIODO_CHOICES, default=3)
     order           = models.IntegerField(default=0)
 
     class Meta:

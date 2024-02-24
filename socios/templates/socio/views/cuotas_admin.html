@@ -6,6 +6,10 @@
     {{ nameWeb }} {{ title }}
 {% endblock %}
 
+{% block header %} 
+    {% include "socio/header/header_socios.html" %}
+{% endblock %}
+
 {% block body %}
     {% include "socio/banner/banner_general.html" %}
     {% include "socio/form/form_cuotas_admin.html" %}

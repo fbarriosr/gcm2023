@@ -93,6 +93,9 @@
               {% if rol == 'SUPER' or rol == 'SECR' %}
               <li><a class="dropdown-item menu" href="{% url 'listarUsuarios'%}">Admin Usuarios</a></li>
               {% endif %}
+              {% if rol == 'SUPER' or rol == 'SECR' %}
+              <li><a class="dropdown-item menu" href="{% url 'cuotas_admin'%}">Admin Cuotas</a></li>
+              {% endif %}
 
               <li><a class="dropdown-item menu" href="{% url 'logout'%}">Salir</a></li>
             </ul>

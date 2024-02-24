@@ -16,9 +16,6 @@ urlpatterns = [
     path('cuotas/', cuotas.as_view(), name='cuotas'),
     #tesorero
     path('cuotas_admin/', cuotas_admin.as_view(), name='cuotas_admin'),
-    path('cuotas_admin2/', cuotas_admin2.as_view(), name='cuotas_admin2'),
-    path('cuotas_admin_mod/', cuotas_admin_mod.as_view(), name='cuotas_admin_mod'),
-
     #path('generar_cuotas/<int:año>/<int:valor>', generar_cuotas, name='generar_cuotas'),
     path('generar_cuotas_form/', generar_cuotas, name='generar_cuotas_form'),
     path('generar_cuotas_socio/', generar_cuotas_socio, name='generar_cuotas_socio'),
@@ -28,10 +25,8 @@ urlpatterns = [
 
     path('contact/', contact, name='contact'),
 
-    path('contact/', contact, name='contact'),
-
     path('perfil/', perfil.as_view(), name='perfil'),
-    path('password/'   , PasswordUsuario.as_view()            , name = 'cambiar_password'),
+    path('password/'   , PasswordUsuario.as_view(), name='cambiar_password'),
     
 ]
 

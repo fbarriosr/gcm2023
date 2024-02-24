@@ -1,0 +1,81 @@
+{% extends "web/root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block header %} 
+
+      {% include "socio/header/header_socios.html" %}
+
+{% endblock %}
+
+{% block body %}
+
+{% include "web/banner/banner2.html" %}
+
+<div class="container marketing" id="links">
+  <h3>Situacion al 17 Febrero 2024</h3>
+  <div class="row">
+    <div class="col resumen-local">
+      <h3>Situación año 2024</h3>
+      <div>
+        <p>cuota Año:</p>
+        <p>2024</p>
+      </div>
+      <div>
+        <p>Valor Cuota:</p>
+        <p>$7.000</p>
+      </div>
+    </div>
+    <div class="col">
+      <div>
+        <h3>Situación Global</h3>
+        <p>Deuda Total</p>
+        <p>Pendiente</p>
+      </div>
+    </div>
+  </div>
+  <div class="row table-responsive" >
+    <table class="table table-striped ">
+      <thead>
+        <tr>
+          <th scope="col">N°</th>
+          <th scope="col">Nombre</th>
+          <th scope="col">Activo</th>
+          <th scope="col">Rut Usuario</th>
+          <th scope="col">Deuda Acumulada</th>
+          <th scope="col">N° Cuotas Pagadas</th>
+          <th scope="col">Valor</th>
+          <th scope="col">N° Cuotas Pendientes</th>
+          <th scope="col">Valor</th>
+          <th scope="col">Al Día</th>
+          <th scope="col">Deuda Total</th>
+          <th scope="col">Pendiente</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      {% for usuario in resumen_usuarios %}
+        <tr>
+          <td></td>
+          <td>{{ usuario.nombre|upper|default:''}}</td>
+          <td>{{ usuario.es_activo|upper|default:'' }}</td>
+          <td>{{ usuario.rut|upper|default:'' }}</td>
+          <td>{{ usuario.deuda_pendiente|upper|default:'NO' }}</td>
+          <td>{{ usuario.cuotas_pagadas|default:'0' }}</td>
+          <td>{{ usuario.monto_pagado|default:'0' }}</td>
+          <td>{{ usuario.cuotas_impagas|upper|default:'0' }}</td>
+          <td>{{ usuario.monto_impago|upper|default:'0' }}</td>
+          <td>{{ usuario.al_dia|upper|default:'NO'  }}</td>
+          <td>{{ usuario.deuda_total|upper|default:'0' }}</td>
+          <td>{{ usuario.pendiente|upper|default:'SI' }}</td>
+        <tr>
+        {% endfor%}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

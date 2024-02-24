@@ -7,6 +7,7 @@ urlpatterns = [
     path('solicitudes', solicitudHome.as_view(), name= 'solicitudes'),
     path('listarSolicitudes', listarSolicitudes.as_view(), name= 'listarSolicitudes'),
     path('solicitudUpdate', solicitudUpdate.as_view(), name= 'solicitudUpdate'),
+    path('resumen_cuotas', resumenCuotas.as_view(), name='resumenCuotas'),
 
 
 ]
