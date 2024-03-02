@@ -29,6 +29,26 @@
         <p>$7.000</p>
       </div>
     </div>
+    <!-- Buscar -->
+    <p>devuelve {{ request.GET.buscar }}</p>
+    <div class="my-4">
+      <form method="get" > 
+        <div class="row m-b-sm m-t-sm">
+          <div class="col-md-9">
+            <div class="input-group">
+              <input type="text"  class="form-control-sm form-control" placeholder="Buscar..." name="buscar" dato = "{{ request.GET.buscar }}">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div style="text-align: right">
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary"><i>Buscar</i></button> 
+              </span> 
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
     <div class="col">
       <div>
         <h3>Situación Global</h3>

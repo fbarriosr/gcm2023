@@ -20,6 +20,7 @@ from django.views.generic.edit import FormView
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User, Group
 from django.urls import reverse_lazy
+from django.db.models import Q
 
 from django.shortcuts import render,redirect
 from django.http import HttpResponseRedirect,HttpResponse,JsonResponse
@@ -32,6 +33,9 @@ from .forms import *
 from .utils import *
 from .choices import estado_cuota
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 nameWeb = "CGM"
 
@@ -547,19 +551,29 @@ class cuotas_admin(SocioMixin,TemplateView, View):
         desde esta vista se aprueban o rechazan las cuotas en estado
         de 'En Revision', enviadas por los socios del club. 
     '''
-
+    
     template_name = "socio/views/cuotas_admin.html"
 
-    def get_context_data(self, **kwargs):
+    def get_queryset(self):
 
-        contexto =  super().get_context_data(**kwargs)
-        contexto['nameWeb'] = nameWeb
-        contexto['title'] = 'cuotas_admin_mod'
+        buscar = self.request.GET.get('buscar')
+        print(f'print buscar = {buscar}') 
+        logger.info(f'logger buscar = {buscar}') 
 
         try:
-            front = Front.objects.filter(titulo="cuotas")
-            cuotas = Cuota.objects.filter(estado_pago='E').select_related('usuario', 'año')
+            front = Front.objects.filter(titulo="cuotas")  
 
+            if buscar:
+                if  buscar.upper() in ['TODO', 'TODOS', '*']:
+                    cuotas = Cuota.objects.filter(estado_pago='E').select_related('usuario', 'año')
+                else:
+                    cuotas = Cuota.objects.filter(
+                        Q(usuario__rut__icontains=buscar) |
+                        Q(usuario__apellido_paterno__icontains=buscar) |
+                        Q(usuario__primer_nombre__icontains=buscar) 
+                    ).filter(Q(estado_pago='E')).select_related('usuario', 'año').distinct()
+            else:
+                cuotas = Cuota.objects.filter(estado_pago='E').select_related('usuario', 'año')
             # Crear una lista de objetos datetime para representar los meses del año 
             mes_cuota = [date(2000, mes, 1) for mes in range(1, 13)]
 
@@ -582,15 +596,56 @@ class cuotas_admin(SocioMixin,TemplateView, View):
             usuarios_con_cuotas = Usuario.objects.filter(cuota__isnull=False).distinct()
             listado_usuarios = usuarios_con_cuotas.values_list('email', flat=True).order_by('-email')  
 
-            contexto['cuotas'] = cuotas
-            contexto['front'] = list(front.values('titulo','img', 'contenido', 'order','file'))
-            contexto['años_cuotas_socio'] = años_cuotas_socio
-            contexto['listado_usuarios'] = listado_usuarios
-            contexto['rol'] = self.request.user.perfil
+            return {
+                'cuotas': cuotas,
+                'front': list(front.values('titulo','img', 'contenido', 'order','file')),
+                'años_cuotas_socio': años_cuotas_socio,
+                'listado_usuarios': listado_usuarios,
+                'rol': self.request.user.perfil
+            }
+
         
         except Exception as e:
             print(f"Error al obtener datos del contexto: {str(e)}")
+            
+            cuotas = []
+            front = []
+            años_cuotas_socio = []
+            listado_usuarios = []
 
+            # Imprimir detalles del error
+            import traceback
+            print(traceback.format_exc())
+
+            return {
+                'cuotas': cuotas,
+                'front': front,
+                'años_cuotas_socio': años_cuotas_socio,
+                'listado_usuarios': listado_usuarios,
+                'rol': self.request.user.perfil  # o el valor que prefieras en caso de error
+            }
+
+    def get_context_data(self, **kwargs):
+    
+        # contexto =  super().get_context_data(**kwargs)
+        datos = self.get_queryset()
+
+        cuotas = datos['cuotas']
+        front = datos['front']
+        años_cuotas_socio = datos['años_cuotas_socio']
+        listado_usuarios = datos['listado_usuarios']
+
+        contexto = {
+            'nameWeb': nameWeb,
+            'front': front,
+            'title': 'cuotas_admin_mod',
+            'rol': self.request.user.perfil,
+            'datos': cuotas,
+            'cuotas': cuotas,
+            'años_cuotas_socio': años_cuotas_socio,
+            'listado_usuarios': listado_usuarios,
+        }
+        
         return contexto
 
     def post(self, request, *args, **kwargs):
@@ -620,7 +675,7 @@ class cuotas_admin(SocioMixin,TemplateView, View):
                 except Exception as e:
                     print(f"Error al actualizar las cuotas: {str(e)}")
                 
-            return redirect("cuotas_admin_mod") 
+            return redirect("cuotas_admin") 
 
 
 #@login_required Si se usa con request, sin heredar de vistas

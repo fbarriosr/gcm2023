@@ -9,5 +9,4 @@ urlpatterns = [
     path('solicitudUpdate', solicitudUpdate.as_view(), name= 'solicitudUpdate'),
     path('resumen_cuotas', resumenCuotas.as_view(), name='resumenCuotas'),
 
-
 ]

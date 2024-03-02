@@ -38,6 +38,7 @@ from web.views import *
 from usuarios.views import *
 from socios.views import *
 
+
 admin.autodiscover()
 urlpatterns = [
 	url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}),

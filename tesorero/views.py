@@ -33,6 +33,7 @@ import csv
 from django.core.paginator import Paginator
 from socios.forms import *
 from .forms import *
+from secretario.forms import FormularioUsuariosView
 
 nameWeb = "CGM"
 
@@ -194,13 +195,15 @@ class resumenCuotas(TesoreroMixin, TemplateView):
         como van durante el año y si se encuentran al día, o por el contrario arrastran
         alguna deuda pendiente. 
     '''
-
+    model = Usuario
+    form_class = FormularioUsuariosView
     template_name = "tesorero/views/resumenCuotas.html"
-    def get_context_data(self, **kwargs):
-        contexto = super().get_context_data(**kwargs)
-        contexto["nameWeb"] = nameWeb
-        contexto["title"] = "Resumen Cuotas"
-        contexto['rol'] = self.request.user.perfil
+    
+    def get_queryset(self):
+
+        buscar = self.request.GET.get('buscar')
+        print(f'buscar = {buscar}')   
+
 
         def calcular_monto_total(cuotas):
             return cuotas.aggregate(Sum('año__monto_cuota'))['año__monto_cuota__sum'] or 0
@@ -209,8 +212,19 @@ class resumenCuotas(TesoreroMixin, TemplateView):
         año_actual = int(datetime.now().year)   
 
         # Obtener la lista de usuarios unicos con cuota en el año actual
-        lista_usuarios = Usuario.objects.all()
-        print(f"cantidad usuarios: {len(lista_usuarios)}")
+        if buscar:
+            if buscar.upper() in ['TODO', 'TODOS', '*']:
+                lista_usuarios = Usuario.objects.all().order_by('apellido_paterno')
+            else:
+                lista_usuarios = Usuario.objects.filter(
+                    Q(rut__icontains=buscar) |
+                    Q(apellido_paterno__icontains=buscar) |
+                    Q(primer_nombre__icontains=buscar)
+                ).distinct()
+        else:
+            lista_usuarios = Usuario.objects.all().order_by('apellido_paterno')
+
+        # print(f"cantidad usuarios: {len(lista_usuarios)}")
 
         # Lista que almacenara los datos relacionados con las cuotas para cada usuario
         resumen_usuarios = []
@@ -251,7 +265,79 @@ class resumenCuotas(TesoreroMixin, TemplateView):
 
             resumen_usuarios.append(resumen_usuario)
 
-        contexto["resumen_usuarios"] = resumen_usuarios
-        contexto["año_actual"] = año_actual
+        return resumen_usuarios
+
+    
+    def get_context_data(self,**kwargs):
+        contexto = {}
+
+        contexto["nameWeb"] = nameWeb
+        contexto["title"] = "Resumen Cuotas"
+        contexto['rol'] = self.request.user.perfil
+        contexto['datos'] = self.get_queryset()
+        contexto["resumen_usuarios"] = self.get_queryset()
+        # contexto["año_actual"] = año_actual
+        print(f'contexto{contexto}') 
 
         return contexto
+
+
+    # def get_context_data(self, **kwargs):
+    #     contexto = super().get_context_data(**kwargs)
+    #     contexto["nameWeb"] = nameWeb
+    #     contexto["title"] = "Resumen Cuotas"
+    #     contexto['rol'] = self.request.user.perfil
+
+    #     def calcular_monto_total(cuotas):
+    #         return cuotas.aggregate(Sum('año__monto_cuota'))['año__monto_cuota__sum'] or 0
+
+    #     # Obtener el año actual
+    #     año_actual = int(datetime.now().year)   
+
+    #     # Obtener la lista de usuarios unicos con cuota en el año actual
+    #     lista_usuarios = Usuario.objects.all()
+    #     # print(f"cantidad usuarios: {len(lista_usuarios)}")
+
+    #     # Lista que almacenara los datos relacionados con las cuotas para cada usuario
+    #     resumen_usuarios = []
+
+    #     # Obtenemos localmente las cuotas para evitar consultas a la bd por cada calculo
+    #     cuotas_anuales = Cuota.objects.all()
+
+    #     # Resumen de cuotas por usuario
+    #     for usuario in lista_usuarios:
+            
+    #         # Calculos de cuotas para el año en curso
+    #         cuotas_año_actual = cuotas_anuales.filter(año__año=año_actual, usuario=usuario)
+
+    #         cuotas_pagadas = cuotas_año_actual.filter(estado_pago='A',).count()
+    #         cuotas_impagas = cuotas_año_actual.filter(~Q(estado_pago='A'),).count()
+    #         monto_pagado = calcular_monto_total(cuotas_año_actual.filter(estado_pago = 'A'))
+    #         monto_impago = calcular_monto_total(cuotas_año_actual.filter(~Q(estado_pago='A')))
+
+    #         # Calculos relacionados con cuotas de años anteriores
+    #         cuotas_años_anteriores = cuotas_anuales.exclude(año__año=año_actual).filter(usuario=usuario)
+
+    #         deuda_pendente= calcular_monto_total(cuotas_años_anteriores.filter(~Q(estado_pago='A')))
+    #         deuda_total = deuda_pendente + monto_impago
+
+    #         resumen_usuario = {
+    #             "nombre": f"{usuario.primer_nombre} {usuario.apellido_paterno}",
+    #             "es_activo": 'si' if usuario.is_active else 'no',
+    #             "rut": usuario.rut,
+    #             "deuda_pendiente": deuda_pendente,
+    #             "cuotas_pagadas": cuotas_pagadas,
+    #             "monto_pagado": monto_pagado,
+    #             "cuotas_impagas": cuotas_impagas,
+    #             "monto_impago": monto_impago,
+    #             "al_dia": 'si' if Cuota.objects.filter(estado_pago='A', año__año=año_actual).count() == 12 else 'no',
+    #             "deuda_total": deuda_total,
+    #             "pendiente": 'si' if deuda_total > 0 else 'no'
+    #         }
+
+    #         resumen_usuarios.append(resumen_usuario)
+
+    #     contexto["resumen_usuarios"] = resumen_usuarios
+    #     contexto["año_actual"] = año_actual
+
+    #     return contexto

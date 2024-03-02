@@ -398,6 +398,7 @@ class listarUsuarios(SecretarioMixin, View):
     def get_queryset(self):
         
         buscar = self.request.GET.get('buscar')
+        print(f'listar usuarios buscar: {buscar}') 
         if buscar:  
             if buscar.upper() in ['TODO', 'TODOS', '*']:
                     lUsuarios = self.model.objects.order_by('apellido_paterno')
