@@ -59,9 +59,9 @@ class Usuario(AbstractBaseUser):
     situacionEspecial       = models.BooleanField(default=False, verbose_name="Situación Especial")
     fundador                = models.BooleanField(default=False, verbose_name="Fundador")
 
-    institucion             = models.CharField(max_length=20, choices=instituciones, default="NI")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
-    grado                   = models.CharField(max_length=5, choices=grados, default="NI")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
-    condicion               = models.CharField(max_length=20, choices=condicion, default="NI")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
+    institucion             = models.CharField(max_length=20, choices=instituciones, default="NI",blank=True)  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
+    grado                   = models.CharField(max_length=5, choices=grados, default="NI", blank=True)  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
+    condicion               = models.CharField(max_length=20, choices=condicion, default="NI", blank=True)  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
 
     profesion               = models.CharField(max_length=200, blank=True, null=True, verbose_name="Profesión")
     fecha_incorporacion     = models.DateField(blank=True, null=True, default=datetime.date.today, verbose_name="Fecha de nacimiento")

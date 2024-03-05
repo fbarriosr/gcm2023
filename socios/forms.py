@@ -216,7 +216,8 @@ class FormularioPerfilUpdate(forms.ModelForm):
         model = Usuario
         fields = ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',
                     'rut','email','telefono', 'fecha_nacimiento',
-                    'institucion','grado','profesion' ]
+                    'institucion','grado','profesion',
+                    'region', 'direccion' ]
         labels = {
             'primer_nombre':'Primer Nombre',
             'segundo_nombre': 'Segundo Nombre',
@@ -228,7 +229,9 @@ class FormularioPerfilUpdate(forms.ModelForm):
             'fecha_nacimiento': 'Fecha de nacimiento',
             'institucion': 'Institucion',
             'grado':'Grado',
-            'profesion':'Profesion'
+            'profesion':'Profesion',
+            'region': 'Región',
+            'direccion': 'Dirección'
         }
         widgets = {
 
@@ -308,6 +311,18 @@ class FormularioPerfilUpdate(forms.ModelForm):
                     'id': 'profesion',
                 }
             ),
+            'direccion': forms.TextInput(
+                attrs={
+                    'class': 'form-control ',
+                    'id': 'direccion',
+                }
+            ),
+            'region':  forms.Select(
+                attrs={
+                    'class': 'form-control ',
+                    'choices': regiones,
+                    'id': 'region',
+                }),
         }
 
     def save(self,commit = True):
