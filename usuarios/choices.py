@@ -41,7 +41,7 @@ grados =  (
     ('GDB', 'GENERAL DE BRIGADA'),
     ('CRL', 'CORONEL'),
     ('TCL', 'TENIENTE CORONEL'),
-    ('CAD', 'CADETE'),
+    ('CAD', 'CADETE '),
     ('NI', 'NO INFORMAR'),
 )
 
