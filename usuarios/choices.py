@@ -1,6 +1,6 @@
 sexos = (
-    ('F', 'Femenino'),
-    ('M', 'Masculino'),
+    ('F', 'FEMENINO'),
+    ('M', 'MASCULINO'),
 )
 
 estado = (
@@ -13,9 +13,10 @@ estado = (
 
 categoria = (
     ('S', 'SENIOR'),
-    ('SS', 'SUPER SENIOR'),
+    ('SS', 'SUPERSENIOR'),
     ('V', 'VARON'),
     ('J', 'JUVENIL'),
+    ('NI', 'NO INFORMAR'),
 )
 
 civil = (
@@ -40,7 +41,7 @@ grados =  (
     ('GDB', 'GENERAL DE BRIGADA'),
     ('CRL', 'CORONEL'),
     ('TCL', 'TENIENTE CORONEL'),
-    ('CAD', 'CAD'),
+    ('CAD', 'CADETE'),
     ('NI', 'NO INFORMAR'),
 )
 

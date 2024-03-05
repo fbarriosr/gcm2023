@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser,PermissionsMixin
 from search_admin_autocomplete.admin import SearchAutoCompleteAdmin
 from .choices import *
+from socios.choices import *
 import datetime
 
 class MyUserManager(BaseUserManager):
@@ -40,12 +41,12 @@ class MyUserManager(BaseUserManager):
 
 
 class Usuario(AbstractBaseUser):
-    email                   = models.EmailField(verbose_name="email", max_length=255, unique=False)
+    email                   = models.EmailField(verbose_name="email", max_length=255, unique=False, null=True)
     is_active               = models.BooleanField(default=True)
     is_admin                = models.BooleanField(default=False)
     rut                     = models.CharField(max_length=12,  unique=True, verbose_name="Rut")
     primer_nombre           = models.CharField(max_length=200, blank=True, null=False, verbose_name="Primer nombre")
-    segundo_nombre          = models.CharField(max_length=200, blank=True, null=False, verbose_name="Segundo nombre")
+    segundo_nombre          = models.CharField(max_length=200, blank=True, null=True, verbose_name="Segundo nombre")
     apellido_paterno        = models.CharField(max_length=200, blank=True, null=False, verbose_name="Apellido paterno")
     apellido_materno        = models.CharField(max_length=200, blank=True, null=False, verbose_name="Apellido materno")
     fecha_nacimiento        = models.DateField(blank=True, null=True, verbose_name="Fecha de nacimiento")
@@ -54,7 +55,7 @@ class Usuario(AbstractBaseUser):
     eCivil                  = models.CharField(max_length=30, choices=civil, default="NI", verbose_name="Estado Civil")  
     perfil                  = models.CharField(max_length=20, choices=perfil, default="S") # ej. socio,invitado, capitan, tesorero...
     estado                  = models.CharField(max_length=20, choices=estado, default="A")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
-    categoria               = models.CharField(max_length=20, choices=categoria, default="N")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
+    categoria               = models.CharField(max_length=20, choices=categoria, default="NI")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
     situacionEspecial       = models.BooleanField(default=False, verbose_name="Situación Especial")
     fundador                = models.BooleanField(default=False, verbose_name="Fundador")
 
@@ -62,8 +63,13 @@ class Usuario(AbstractBaseUser):
     grado                   = models.CharField(max_length=5, choices=grados, default="NI")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
     condicion               = models.CharField(max_length=20, choices=condicion, default="NI")  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
 
-    profesion               = models.CharField(max_length=200, blank=True, null=False, verbose_name="Profesión")
-    fecha_incorporacion     = models.DateField(default=datetime.date.today)
+    profesion               = models.CharField(max_length=200, blank=True, null=True, verbose_name="Profesión")
+    fecha_incorporacion     = models.DateField(blank=True, null=True, default=datetime.date.today, verbose_name="Fecha de nacimiento")
+
+
+    direccion       = models.CharField(max_length=200, blank=True, null= True, verbose_name="Direccion")
+    region          = models.CharField(max_length=50,choices= regiones, blank=True, default= ' ', verbose_name="Region")
+    
     objects = MyUserManager()
 
     USERNAME_FIELD = "rut"

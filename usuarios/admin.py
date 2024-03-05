@@ -77,7 +77,7 @@ class UserAdmin(ImportExportModelAdmin,BaseUserAdmin):
     fieldsets = [
         ('Principal', {"fields": ["rut",'password']}),
         ("Personal", {"fields": ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',"email",'fecha_nacimiento']}),
-        ('Info', {"fields": ["telefono",'sexo','eCivil','perfil','estado','categoria','situacionEspecial','fundador']}),
+        ('Info', {"fields": ["telefono",'region','direccion','sexo','eCivil','perfil','estado','categoria','situacionEspecial','fundador']}),
         ("Permisos", {"fields": ["is_admin",'is_active']}),
         ("Personal Uniformado", {"fields": ["institucion",'grado', 'condicion','profesion','fecha_incorporacion']}),
     ]
@@ -86,7 +86,7 @@ class UserAdmin(ImportExportModelAdmin,BaseUserAdmin):
     add_fieldsets = [
         ('Datos', {"fields": ["rut", "password1",'password2']}),
         ("Personal", {"fields": ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',"email",'fecha_nacimiento']}),
-        ('Info', {"fields": ["telefono",'sexo','eCivil','perfil','estado','categoria','situacionEspecial','fundador']}),
+        ('Info', {"fields": ["telefono",'region','direccion','sexo','eCivil','perfil','estado','categoria','situacionEspecial','fundador']}),
         ("Permisos", {"fields": ["is_admin",'is_active']}),
         ("Personal Uniformado", {"fields": ["institucion",'grado', 'condicion','profesion','fecha_incorporacion']}),
     ]

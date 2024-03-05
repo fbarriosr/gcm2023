@@ -307,7 +307,7 @@ class FormularioUsuariosView(forms.ModelForm):
     class Meta:
         model = Usuario
         fields = ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',
-                    'rut','email','telefono', 'fecha_nacimiento',
+                    'rut','email','telefono', 'region','direccion','fecha_nacimiento',
                     'estado','categoria','sexo','eCivil','perfil','situacionEspecial','fundador',
                     "is_admin",'is_active',
                     'institucion','grado','profesion', 'condicion','fecha_incorporacion' ]
@@ -319,6 +319,8 @@ class FormularioUsuariosView(forms.ModelForm):
             'rut':  'RUT',
             'email': 'Correo electrónico',
             'telefono':'Telefono',
+            'region':'Región',
+            'direccion':'Dirección',
             'sexo': 'Sexo',
             'eCivil': 'Estado Civil',
             'perfil': 'Perfil',
@@ -391,6 +393,19 @@ class FormularioUsuariosView(forms.ModelForm):
                     'id': 'telefono',
                     'value':'+56 9 ',
                 }
+            ),
+            'region': forms.Select(
+                attrs={
+                    'class': 'form-control ',
+                    'choices': regiones,
+                    'id': 'region',
+                }
+            ),
+            'direccion': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'direccion',
+                }                
             ),
             'sexo': forms.Select(
                 attrs={
