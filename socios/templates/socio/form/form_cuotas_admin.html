@@ -11,6 +11,7 @@
     <!-- Buscar -->
     <div class="my-4">
       <form method="get" > 
+        {% csrf_token %}
         <div class="row m-b-sm m-t-sm">
           <div class="col-md-9">
             <div class="input-group">
@@ -170,22 +171,23 @@
 
     init(cuotaRows, 'todos', 'todos')
 
-    // Evento para el filtro por año seleccionado
-    dropdownAnual.addEventListener('change', () => {
-      // console.log('año seleccionado', dropdownAnual.value);
-      añoActual = dropdownAnual.value;
-      ocultarMostrarCuotas (cuotaRows, añoActual, socioSeleccionado);
-    })
+    // // Evento para el filtro por año seleccionado
+    // dropdownAnual.addEventListener('change', () => {
+    //   // console.log('año seleccionado', dropdownAnual.value);
+    //   añoActual = dropdownAnual.value;
+    //   ocultarMostrarCuotas (cuotaRows, añoActual, socioSeleccionado);
+    // })
 
-    // Evento para el filtro por socio seleccionado
-    dropdownSocios.addEventListener('change', () => {
-      // console.log('socio seleccionado', dropdownSocios.value);
-      socioSeleccionado = dropdownSocios.value;
-      ocultarMostrarCuotas (cuotaRows, añoActual, socioSeleccionado);
-    })
+    // // Evento para el filtro por socio seleccionado
+    // dropdownSocios.addEventListener('change', () => {
+    //   // console.log('socio seleccionado', dropdownSocios.value);
+    //   socioSeleccionado = dropdownSocios.value;
+    //   ocultarMostrarCuotas (cuotaRows, añoActual, socioSeleccionado);
+    // })
 
     // Evento para la seleccion de los registros por el control Switch
     switchSelected.addEventListener('change', ()=> {
+      console.log('switch activado')
       checkboxes.forEach((checkbox)=> checkbox.checked = switchSelected.checked);
     });
 
