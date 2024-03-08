@@ -56,15 +56,22 @@
         <div class="container marketing" id="links">
             <!-- Three columns of text below the carousel -->
             <div class="row">
+                {% if bases %}
                 <div class="col-lg-3">
                   <h6 ><a href="/media/{{bases}}"  target="_blank" style="color:#BF9D5E!important;">BASES </a></h6">
                 </div>
+                {%endif%}
+
+                {% if resultados %}
                 <div class="col-lg-3">
                   <h6 style="color:black!important;"><a href="/media/{{resultados}}"  target="_blank" style="color:#BF9D5E!important;">RESULTADOS</a></h6">
                 </div>
+                {%endif%}
+                {% if premiacion %}
                 <div class="col-lg-3">
                   <h6 style="color:black!important;"><a href="/media/{{premiacion}}"  target="_blank" style="color:#BF9D5E!important;">PREMIACIÓN</a></h6">
                 </div>
+                {%endif%}
                 {% if solicitud.torneo.abierto %}
                 <div class="col-lg-3">
                   <h6 style="color:black!important;"><a href="{% url 'suspender'%}" style="color:#BF9D5E!important;">SUSPENDER</a></h6">
