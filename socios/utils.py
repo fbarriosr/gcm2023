@@ -179,7 +179,7 @@ def contact(tipo, nombre=None, asunto=None, mensaje=None, email=None, año=None,
                 subject,
                 template,
                 settings.EMAIL_HOST_USER, # deja como remitente al correo configurado del sistema
-                ['nicolas.ep.dev@gmail.com']
+                ['nicolas.ep.dev@gmail.com', 'cgm.tesorero@gmail.com']
             )
 
         elif tipo == 'formulario_contacto':  
@@ -199,7 +199,7 @@ def contact(tipo, nombre=None, asunto=None, mensaje=None, email=None, año=None,
                 subject,
                 template,
                 correo, # usar como remitente el correo proporcionado en el formulario
-                ['nicolas.ep.dev@gmail.com']
+                ['nicolas.ep.dev@gmail.com', 'cgm.secretario@gmail.com']
             )
 
         email.fail_silently = False

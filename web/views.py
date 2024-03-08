@@ -57,18 +57,10 @@ class home(TemplateView, View):
             contact(tipo, nombre, asunto, mensaje, email)
 
             return redirect("home")
-
-        # Si el formulario no es válido, rellenar con datos proporcionados por el usuario
-        form.initial = {
-            'nombre': request.POST.get('nombre', ''),
-            'email': request.POST.get('email', ''),
-            'asunto': request.POST.get('asunto', ''),
-            'mensaje': request.POST.get('mensaje', ''),
-            # Agrega otros campos según sea necesario
-        }
-
-        contexto = {'form': form}
-        return render(request, 'web/views/home.html', contexto)
+        else:
+            # Si el formulario no es válido, aún así incluir los elementos en el contexto
+            contexto = self.get_context_data(form=form, error_message="Por favor verifica la activacion del captcha")
+            return render(request, 'web/views/home.html', contexto)
 
 
 
@@ -88,9 +80,12 @@ class home(TemplateView, View):
         
         # Recuperar los datos del formulario de la sesión si existen
         form_data = self.request.session.pop('form_data', {})
-        contexto['form'] = FormHome(initial=form_data)   
+        # Incluye el formulario en el contexto sin inicialización especial
+        contexto['form'] = kwargs.get('form', FormHome())
+        contexto['error_message'] = kwargs.get('error_message', None)
 
         return contexto
+    
 
 # Create your views here.
 class historia(TemplateView):
