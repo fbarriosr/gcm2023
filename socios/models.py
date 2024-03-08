@@ -96,7 +96,7 @@ class Solicitud (models.Model):
     recargoInvitado = models.IntegerField(default=0, null=False, verbose_name="Recargo Invitado")
     cuota           = models.IntegerField(default=0, null=False, verbose_name="Cuota de Campeonato")
     monto           = models.IntegerField(default=0, null=False, verbose_name="Monto Pagado")
-    estado          = models.CharField(max_length=50,choices= estado_solicitud, default= 'P', verbose_name="Estado")
+    estado          = models.CharField(max_length=50,blank=True,choices= estado_solicitud, default= 'P', verbose_name="Estado")
     motivo          = models.TextField(default='',blank=True, verbose_name='Motivo')
     checkCapitan    = models.BooleanField(default=False)
     indiceTorneo    = models.IntegerField(default=0,blank=True, null=True, verbose_name="Indice Torneo")

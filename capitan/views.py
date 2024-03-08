@@ -52,8 +52,27 @@ def export_csv_cumpleanos(request):
     sol = Usuario.objects.order_by('fecha_nacimiento__month', 'fecha_nacimiento__day')
        
     for obj in sol:
-        writer.writerow([ obj.apellido_paterno.capitalize(), obj.apellido_materno.capitalize() , obj.primer_nombre.capitalize() , obj.segundo_nombre.capitalize() , 
-            obj.fecha_nacimiento, obj.get_grado_display(), obj.get_institucion_display(), obj.fundador , obj.get_estado_display(), obj.perfil , obj.telefono ])
+        try:
+            apellido_paterno = obj.apellido_paterno.capitalize()
+        except AttributeError:
+            apellido_paterno = ''
+
+        try:
+            apellido_materno = obj.apellido_materno.capitalize()
+        except AttributeError:
+            apellido_materno = ''
+
+        try:
+            primer_nombre = obj.primer_nombre.capitalize()
+        except AttributeError:
+            primer_nombre = ''
+
+        try:
+            segundo_nombre = obj.segundo_nombre.capitalize()
+        except AttributeError:
+            segundo_nombre = ''
+        writer.writerow([ apellido_paterno, apellido_materno , primer_nombre , segundo_nombre , 
+            obj.fecha_nacimiento, obj.get_grado_display(), obj.get_institucion_display(), obj.fundador , obj.get_estado_display(), obj.get_perfil_display() , obj.telefono ])
 
     return response
 
@@ -71,9 +90,30 @@ def export_csv_cumpleanos_mes(request):
 
     sol = Usuario.objects.filter( 
                       fecha_nacimiento__month__in=[month, next_month.month]).order_by('fecha_nacimiento__day')
-       
+    
+
     for obj in sol:
-        writer.writerow([ obj.apellido_paterno.capitalize(), obj.apellido_materno.capitalize() , obj.primer_nombre.capitalize() , obj.segundo_nombre.capitalize() , 
+        try:
+            apellido_paterno = obj.apellido_paterno.capitalize()
+        except AttributeError:
+            apellido_paterno = ''
+
+        try:
+            apellido_materno = obj.apellido_materno.capitalize()
+        except AttributeError:
+            apellido_materno = ''
+
+        try:
+            primer_nombre = obj.primer_nombre.capitalize()
+        except AttributeError:
+            primer_nombre = ''
+
+        try:
+            segundo_nombre = obj.segundo_nombre.capitalize()
+        except AttributeError:
+            segundo_nombre = ''
+
+        writer.writerow([ apellido_paterno, apellido_materno , primer_nombre , segundo_nombre , 
             obj.fecha_nacimiento, obj.get_grado_display(), obj.get_institucion_display(), obj.fundador , obj.get_estado_display(), obj.perfil , obj.telefono ])
 
     return response
@@ -93,8 +133,27 @@ def export_csv_listado(request):
     sol = Solicitud.objects.filter(torneo=current).filter(estado='A').order_by('fecha')
        
     for indice, obj in enumerate(sol, start=1):
-        writer.writerow([indice, obj.fecha, obj.usuario.apellido_paterno.capitalize(), obj.usuario.apellido_materno.capitalize(),
-                     obj.usuario.primer_nombre.capitalize(), obj.usuario.segundo_nombre.capitalize(),
+        try:
+            apellido_paterno = obj.apellido_paterno.capitalize()
+        except AttributeError:
+            apellido_paterno = ''
+
+        try:
+            apellido_materno = obj.apellido_materno.capitalize()
+        except AttributeError:
+            apellido_materno = ''
+
+        try:
+            primer_nombre = obj.primer_nombre.capitalize()
+        except AttributeError:
+            primer_nombre = ''
+
+        try:
+            segundo_nombre = obj.segundo_nombre.capitalize()
+        except AttributeError:
+            segundo_nombre = ''
+
+        writer.writerow([indice, obj.fecha, apellido_paterno, apellido_materno,primer_nombre,segundo_nombre,
                      obj.usuario.get_categoria_display(), obj.indice, obj.carro, obj.acompanantes])
     return response
 

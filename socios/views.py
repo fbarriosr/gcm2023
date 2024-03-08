@@ -367,9 +367,15 @@ class torneo(SocioMixin,DetailView):
     
 
     def get_object(self, **kwargs):
-        torneo= self.request.COOKIES.get('torneoId') 
-        current = Torneo.objects.get(id= torneo)
-        return current 
+        torneo_id = self.request.COOKIES.get('torneoId')
+
+        if torneo_id:
+            current = Torneo.objects.get(id= torneo_id)
+        else:
+            print(self.kwargs.get('slug', None))
+            current =  Torneo.objects.get(slug = self.kwargs.get('slug', None))
+
+        return current
 
 
 class crearSolicitud(SocioMixin,CreateView):

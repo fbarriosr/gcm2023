@@ -15,7 +15,31 @@
 
 
   {%if datos%}
+  <div class="container ">
+    <div class="row" style="padding-top:80px">
+      <div class="col align-self-end">
+        <div>
+          {% if estado != '' and buscar != '' %}
+          <a class="navbar-brand"  
+          href="{% url 'export_csv_solicitudes'%}?buscar={{buscar}}&?estado={{estado}}">
+            <img src="{% static 'web/assets/logos/excel.png' %}"
+          width="70px" />
+          </a>
+          {% elif estado != '' and buscar == '' %}
+          <a class="navbar-brand"  
+          href="{% url 'export_csv_solicitudes'%}?estado={{estado}}">
+            <img src="{% static 'web/assets/logos/excel.png' %}"
+          width="70px" />
+          </a>
+          {%endif%}
 
+        </div>
+        <div>
+          <strong>Exportar</strong>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="container marketing" id="links">
       <div class="row table-responsive" >
           <h2>{{ title}}</h2>
@@ -68,14 +92,14 @@
                 <td>{{ t.cancela_deuda_socio| upper  }}</td>
                 <td>{{ t.monto | upper  }}</td>
                 <td>
-                  {{ t.estado | upper  }}
-                  {% if t.get_estado_display == 'Aprobado' %}
+                  {{ t.get_estado_display   }}
+                  {% if t.estado == 'A' %}
                   <a type="button" onclick="solicitudId('{{ t.id }}','{% url 'solicitudUpdate'%}' )" class="btn btn-white btn-sm"> <img src="{% static 'web/assets/logos/ok.png' %} " style="padding: 0px !important; width: 30px!important;"></a>
-                  {% elif t.get_estado_display == 'Pendidente' %}
+                  {% elif t.estado == 'P' %}
                   <a type="button" onclick="solicitudId('{{ t.id }}','{% url 'solicitudUpdate'%}' )" class="btn btn-white btn-sm"> <img src="{% static 'web/assets/logos/pendiente.png' %} " style="padding: 0px !important; width: 30px!important;"></a>
-                  {% elif t.get_estado_display == 'Rechazado' %}
+                  {% elif t.estado == 'R' %}
                   <a type="button" onclick="solicitudId('{{ t.id }}','{% url 'solicitudUpdate'%}' )" class="btn btn-white btn-sm"> <img src="{% static 'web/assets/logos/rechazado.png' %} " style="padding: 0px !important; width: 30px!important;"></a>
-                  {% elif t.get_estado_display == 'Suspender' %}
+                  {% elif t.estado == 'S' %}
                   <a type="button" onclick="solicitudId('{{ t.id }}','{% url 'solicitudUpdate'%}' )" class="btn btn-white btn-sm"> <img src="{% static 'web/assets/logos/suspendido.png' %} " style="padding: 0px !important; width: 30px!important;"></a>
                   {%endif%}
                 </td>
@@ -170,6 +194,7 @@
 {% endblock %}
 
 {% block extraJs %} 
+<script src="extensions/export/bootstrap-table-export.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script> 
 <script src="{% static 'socio/js/toastr.min.js' %}"></script> 
 <script src="{% static 'socio/js/notificaciones.js' %}"></script>

@@ -79,13 +79,14 @@ class listarSolicitudes(TesoreroMixin, View):
             lSolicitudes = lSolicitudes.filter(estado=estado)
 
         if buscar:
-            if buscar.upper() in ['TODO', 'TODOS', '*']:
+            buscar_upper = buscar.upper()
+            if buscar_upper in ['TODO', 'TODOS', '*']:
                 lSolicitudes = lSolicitudes.order_by('fecha')
             else:
                 lSolicitudes = lSolicitudes.filter(
-                    Q(usuario__rut__icontains=buscar) |
-                    Q(usuario__apellido_paterno__icontains=buscar) |
-                    Q(usuario__primer_nombre__icontains=buscar)
+                    Q(usuario__rut__icontains=buscar_upper) |
+                    Q(usuario__apellido_paterno__icontains=buscar_upper) |
+                    Q(usuario__primer_nombre__icontains=buscar_upper)
                 ).distinct()
         else:
             lSolicitudes = lSolicitudes.order_by('fecha')
@@ -104,10 +105,17 @@ class listarSolicitudes(TesoreroMixin, View):
         contexto['subtitle']    =  'Listado de Solicitudes'
          
         estado = self.request.GET.get('estado')
+        buscar = self.request.GET.get('buscar')
+
         if estado:
             contexto['estado']      =  estado
         else:
              contexto['estado']      = ''
+
+        if buscar:
+            contexto['buscar']      =  buscar
+        else:
+             contexto['buscar']      = ''
        
         contexto['msmEmpty']    =  'No hay resultados'
         
@@ -133,6 +141,52 @@ class listarSolicitudes(TesoreroMixin, View):
     def get(self,request,*args,**kwargs):
         return render(request,self.template_name,self.get_context_data())
 
+
+def export_csv_solicitudes(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="solicitudesListar.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Fecha','Rut','Apellido Paterno', 'Primer Nombre', 
+        'Deudas', 'Recargo','Cuota', 'Cancela Deuda socio (NO/SI)','TOTAL'])
+
+    buscar = request.GET.get('buscar')
+    estado = request.GET.get('estado')
+    torneoid = request.COOKIES.get('torneoId')
+
+    lSolicitudes = Solicitud.objects.filter(torneo__id=torneoid)
+
+    if estado in ['P', 'A', 'S', 'R']:
+        lSolicitudes = lSolicitudes.filter(estado=estado)
+
+    if buscar:
+        buscar_upper = buscar.upper()
+        if buscar_upper in ['TODO', 'TODOS', '*']:
+            lSolicitudes = lSolicitudes.order_by('fecha')
+        else:
+            lSolicitudes = lSolicitudes.filter(
+                Q(usuario__rut__icontains=buscar_upper) |
+                Q(usuario__apellido_paterno__icontains=buscar_upper) |
+                Q(usuario__primer_nombre__icontains=buscar_upper)
+            ).distinct()
+    else:
+        lSolicitudes = lSolicitudes.order_by('fecha')
+
+    for obj in lSolicitudes:
+        try:
+            apellido_paterno = obj.usuario.apellido_paterno.capitalize()
+        except AttributeError:
+            apellido_paterno = ''
+
+        try:
+            primer_nombre = obj.usuario.primer_nombre.capitalize()
+        except AttributeError:
+            primer_nombre = ''
+
+        writer.writerow([ obj.fecha,obj.usuario.rut,apellido_paterno, primer_nombre , 
+             obj.deuda_socio, obj.recargo, obj.cuota , obj.cancela_deuda_socio, obj.monto])
+
+    return response
 
 
 
