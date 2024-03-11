@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   # db:
   #   container_name: postgres_web_cgm
@@ -19,12 +19,11 @@ services:
     volumes:
       - ./:/code
     ports:
-      - "9000:8000"
+      - "80:8000"
+    #  - "9000:8000"
     # environment:
     #   - POSTGRES_NAME=postgres
     #   - POSTGRES_USER=postgres
     #   - POSTGRES_PASSWORD=postgres
     #depends_on:
     #  - db
-
-
