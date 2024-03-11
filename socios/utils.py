@@ -16,31 +16,36 @@ from django.shortcuts import redirect
 
 # Genera las cuotas de todos los usuarios para el año requerido
 def generar_cuotas_grupal(año, monto_cuota, monto_descuento, monto_cargo):
-    # Evitamos duplicar datos comprobando que el nuevo año no exista
-    periodo_existente = CuotaAnual.objects.filter(año=año)
-    if periodo_existente:
-        return 'El año ingresado ya existe'
     
+    # Verificamos si ya existe una CuotaAnual para el año especificado
+    cuota_anual, created = CuotaAnual.objects.get_or_create(año=año, defaults={'monto_cuota': monto_cuota, 'cargo': monto_cargo, 'descuento': monto_descuento})
+
     # Evitamos errores comprobando que existan usuarios antes de continuar
     if Usuario.objects.exists():
         usuarios = Usuario.objects.all()
         
         # Evitamos duplicados de DescuentoCuota, CargoCuota y CuotaAnual para el mismo año
-        cargo_anual, _      = CargoCuota.objects.get_or_create(monto_cargo=monto_cargo)
-        descuento_anual, _  = DescuentoCuota.objects.get_or_create(monto_descuento=monto_descuento)
-        cuota_anual, _      = CuotaAnual.objects.get_or_create(año=año, monto_cuota=monto_cuota, cargo=cargo_anual, descuento=descuento_anual)
+        cuota_anual, _  = CuotaAnual.objects.get_or_create(año=año, monto_cuota=monto_cuota, cargo=monto_cargo, descuento=monto_descuento)
 
         # En vez de ingresar los registros 1 a 1 los guardamos en una lista y luego hacemos un volcado a la bd
         cuotas = []
         for usuario in usuarios:
-            for num_cuota in range(1,13):
-                mes_cuota = num_cuota + 2 if num_cuota <= 10 else num_cuota - 10
-                # Cuota.objects.create(usuario=usuario, año=cuota_anual, numero_cuota=num_cuota, mes=mes_cuota, order=num_cuota)
-                cuotas.append(Cuota(usuario=usuario, año=cuota_anual, numero_cuota=num_cuota, mes=mes_cuota, order=num_cuota))
+
+            # Verificamos si ya existe una CuotaAnual para el usuario y el año especificados
+            cuota_existente = Cuota.objects.filter(usuario=usuario, año=cuota_anual).exists()
+            
+            if not cuota_existente:
+                for num_cuota in range(1,13):
+                    mes_cuota = num_cuota + 2 if num_cuota <= 10 else num_cuota - 10
+                    # Cuota.objects.create(usuario=usuario, año=cuota_anual, numero_cuota=num_cuota, mes=mes_cuota, order=num_cuota)
+                    cuotas.append(Cuota(usuario=usuario, año=cuota_anual, numero_cuota=num_cuota, mes=mes_cuota, order=num_cuota))
         
-        Cuota.objects.bulk_create(cuotas)
-        
-        return 'Operacion exitosa'
+        # Solo creamos las cuotas si no existen para el usuario y el año especificados
+        if cuotas:
+            Cuota.objects.bulk_create(cuotas)
+            return 'Operacion exitosa'
+        else:
+            return 'Las cuotas para el año y usuario especificados ya existen'
     else:
         return 'Deben existir primero usuarios en la BD.'
 

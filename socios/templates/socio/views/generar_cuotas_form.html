@@ -28,7 +28,7 @@
         <p for="">Genera los registros de las 12 cuotas mensuales 
           de todos los socios del club par el año que se sea ingresado
         </p>
-        <form action="" method="post" class="form">
+        <form action="{% url 'generar_cuotas2' %}" method="post" class="form">
           {% csrf_token %}
           <div class="mb-3">
             <label class="form-label" for="{{ form.año.id_for_label }}">Ingrese el año:</label>

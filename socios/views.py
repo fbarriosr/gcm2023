@@ -39,6 +39,7 @@ logger = logging.getLogger(__name__)
 
 nameWeb = "CGM"
 
+
 #def generar_cuotas(request, año, valor):
 def generar_cuotas(request):
     print('ingresando a generar_cuotas..')
@@ -53,12 +54,35 @@ def generar_cuotas(request):
                 return HttpResponseRedirect(reverse('generar_cuotas_form'))
             else:
                 messages.error(request, respuesta)
-                return render(request, 'error.html', {'mensaje_error': respuesta})
+                return render(request, 'error.html', {'mensaje_error': respuesta}) 
     else:
         form = GenerarCuotasForm()
 
     print('saliendo de generar_cuotas..')
     return render(request, 'socio/views/generar_cuotas_form.html', {'form': form})
+
+#def generar_cuotas(request, año, valor):
+def generar_cuotas2(request):
+    print('ingresando a generar_cuotas..')
+    if request.method == 'POST':
+        form = GenerarCuotasForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            respuesta = generar_cuotas_grupal(data['año'], data['valor'], data['descuento'], data['cargo'])
+            print('respuesta:', respuesta)
+            if respuesta == 'Operacion exitosa':
+                messages.success(request, 'Las cuotas del año se generaron con éxito')
+                return HttpResponseRedirect(reverse('generar_cuotas_form'))
+            else:
+                messages.error(request, respuesta)
+                return render(request, 'error.html', {'mensaje_error': respuesta}) 
+    else:
+        form = GenerarCuotasForm()
+
+    print('saliendo de generar_cuotas..')
+    return render(request, 'socio/views/generar_cuotas_form.html', {'form': form})
+
+
 
 def generar_cuotas_socio(request):
     if request.method == 'POST':
@@ -273,7 +297,7 @@ class torneos(SocioMixin,TemplateView):
         
         diccionario_fechas = list(Torneo.objects.filter(activo=True).values('fecha'))
 
-        if len(diccionario_fechas)>0:
+        if len(diccionario_fechas) > 0:
 
             # Obtener los años de cada fecha en una lista
             anios = [elemento['fecha'].year for elemento in diccionario_fechas]
