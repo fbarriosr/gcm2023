@@ -321,6 +321,11 @@ class torneos(SocioMixin,TemplateView):
 
         return contexto
 
+    def get(self, *args, **kwargs):
+        response = super().get( *args, **kwargs)
+        response.delete_cookie('torneoId')
+        return response
+
 # Create your views here.
 class torneo(SocioMixin,DetailView):
     model = Torneo
