@@ -34,6 +34,7 @@ from .utils import *
 from .choices import estado_cuota
 import json
 import logging
+import csv
 
 logger = logging.getLogger(__name__)
 
@@ -116,6 +117,34 @@ def restablecer_cuotas_socio(request):
         respuesta = restablecer_cuotas_individual(rut, año)
         return HttpResponse(respuesta)
     return HttpResponse(f'algo anda mal')
+
+def export_csv_solicitudesAprobadas(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="solicitudesListarAprobados.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Fecha','Rut','Apellido Paterno', 'Primer Nombre',  'INDICE'])
+
+   
+    torneoid = request.COOKIES.get('torneoId')
+
+    lSolicitudes = Solicitud.objects.filter(torneo__id=torneoid).filter(estado='A').order_by('fecha')
+
+    for obj in lSolicitudes:
+        try:
+            apellido_paterno = obj.usuario.apellido_paterno.capitalize()
+        except AttributeError:
+            apellido_paterno = ''
+
+        try:
+            primer_nombre = obj.usuario.primer_nombre.capitalize()
+        except AttributeError:
+            primer_nombre = ''
+
+        writer.writerow([ obj.fecha,obj.usuario.rut,apellido_paterno, primer_nombre ,  obj.indice])
+
+    return response
+
 
 class PasswordUsuario(SocioMixin,UpdateView):
     model = Usuario
@@ -374,6 +403,12 @@ class torneo(SocioMixin,DetailView):
         solicitud = Solicitud.objects.filter(usuario__email=self.request.user.email).filter(torneo__id=torneoid).order_by('-fecha') #ultima solicitud
         contexto['rol'] = self.request.user.perfil
 
+        solAprobados = Solicitud.objects.filter(torneo__id=torneoid).filter(estado='A')
+        if (len(solAprobados)==0 ):
+            contexto['solAprobados']= False
+        else:
+            contexto['solAprobados']= True
+
         if (len(solicitud)==0 ): # no hay solicitud
             if (torneoEstado==False): #torneo Cerrado
                 contexto['solicitudEstado']= 'C'
@@ -438,6 +473,12 @@ class crearSolicitud(SocioMixin,CreateView):
         torneoTitulo = str(torneo.titulo).upper().replace('TORNEO','') 
         contexto['titulo'] = 'INSCRIPCIÓN  TORNEO '+ torneoTitulo
         contexto['rol'] = self.request.user.perfil
+
+        solAprobados = Solicitud.objects.filter(torneo__id=torneoid).filter(estado='A')
+        if (len(solAprobados)==0 ):
+            contexto['solAprobados']= False
+        else:
+            contexto['solAprobados']= True
      
         return contexto
 

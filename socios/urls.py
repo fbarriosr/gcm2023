@@ -28,6 +28,7 @@ urlpatterns = [
 
     path('perfil/', perfil.as_view(), name='perfil'),
     path('password/'   , PasswordUsuario.as_view(), name='cambiar_password'),
+    path('export_csv_solicitudesAprobadas/', export_csv_solicitudesAprobadas, name='export_csv_solicitudesAprobadas'),
     
 ]
 
