@@ -416,3 +416,9 @@ function crearUsuario(){
     
 
 }
+
+function crearCookie(nombre, valor) {
+    document.cookie = nombre + "=" + valor + ";path=/";
+    console.log('cookie');
+    window.location.href = "/torneo";
+}

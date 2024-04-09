@@ -4,7 +4,7 @@ from socios.views import *
 
 urlpatterns = [   
     path('torneos', torneos.as_view(), name= 'torneos'),
-    path('torneo/<slug:slug>/', torneo.as_view(), name='torneo'),
+    path('torneo', torneo.as_view(), name='torneo'),
     path('noticias', noticias.as_view(), name = 'noticias'),
     path('noticia/<slug:slug>/' , noticia.as_view(), name = 'noticia'),
     path('ranking', ranking.as_view(), name= 'ranking'),

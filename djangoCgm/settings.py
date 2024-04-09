@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'search_admin_autocomplete',
-    'django_cleanup.apps.CleanupConfig',
     'import_export',
     'web',
     'usuarios',
@@ -49,6 +48,7 @@ INSTALLED_APPS = [
     'capitan',
     'secretario',
     'django_recaptcha',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [

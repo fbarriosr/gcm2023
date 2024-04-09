@@ -165,9 +165,9 @@ class FormularioTorneoCreate(forms.ModelForm):
     class Meta:
         model = Torneo
         fields = [ 'titulo','fecha' ,'direccion','region',         
-                    'descripcion','img',             
+                    'descripcion',             
                     'cupos','inscritos','activo','proximo','abierto',
-                    'bases','list_inscritos','resultados',     
+                    'bases','list_inscritos','list_salidas','resultados',     
                     'premiacion' ]
         labels = {
             'titulo'        : 'Titulo (requerido) ',
@@ -175,7 +175,6 @@ class FormularioTorneoCreate(forms.ModelForm):
             'direccion'     : 'Dirección (requerido)',       
             'region'        : 'Región (requerido)',      
             'descripcion'   : 'Descripción', 
-            'img'           : 'Imagen (requerido)',   
             'cupos'         : 'Cupos (requerido)',
             'inscritos'     : 'Inscritos (requerido)', 
             'activo'        : 'Activo', 
@@ -183,6 +182,7 @@ class FormularioTorneoCreate(forms.ModelForm):
             'abierto'       : 'Abierto',   
             'bases'         : 'Bases', 
             'list_inscritos': 'Listado de Inscritos',
+            'list_salidas'  : 'Listado de Salidas',
             'resultados'    : 'Resultados',
             'premiacion'    : 'Premiación',
         }
@@ -219,12 +219,6 @@ class FormularioTorneoCreate(forms.ModelForm):
                     'class': 'form-control ',
                     'id': 'descripcion',
                     'style': "height: 200px",
-                }                
-            ),
-            'img': forms.FileInput(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'img',
                 }                
             ),
             'cupos': forms.TextInput(
@@ -277,6 +271,12 @@ class FormularioTorneoCreate(forms.ModelForm):
                 attrs = {
                     'class': 'form-control ',
                     'id': 'list_inscritos',
+                }                
+            ),
+            'list_salidas': forms.FileInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'list_salidas',
                 }                
             ),
             'resultados': forms.FileInput(

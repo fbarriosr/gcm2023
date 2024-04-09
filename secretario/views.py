@@ -294,7 +294,6 @@ class torneoCreate(SecretarioMixin,CreateView):
                     direccion         = form.cleaned_data.get('direccion'),
                     region            = form.cleaned_data.get('region'),
                     descripcion       = form.cleaned_data.get('descripcion'),
-                    img               = form.cleaned_data.get('img'),
                     cupos             = form.cleaned_data.get('cupos'),
                     inscritos         = form.cleaned_data.get('inscritos'),
                     activo            = form.cleaned_data.get('activo'),
@@ -302,6 +301,7 @@ class torneoCreate(SecretarioMixin,CreateView):
                     abierto           = form.cleaned_data.get('abierto'),
                     bases             = form.cleaned_data.get('bases'),
                     list_inscritos    = form.cleaned_data.get('list_inscritos'),
+                    list_salidas      = form.cleaned_data.get('list_salidas'),
                     resultados        = form.cleaned_data.get('resultados'),
                     premiacion        = form.cleaned_data.get('premiacion'),
                 )

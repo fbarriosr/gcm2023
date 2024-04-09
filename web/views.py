@@ -67,7 +67,7 @@ class home(TemplateView, View):
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-        contexto["title"] = "home"
+        contexto["title"] = "Bienvenidos al club"
 
         galeria = Galeria.objects.order_by('order')
         banner = Links.objects.filter(banner=True).order_by('order')
@@ -95,7 +95,7 @@ class historia(TemplateView):
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-        contexto["title"] = "historia"
+        contexto["title"] = "Nuestra Historia"
         front = Front.objects.filter(titulo="historia")
         
         listado_p = Listado.objects.filter(tipo__tipo__in=['Presidente']).filter(actual=False)
@@ -137,7 +137,7 @@ class comite(TemplateView):
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-        contexto["title"] = "comite"
+        contexto["title"] = "Nuestro Comite"
         
         front = Front.objects.filter(titulo="comite")
         #listado_rc = Listado.objects.filter(tipo__tipo="ComisionRC")
@@ -158,7 +158,7 @@ class directorio(TemplateView):
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-        contexto["title"] = "directorio"
+        contexto["title"] = "Nuestro Directorio"
         front = Front.objects.filter(titulo="directorio")
         listado_d = Listado.objects.filter(grupo='D').filter(actual=True)
         listado_m = Listado.objects.filter(grupo='M').filter(actual=True)
@@ -181,7 +181,7 @@ class estatutos(TemplateView):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
 
-        contexto["title"] = "Estatutos"
+        contexto["title"] = "Nuestros Estatutos"
         front = Front.objects.filter(titulo="estatutos")
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         

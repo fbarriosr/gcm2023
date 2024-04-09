@@ -244,7 +244,7 @@ class noticia(SocioMixin,DetailView):
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-        contexto["title"] = "noticia"
+        contexto["title"] = "Noticia"
         dato =  self.get_object()
         contexto['new'] =  dato[0]
         dato = list(dato.values('titulo','img','fecha','resumen','info','slug','img1', 'img2', 'img3','img4','img5','region'))
@@ -294,7 +294,7 @@ class noticias(SocioMixin,TemplateView):
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-        contexto["title"] = "noticias"
+        contexto["title"] = "Noticias"
         contexto['datos'] = self.get_queryset()
 
         if contexto['datos'].paginator.num_pages > 1 and contexto['datos'].number != contexto['datos'].paginator.num_pages : # tiene un next
@@ -320,7 +320,7 @@ class torneos(SocioMixin,TemplateView):
         
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-        contexto["title"] = "torneo"
+        contexto["title"] = "Torneo"
         mainCard = Torneo.objects.filter(activo=True).filter(proximo = True)
         torneoCard = Torneo.objects.filter(activo=True).filter(proximo= False).order_by('-fecha')
         
@@ -395,7 +395,6 @@ class torneo(SocioMixin,DetailView):
         torneoid = dato.id
         torneoEstado = dato.abierto
         contexto['torneoEstado'] = torneoEstado
-        contexto['torneoImg']= dato.img
         contexto['torneoFecha']= str(dato.fecha)
         contexto['torneoLugar']= dato.direccion+'-' + dato.region
         contexto['torneoInscritos']= dato.inscritos
@@ -432,15 +431,16 @@ class torneo(SocioMixin,DetailView):
 
     def get_object(self, **kwargs):
         torneo_id = self.request.COOKIES.get('torneoId')
-
+        '''
         if torneo_id:
             current = Torneo.objects.get(id= torneo_id)
         else:
             print(self.kwargs.get('slug', None))
             current =  Torneo.objects.get(slug = self.kwargs.get('slug', None))
-
+        
         return current
-
+        '''
+        return Torneo.objects.get(id= torneo_id)
 
 class crearSolicitud(SocioMixin,CreateView):
     model = Solicitud
@@ -474,7 +474,7 @@ class crearSolicitud(SocioMixin,CreateView):
         contexto['titulo'] = 'INSCRIPCIÓN  TORNEO '+ torneoTitulo
         contexto['rol'] = self.request.user.perfil
 
-        solAprobados = Solicitud.objects.filter(torneo__id=torneoid).filter(estado='A')
+        solAprobados = Solicitud.objects.filter(torneo__id=torneo.id).filter(estado='A')
         if (len(solAprobados)==0 ):
             contexto['solAprobados']= False
         else:
@@ -485,7 +485,7 @@ class crearSolicitud(SocioMixin,CreateView):
     def get_object(self, **kwargs):
         torneo= self.request.COOKIES.get('torneoId') 
         current = Torneo.objects.get(id= torneo)
-        return current 
+        return current
 
     def post(self,request,*args,**kwargs):  
         if request.is_ajax():
@@ -605,7 +605,7 @@ class ranking(SocioMixin,TemplateView):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
 
-        contexto["title"] = "ranking"
+        contexto["title"] = "Ranking"
         front = Front.objects.filter(titulo="ranking")
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         contexto['rol'] = self.request.user.perfil
