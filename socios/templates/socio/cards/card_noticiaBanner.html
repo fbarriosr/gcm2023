@@ -1,0 +1,35 @@
+{% load static %} {% static "" as baseUrl %}
+<div class="container ">
+   {% if datos %}
+   <div class="row row-cols-1 row-cols-md-3 g-4">
+      {% for value in datos %}
+      <div class="col-sm-12">
+         <div class="card cardTorneo">
+            <a class="" href="{%url 'noticia' value.slug %}" target="_blank">
+               <div class="card-header text-center" style="color: black;"><h6 style="font-weight: 800!important;">NOTICIA</h6></div>
+               <img src="media/{{ value.img }}" class="card-img-top" alt="...">
+               <div class="card-body cardTorneo" style="color: black;">
+                  <h5 class="card-title text-center"> {{ value.titulo | upper }}</h5>
+                  <h6> <img src="static/web/assets/logos/point.png" style="padding: 5px; text-align: left!;"> {{ value.direccion |capfirst}}, {{ value.get_region_display }}</h6>
+                  <p class="card-text"> {{ value.resumen |capfirst }}</p>
+               </div>
+            </a>
+            <div class="card-footer">
+               <small class="text-body-secondary"> 
+               {% if rol == 'SECR' or rol == 'SUPER' %}
+                    {% if value.is_active %}
+                    <img src="{% static 'web/assets/logos/activo.png' %}" style="padding:0px!important">
+                    {%else%}
+                    <img src="{% static 'web/assets/logos/noActivo.png' %}" style="padding:0px!important">
+                    {%endif%}
+               {%endif%}
+               <img src="static/web/assets/logos/calendario.png" style="padding: 10px;">{{ value.fecha }}
+               </small>
+            </div>
+         </div>
+      </div>
+      {% endfor %}
+   </div>
+   {%endif%}
+</div>
+<!-- /.container -->

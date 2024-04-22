@@ -1,6 +1,9 @@
 $(document).ready(function () {
    $("#patente").parent().hide() 
    $("#acompanantes").parent().hide()
+   $("#auto").parent().hide()
+   $("#autoLabel").hide()
+
    deuda = $('#deuda').val()
    if (Number(deuda)== 0){
        $('#recargo').val(0)
@@ -28,6 +31,22 @@ $("#cancela_deuda_socio").change(function() {
       $('#total').val(total)
     }
 });
+
+$("#busCGM").change(function() {
+    if(this.checked) {
+        $("#auto").prop("checked", false);
+        $("#auto").parent().show()
+        $("#autoLabel").show()
+
+        
+    }else{
+        $("#auto").parent().hide()
+        $("#autoLabel").hide()
+        $("#patente").parent().hide() 
+    }
+});
+
+
 
 $("#carro").change(function() {
     if(this.checked) {
@@ -57,7 +76,7 @@ function crearSolicitud(){
         url:  $('#form_edicion').attr('action'),
         type: $('#form_edicion').attr('method'),
         success: function (response) {
-            notificacionSuccessUrl(response.mensaje, '../torneos')
+            notificacionSuccessUrl(response.mensaje, '../calendario')
             console.log(response.mensaje)  
         },
         error: function (error) {
@@ -231,7 +250,7 @@ function createTorneo(){
         cache: false,
         data: data,
         success: function (response) {
-            notificacionSuccessUrl('Actualizando', 'torneos')
+            notificacionSuccessUrl('Actualizando', 'calendario')
             console.log(response.mensaje)   
         },
         error: function (error) {
@@ -248,10 +267,6 @@ function createTorneo(){
                 }
                 if(obj.error.direccion){
                     m = 'Dirección: '+ obj.error.direccion
-                    notificacionError(m)
-                }
-                if(obj.error.img){
-                    m = 'Imagen: '+ obj.error.img
                     notificacionError(m)
                 }
                 console.log(obj.error)
@@ -278,7 +293,7 @@ function updateTorneo(){
         cache: false,
         data: data,
         success: function (response) {
-            notificacionSuccessUrl('Actualizando', 'torneos')
+            notificacionSuccessUrl('Actualizando', 'calendario')
             console.log(response.mensaje)   
         },
         error: function (error) {
@@ -301,7 +316,7 @@ function eliminarTorneo(){
             type: 'post',
             success: function (response) {
                 Cookies.remove('torneoId');
-                notificacionSuccessUrl(response.mensaje,'torneos')             
+                notificacionSuccessUrl(response.mensaje,'calendario')             
             },
             error: function (error) {
                 console.log(error) 
@@ -417,8 +432,8 @@ function crearUsuario(){
 
 }
 
-function crearCookie(nombre, valor) {
+function crearCookie(nombre, valor, url) {
     document.cookie = nombre + "=" + valor + ";path=/";
     console.log('cookie');
-    window.location.href = "/torneo";
+    window.location.href = url;
 }

@@ -8,7 +8,7 @@
     style="background-color: #e3f2fd"
   >
     <div class="container-fluid">
-      <a class="navbar-brand"  href="{% url 'torneos'%}"
+      <a class="navbar-brand"  href="{% url 'inicio'%}"
         ><img src="{% static '/web/assets/logos/logo.png' %}"
       width="50px"/></a>
       <button
@@ -29,7 +29,13 @@
         
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'torneos'%}">TORNEOS</a>
+            <a class="nav-link" href="{% url 'inicio'%}">INICIO</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'torneos'%}">CALENDARIO</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'multimedias'%} ">MULTIMEDIA</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'noticias'%} ">NOTICIAS</a>
@@ -46,13 +52,10 @@
               EL CLUB
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item menu" href="/media/normas_reglas/basesGenerales.pdf" target="_blank">BASES GENERALES</a></li>
-              <li><a class="dropdown-item menu" href="">NORMAS Y REGLAMENTOS</a></li>
-              <li><a class="dropdown-item menu" href="">MEMORIAS Y BALANCE</a></li>
+              {% for value in elClub %}
+              <li><a class="dropdown-item menu"  href="media/{{ value.archivo}}" target="_blank">{{ value.titulo | upper}}</a></li>
+              {% endfor %}
             </ul>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'cuotas'%} ">VER MIS CUOTAS</a>
           </li>
         </ul>
       </div>
@@ -87,6 +90,7 @@
             </button>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item menu" href="{% url 'perfil' %}">Perfil</a></li>
+              <li><a class="dropdown-item menu" href="{% url 'cuotas' %}">Ver mis Cuotas</a></li>
               <li><a class="dropdown-item menu" href="{% url 'cambiar_password' %}">Contraseña</a></li>
               {% if rol == 'SUPER' or rol == 'CAP' %}
               <li><a class="dropdown-item menu" href="{% url 'cumpleanos'%}">Cumpleaños</a></li>

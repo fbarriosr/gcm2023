@@ -18,3 +18,4 @@ django-admin-list-filter-dropdown
 django-admin-rangefilter
 django-admin-autocomplete-filter
 django-import-export
+django-multiupload

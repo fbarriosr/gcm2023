@@ -8,12 +8,6 @@ from .models import *
 # Register your models here.
 admin.site.register(Galeria, GaleriaAdmin)
 admin.site.register(Links, LinksAdmin)
-admin.site.register(Front, FrontAdmin)
+admin.site.register(Paginas_Web, Paginas_WebAdmin)
 admin.site.register(Listado, ListadosAdmin)
 admin.site.register(Tipo, TiposAdmin)
-
-admin.site.register(Club, ClubesAdmin)
-admin.site.register(Campeonato, CampeonatosAdmin)
-
-admin.site.register(NormaRegla, NormasReglasAdmin)
-

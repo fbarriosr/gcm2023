@@ -16,7 +16,7 @@ from usuarios.choices import *
 
 class FormularioRankingUpdate(forms.ModelForm):
     class Meta:
-        model = Front
+        model = Paginas_Socio
         fields = ['contenido','file']
         labels = {
             'contenido':'Contenido',
@@ -164,9 +164,8 @@ class FormularioNoticiaUpdate(FormularioNoticiaCreate):
 class FormularioTorneoCreate(forms.ModelForm):
     class Meta:
         model = Torneo
-        fields = [ 'titulo','fecha' ,'direccion','region',         
-                    'descripcion',             
-                    'cupos','inscritos','activo','proximo','abierto',
+        fields = [ 'titulo','fecha' ,'direccion','region',                     
+                    'cupos','activo','actual','abierto',
                     'bases','list_inscritos','list_salidas','resultados',     
                     'premiacion' ]
         labels = {
@@ -174,12 +173,10 @@ class FormularioTorneoCreate(forms.ModelForm):
             'fecha'         : 'Fecha (requerido)',        
             'direccion'     : 'Dirección (requerido)',       
             'region'        : 'Región (requerido)',      
-            'descripcion'   : 'Descripción', 
             'cupos'         : 'Cupos (requerido)',
-            'inscritos'     : 'Inscritos (requerido)', 
-            'activo'        : 'Activo', 
-            'proximo'       : 'Próximo',  
-            'abierto'       : 'Abierto',   
+            'activo'        : 'Ver Torneo (No/Si)', 
+            'actual'        : 'Torneo Actual (No/Si)',  
+            'abierto'       : 'Torneo Abierto (No/Si)',   
             'bases'         : 'Bases', 
             'list_inscritos': 'Listado de Inscritos',
             'list_salidas'  : 'Listado de Salidas',
@@ -213,27 +210,12 @@ class FormularioTorneoCreate(forms.ModelForm):
                     'id': 'region',
                 }
             ),
-
-            'descripcion': forms.Textarea(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'descripcion',
-                    'style': "height: 200px",
-                }                
-            ),
             'cupos': forms.TextInput(
                 attrs = {
                     'class': 'form-control ',
                     'id': 'cupos',
                 }                
             ),
-            'inscritos': forms.TextInput(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'inscritos',
-                }                
-            ),
-
             'activo': forms.CheckboxInput(
                 attrs = {
                     'class': 'form-check-input switch',
@@ -243,10 +225,10 @@ class FormularioTorneoCreate(forms.ModelForm):
 
                 }                
             ),
-            'proximo': forms.CheckboxInput(
+            'actual': forms.CheckboxInput(
                 attrs = {
                     'class': 'form-check-input switch',
-                    'id': 'proximo',
+                    'id': 'actual',
                     'type':'checkbox',
                     'rol': 'switch'
 
@@ -273,6 +255,7 @@ class FormularioTorneoCreate(forms.ModelForm):
                     'id': 'list_inscritos',
                 }                
             ),
+
             'list_salidas': forms.FileInput(
                 attrs = {
                     'class': 'form-control ',

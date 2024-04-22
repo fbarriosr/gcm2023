@@ -33,6 +33,7 @@ from datetime import datetime
 from socios.utils import contact
 from .forms import FormHome
 from django.http import JsonResponse
+from django.http import HttpResponseNotFound
 
 
 nameWeb = "CGM"
@@ -95,41 +96,32 @@ class historia(TemplateView):
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-        contexto["title"] = "Nuestra Historia"
-        front = Front.objects.filter(titulo="historia")
         
-        listado_p = Listado.objects.filter(tipo__tipo__in=['Presidente']).filter(actual=False)
-
-
-        # contexto['front']  = list(front.values('titulo','img', 'contenido', 'order'))[0]
-        contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
-        contexto['listado_p'] = list(listado_p.values('titulo', 'img', 'order'))
-        contexto['listado_pTitulo'] = 'Antiguos Presidentes'
-        
+        dato = Paginas_Web.objects.get(tipo ="H")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
         linksMenu = Links.objects.filter(banner=False).order_by('tipo','order')
         contexto['linksMenu'] = list(linksMenu.values('url', 'titulo'))
 
         return contexto
 
-class notFound404(TemplateView):
+class NotFound404(TemplateView):
     template_name = "web/views/404.html"
 
-    def get_context_data(self,**kwargs):
+    def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
-        contexto['nameWeb'] = nameWeb
-        contexto['title'] = '404'
-        front = Front.objects.filter(titulo="404")
-        datos = list(front.values('titulo','img', 'contenido'))
-        if len(datos ) > 0:
-            contexto['front'] =  datos
-            contexto['h1']     = datos[0]['contenido']
-        else:
-            contexto['front'] = []
-            contexto['h1']     = 'No hay sitio'
-        print('contexto') 
-        print(contexto['front'])
+        contexto["nameWeb"] = nameWeb
+        
+        dato = Paginas_Web.objects.get(tipo ="404")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
+        linksMenu = Links.objects.filter(banner=False).order_by('tipo','order')
+        contexto['linksMenu'] = list(linksMenu.values('url', 'titulo'))
+        return contexto
 
-        return contexto  
+
+def handler404(request, exception):
+    return HttpResponseNotFound(NotFound404.as_view()(request=request).content)
 
 class comite(TemplateView):
     template_name = "web/views/comite.html"
@@ -137,13 +129,15 @@ class comite(TemplateView):
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-        contexto["title"] = "Nuestro Comite"
         
-        front = Front.objects.filter(titulo="comite")
-        #listado_rc = Listado.objects.filter(tipo__tipo="ComisionRC")
+        
+        dato = Paginas_Web.objects.get(tipo ="C")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
+
+       
         listado = Listado.objects.filter(tipo__tipo__in=['ComisionRC','ComisionED', 'Responsable Institucional'])
 
-        contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         contexto['listado'] = list(listado.values('titulo', 'img', 'tipo__tipo', 'order'))
 
         linksMenu = Links.objects.filter(banner=False).order_by('tipo','order')
@@ -158,13 +152,16 @@ class directorio(TemplateView):
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-        contexto["title"] = "Nuestro Directorio"
-        front = Front.objects.filter(titulo="directorio")
+        
+
+        dato = Paginas_Web.objects.get(tipo ="D")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
+    
         listado_d = Listado.objects.filter(grupo='D').filter(actual=True)
         listado_m = Listado.objects.filter(grupo='M').filter(actual=True)
-       
+   
 
-        contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         contexto['listado_m'] = listado_m
         contexto['listado_d'] = listado_d
       
@@ -175,21 +172,22 @@ class directorio(TemplateView):
         return contexto
 
 
+
+
+
 class estatutos(TemplateView):
     template_name = "web/views/estatutos.html"
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-
-        contexto["title"] = "Nuestros Estatutos"
-        front = Front.objects.filter(titulo="estatutos")
-        contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
         
+        dato = Paginas_Web.objects.get(tipo ="E")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
         linksMenu = Links.objects.filter(banner=False).order_by('tipo','order')
         contexto['linksMenu'] = list(linksMenu.values('url', 'titulo'))
 
         return contexto
-
 def manifest(request):
     data = {
         "name": "Club de Golf Militar",

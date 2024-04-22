@@ -1,0 +1,22 @@
+{% load static %} {% static "" as baseUrl %}
+<div class="container ">
+   {% if datos %}
+   <div class="row row-cols-1 row-cols-md-3 g-4">
+      {% for value in datosClub %}
+      <div class="col-sm-12">
+         <div class="card cardTorneo">
+            <a class="" href="media/{{ value.archivo }}" target="_blank">
+               <div class="card-header text-center" style="color: black;"><h6 style="font-weight: 800!important;">EL CLUB</h6></div>
+               <img src="media/{{ value.img }}" class="card-img-top" alt="...">
+               <div class="card-body cardTorneo" style="color: black;">
+                  <h5 class="card-title text-center"> {{ value.titulo | upper }}</h5>
+               </div>
+            </a>
+           
+         </div>
+      </div>
+      {% endfor %}
+   </div>
+   {%endif%}
+</div>
+<!-- /.container -->

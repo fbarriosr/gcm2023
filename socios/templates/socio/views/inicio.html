@@ -1,0 +1,31 @@
+{% extends "web/root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block header %} 
+
+      {% include "socio/header/header_socios.html" %}
+
+{% endblock %}
+
+
+{% block body %}
+
+
+ {% include "web/banner/banner.html" %}
+
+
+{% include "socio/cards/inicioTorneos.html" %} 
+
+{% include "socio/cards/card_noticiaBanner.html" %}  
+
+{% include "socio/cards/card_elClub.html" %}  
+
+{% endblock %}
+{% block extraJs %} 
+
+<script src="{% static 'socio/js/solicitud.js' %}"></script>    
+{% endblock %}

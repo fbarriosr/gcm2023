@@ -11,20 +11,12 @@ class FormularioSolicitudViewTesorero(forms.ModelForm):
     class Meta:
         model = Solicitud
         fields = [
-        			'indice','auto','patente','busCGM','carro','descripcion',
-                    'acompanantes','deuda_socio','recargo','cuota','monto','cancela_deuda_socio',
+        			'deuda_socio','recargo','cuota','monto','cancela_deuda_socio',
                     'estado', 'motivo','suspende', 'motivoSuspencion']
         labels = {
             'usuario':'Usuario',
             'torneo': 'Torneo',
             'fecha': 'Fecha',
-            'auto': '¿Vas en auto?',
-            'patente': 'Registre la Patente',
-            'busCGM':'¿Usará BUS CGM? (NO/SI)',
-            'carro': '¿Participará en Carro? (NO/SI)',
-            'indice':'Ingrese su Índice',
-            'acompanantes':'¿Con quien va?',
-            'descripcion':'Solicitud',
             'deuda_socio':'Deudas',
             'recargo':'Recargo',
             'cuota': 'Cuota de Campeonato',
@@ -59,65 +51,6 @@ class FormularioSolicitudViewTesorero(forms.ModelForm):
                     'readonly':''
                 }                
             ),
-            'auto': forms.CheckboxInput(
-                attrs = {
-                    'class': 'form-check-input switch',
-                    'id': 'auto',
-                    'type':'checkbox',
-                    'rol': 'switch',
-                    'disabled': True
-                }                
-            ),
-            'patente': forms.TextInput(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'patente',
-                    'readonly':''
-                }                
-            ),
-            'busCGM': forms.CheckboxInput(
-                attrs = {
-                    'class': 'form-check-input switch',
-                    'id': 'busCGM',
-                    'type':'checkbox',
-                    'rol': 'switch',
-                    'disabled': True
-
-                }                
-            ),
-            
-            'carro': forms.CheckboxInput(
-                attrs = {
-                    'class': 'form-check-input switch',
-                    'id': 'carro',
-                    'type':'checkbox',
-                    'rol': 'switch',
-                    'disabled': True
-
-                }                
-            ),
-            
-            'indice': forms.TextInput(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'indice',
-                    'readonly':''
-                }                
-            ),
-            'acompanantes': forms.Textarea(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'acompanantes',
-                }                
-            ),
-            'descripcion': forms.Textarea(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'descripcion',
-                    'style': "height: 200px",
-                    'readonly':''
-                }                
-            ),
             'deuda_socio': forms.TextInput(
                 attrs = {
                     'class': 'form-control ',
@@ -145,7 +78,8 @@ class FormularioSolicitudViewTesorero(forms.ModelForm):
                     'class': 'form-check-input switch',
                     'id': 'cancela_deuda_socio',
                     'type':'checkbox',
-                    'rol': 'switch'
+                    'rol': 'switch', 
+                    'disabled': True
 
                 }                
             ),

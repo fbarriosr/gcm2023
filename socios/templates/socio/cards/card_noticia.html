@@ -21,16 +21,15 @@
                </div>
             </a>
             <div class="card-footer">
-               <small class="text-body-secondary"> <img src="static/web/assets/logos/calendario.png" style="padding: 10px;">{{ value.fecha }}
-               {% if rol == 'Super Usuario' or rol == 'Secretario' %}
-               <a href="" style="padding-right: 20px;padding-left: 30px;">
-                  {% if value.is_active %}
-                     <img src="static/web/assets/logos/activo.png" style="width: 15px;">
-                  {%else %}
-                     <img src="static/web/assets/logos/noActivo.png" style="width: 15px;">
-                  {%endif %}
-               </a>
-               {%endif %}
+               <small class="text-body-secondary"> 
+               {% if rol == 'SECR' or rol == 'SUPER' %}
+                    {% if value.is_active %}
+                    <img src="{% static 'web/assets/logos/activo.png' %}" style="padding:0px!important">
+                    {%else%}
+                    <img src="{% static 'web/assets/logos/noActivo.png' %}" style="padding:0px!important">
+                    {%endif%}
+               {%endif%}
+               <img src="static/web/assets/logos/calendario.png" style="padding: 10px;">{{ value.fecha }}
                </small>
             </div>
          </div>

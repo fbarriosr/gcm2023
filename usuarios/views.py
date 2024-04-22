@@ -33,7 +33,7 @@ class Login(FormView):
     
     template_name = 'usuarios/views/login.html'
     form_class = FormularioLogin
-    success_url = reverse_lazy('torneos')
+    success_url = reverse_lazy('inicio')
     @method_decorator(csrf_protect)
     @method_decorator(never_cache)
 

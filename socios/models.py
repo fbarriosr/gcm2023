@@ -6,11 +6,81 @@ from autoslug import AutoSlugField
 from django.utils import timezone
 import uuid
 from usuarios.models import Usuario
-from .choices import estado, regiones, estado_solicitud, estado_cuota, mes_num_texto
+from .choices import estado, regiones, cards,estado_solicitud, estado_cuota, mes_num_texto, websSocio
 from import_export.admin import ImportExportModelAdmin
+from multiupload.fields import MultiImageField
+from djmoney.models.fields import MoneyField
+
 
 def slugify_two_fields(self):
         return "{}_{}-{}-{}".format(self.titulo, self.fecha.day, self.fecha.month, self.fecha.year)
+
+# CONTENIDO PRINCIPAL DE HISTORIA, ETC
+
+class CardsInicio(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    tipo = models.CharField(max_length=20, choices= cards, default="A")
+    img = models.ImageField(upload_to="CardsInicio/")
+    titulo = models.CharField(max_length=200, blank=True, null=True)
+   
+    class Meta:
+        verbose_name = "CardInicio"
+        verbose_name_plural = "CardsInicio"
+        ordering = ["titulo"]
+
+    def __str__(self):
+        return self.titulo
+
+
+class CardsInicioAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
+    search_fields = ["titulo"]
+    list_display = ("tipo",'titulo')
+    list_per_page = 10
+
+class Paginas_Socio(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    tipo = models.CharField(max_length=20, choices= websSocio, default="B")
+    img = models.ImageField(upload_to="Paginas_Socio/")
+    titulo = models.CharField(max_length=200, blank=True, null=True)
+    contenido = models.TextField(blank=True, null=True)
+    file = models.FileField(upload_to="Paginas_Socio/files/", max_length=254, blank=True)
+    tituloPestana = models.CharField(max_length=200, blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Paginas_Socio"
+        verbose_name_plural = "Paginas_Socios"
+        ordering = ["titulo"]
+
+    def __str__(self):
+        return self.titulo
+
+
+class Paginas_SocioAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
+    search_fields = ["titulo"]
+    list_display = ("tipo",'titulo')
+    list_per_page = 10
+
+class Multimedia (models.Model):
+    id              = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    titulo          = models.CharField(max_length = 200, blank = False, null = False)
+    fecha           = models.DateField(null=False)
+    img             = models.FileField(upload_to='multimedia')
+    slug            = AutoSlugField(populate_from=slugify_two_fields,  unique_with=['titulo','fecha'])
+    is_active       = models.BooleanField('Activo',default = True)
+    class Meta:
+        verbose_name = "Multimedia"
+        verbose_name_plural = "Multimedias"
+        ordering = ["-fecha"]
+
+    def __str__(self):
+        return self.titulo
+
+
+class MultimediaAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
+    search_fields = ["titulo"]
+    list_display = ( "fecha", "titulo", 'is_active')
+    list_per_page = 10  # No of records per page
+    list_filter = ('is_active',)
 
 class Noticia (models.Model):
     id              = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -50,11 +120,9 @@ class Torneo (models.Model):
     fecha           = models.DateField(null=False)
     direccion       = models.CharField(max_length=200, blank=False, null= False, verbose_name="Direccion")
     region          = models.CharField(max_length=50,choices= regiones, default= 'XIII', verbose_name="Region")
-    descripcion     = models.TextField(blank=True)
     cupos           = models.IntegerField(default=100)
-    inscritos       = models.IntegerField(default=0)
     activo          = models.BooleanField(default=True)
-    proximo         = models.BooleanField(default=False)
+    actual          = models.BooleanField(default=False)
     abierto         = models.BooleanField(default=True)
     slug            = AutoSlugField(populate_from=slugify_two_fields,  unique_with=['titulo','fecha'])
     bases           = models.FileField(upload_to="torneos/bases/", max_length=254, blank=True)
@@ -73,9 +141,9 @@ class Torneo (models.Model):
 
 class TorneoAdmin (ImportExportModelAdmin,SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields   = ['titulo']
-    list_display    = ('id','slug','titulo','fecha','region','activo','abierto','proximo','cupos','inscritos' )
+    list_display    = ('id','slug','titulo','fecha','region','activo','abierto','actual','cupos' )
     list_per_page   = 10 # No of records per page
-    list_filter = ('activo','proximo','abierto')
+    list_filter = ('activo','actual','abierto')
 
 
 class Solicitud (models.Model):
@@ -83,24 +151,20 @@ class Solicitud (models.Model):
     usuario         = models.ForeignKey(Usuario,on_delete=models.CASCADE, null=True, verbose_name="Usuario") 
     torneo          = models.ForeignKey(Torneo,on_delete=models.CASCADE, null=True, verbose_name="Torneo")
     fecha           = models.DateTimeField(null=False)
-    auto            = models.BooleanField(default=False)
+    busCGM          = models.BooleanField(default=False)
+    auto            = models.BooleanField(default=False, verbose_name= "Estacionamiento")
     patente         = models.CharField(max_length=12, blank= True , verbose_name="Patente")
     carro           = models.BooleanField(default=False)
-    acompanantes    = models.TextField(blank=True, verbose_name='¿Con quién va?')
-    busCGM          = models.BooleanField(default=False)
+    acompanantes    = models.TextField(blank=True, verbose_name='¿Con quién va?')   
     indice          = models.IntegerField(blank=True, null=True, verbose_name="Indice")
-    descripcion     = models.TextField(blank=True, verbose_name='Solicitud')
-    deuda_socio     = models.IntegerField(default=0, null=False, verbose_name="Deuda Socio")
+    deuda_socio     = models.PositiveIntegerField(default=0, verbose_name="Deuda Socio")
     cancela_deuda_socio  = models.BooleanField(default=False)
-    recargo         = models.IntegerField(default=0, null=False, verbose_name="Recargo")
-    recargoInvitado = models.IntegerField(default=0, null=False, verbose_name="Recargo Invitado")
-    cuota           = models.IntegerField(default=0, null=False, verbose_name="Cuota de Campeonato")
-    monto           = models.IntegerField(default=0, null=False, verbose_name="Monto Pagado")
+    recargo         = models.PositiveIntegerField(default=0, verbose_name="Recargo")
+    recargoInvitado = models.PositiveIntegerField(default=0, verbose_name="Recargo Invitado")
+    cuota           = models.PositiveIntegerField(default=0,  verbose_name="Cuota de Campeonato")
+    monto           = models.PositiveIntegerField(default=0,  verbose_name="Monto Pagado")
     estado          = models.CharField(max_length=50,blank=True,choices= estado_solicitud, default= 'P', verbose_name="Estado")
     motivo          = models.TextField(default='',blank=True, verbose_name='Motivo')
-    checkCapitan    = models.BooleanField(default=False)
-    indiceTorneo    = models.IntegerField(default=0,blank=True, null=True, verbose_name="Indice Torneo")
-    hoyoInicial     = models.IntegerField(default=0,blank=True, null=True, verbose_name="Hoyo Inicial")
     suspende        = models.BooleanField(default=False, verbose_name='Suspende Participación' )
     motivoSuspencion= models.TextField(default='',blank=True, verbose_name='Motivo Suspención')
 
@@ -113,10 +177,31 @@ class SolicitudAdmin (SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields   = ['usuario']
     list_display    = ('usuario','torneo','fecha','busCGM','carro','cancela_deuda_socio' ,'monto' , 'estado')
     list_per_page   = 10 # No of records per page
-    list_filter = ('usuario','torneo', 'estado')
+    list_filter = ('torneo', 'estado', 'fecha')
     autocomplete_fields = ['usuario','torneo']
 
+# PLANTILLA PARA LOS LINKS DE EL CLUB EN HOME DEL SOCIO
+class ElClub(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    titulo  = models.CharField(max_length=200, blank=False, null=False)
+    archivo = models.FileField(upload_to="ElClub/", max_length=254, blank=True)
+    img     = models.ImageField(upload_to='ElClub/',blank = True)
+    order = models.IntegerField(default=0)
 
+
+    class Meta:
+        verbose_name = "ElClub"
+        verbose_name_plural = "ElClubs"
+        ordering = ["order"]
+
+    def __str__(self):
+        return self.titulo
+
+
+class ElClubAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
+    search_fields = ["titulo"]
+    list_display = ("titulo", "order")
+    list_per_page = 10  # No of records per page
 
 # LA ESTRUCTURA DE LAS CUOTAS ANUALES DE LOS SOCIOS DEL CLUB CGM
 class CuotaAnual(models.Model):

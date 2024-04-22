@@ -1,0 +1,90 @@
+{% load static %} {% static "" as baseUrl %}
+<div class="container ">
+   <h1 class=" ">TORNEO ACTUAL</h1>
+   <div class="row justify-content-md-center">
+      {% for value in torneoCardMain %}
+      <div class="col-md-8 .offset-md-3">
+         <div class="card cardTorneo">
+            <a class="" href="">
+               <img src="media/{{ value.img }}" class="card-img-top" alt="...">
+               <div class="card-body cardTorneo" style="color: black;">
+                  <h5 class="card-title text-center"> {{ value.titulo | upper }} </h5>
+                  <h6> 
+               
+                     <img src="static/web/assets/logos/point.png" style="padding: 5px; text-align: left!;"> {{ value.titulo | upper }}, {{ value.get_region_display }}</h6>
+                  <p class="card-text">{{ value.descripcion |capfirst }}</p>
+               </div>
+            </a>
+            <div class="card-footer">
+               <small class="text-body-secondary"> 
+                  {% if rol == 'SECR' or rol == 'SUPER' %}
+                       {% if value.activo %}
+                       <img src="{% static 'web/assets/logos/activo.png' %}" style="padding:0px!important">
+                       {%else%}
+                       <img src="{% static 'web/assets/logos/noActivo.png' %}" style="padding:0px!important">
+                       {%endif%}
+                  {%endif%}
+
+                  {% if value.actual %}
+                  <img src="{% static 'web/assets/logos/laurelVerde.png' %}" style="width: 20px!important;padding:0px!important;" >
+                  {%else%}
+                  <img src="{% static 'web/assets/logos/laurelGris.png' %}" style="width: 20px!important;padding:0px!important;" >
+                  {%endif%}
+                  {% if value.abierto %}
+                  <img src="{% static 'web/assets/logos/lockOpen.png' %}" style="padding:0px!important; width: 15px!important;">
+                  {%else%}
+                  <img src="{% static 'web/assets/logos/lockClose.png' %}" style="padding:0px!important; width: 15px!important;">
+                  {%endif%}
+                  <img src="static/web/assets/logos/calendario.png" style="padding: 10px;">{{value.fecha|date:"d/m/Y"}}
+                  <img src="static/web/assets/logos/user.png" style="padding-left:20px; "> {{ value.inscritos }}/{{ value.cupos }}
+         
+
+                  {% if value.bases %}
+                  <a href="media/{{value.bases}}"> <img src="{% static 'web/assets/botones/bases_ok.png' %}" style="padding: 0px !important; width: 25px!important;margin-left: 10px;"></a>
+                  {%else%}
+                  <a href=""> <img src="{% static 'web/assets/botones/bases.png' %}" style="padding: 0px !important; width: 25px!important;margin-left: 10px;"></a>
+                  {%endif%}
+                  {% if value.abierto %}
+                  <button onclick="crearCookie('torneoId', '{{value.id}}', '{% url 'torneo'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
+                     <img src="{% static 'web/assets/botones/insc_ok.png' %}" style="padding: 0px!important; width: 25px!important; "> 
+                 </button>
+                 {% else %}
+                  <img src="{% static 'web/assets/botones/insc.png' %}" style="padding: 0px !important; width: 25px!important;"> 
+                 {%endif%}
+                  {% if value.list_inscritos %}
+                  <a href="media/{{value.list_inscritos}}" target="_blank"> <img src="{% static 'web/assets/botones/inscritos_ok.png' %}" style="padding: 0px !important; width: 25px!important;"></a>
+                  {%else%}
+                  <a href="#"> <img src="{% static 'web/assets/botones/inscritos.png' %}" style="padding: 0px !important; width: 25px!important;"></a>
+                  {%endif%}
+                  {% if value.list_salidas %}
+                  <a href="media/{{value.list_salidas}}" target="_blank"> <img src="{% static 'web/assets/botones/salidas_ok.png' %}" style="padding: 0px !important; width: 25px!important;" ></a>
+                  {%else%}
+                  <a href="#"> <img src="{% static 'web/assets/botones/salidas.png' %}" style="padding: 0px !important; width: 25px!important;"></a>
+                  {%endif%}
+                  {% if value.resultados %}
+                  <a href="media/{{value.resultados}}" target="_blank"> <img src="{% static 'web/assets/botones/resultados_ok.png' %}" style="padding: 0px !important; width: 25px!important;"></a>
+                  {%else%}
+                  <a href="#"> <img src="{% static 'web/assets/botones/resultados.png' %}" style="padding: 0px !important; width: 25px!important;"></a>
+                  {%endif%}
+                  {% if value.premiacion %}
+                  <a href="media/{{value.premiacion}}" target="_blank"> <img src="{% static 'web/assets/botones/premiacion_ok.png' %}" style="padding: 0px !important; width: 25px!important;"></a>
+                  {%else%}
+                  <a href="#"> <img src="{% static 'web/assets/botones/premiacion.png' %}" style="padding: 0px !important; width: 25px!important;"></a>
+                  {%endif%}
+                  {% if galeria %}
+                  <a href="#"> <img src="{% static 'web/assets/botones/galeria_ok.png' %}" style="padding: 0px !important; width: 25px!important;"></a>
+                  {%else%}
+                  <a href="#"> <img src="{% static 'web/assets/botones/galeria.png' %}" style="padding: 0px !important; width: 25px!important;"></a>
+                  {%endif%}
+               </small>
+            </div>
+         </div>
+      </div>
+      {% endfor %}
+
+   </div>
+
+</div>
+
+
+<!-- /.container -->

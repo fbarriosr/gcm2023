@@ -13,20 +13,19 @@ from django_recaptcha.fields import ReCaptchaField
 class FormularioSolicitudView(forms.ModelForm):
     class Meta:
         model = Solicitud
-        fields = ['indice','auto','patente','busCGM','carro','descripcion',
+        fields = ['indice','auto','patente','busCGM','carro',
                     'acompanantes','deuda_socio','recargo','cuota','monto','cancela_deuda_socio',
                     'estado', 'motivo','suspende', 'motivoSuspencion']
         labels = {
             'usuario':'Usuario',
             'torneo': 'Torneo',
             'fecha': 'Fecha',
-            'auto': '¿Vas en auto?',
+            'auto': '¿Necesita estacionamiento en Unidad Militar?',
             'patente': 'Registre la Patente',
             'busCGM':'¿Usará BUS CGM? (NO/SI)',
             'carro': '¿Participará en Carro? (NO/SI)',
             'indice':'Ingrese su Índice',
             'acompanantes':'¿Con quien va?',
-            'descripcion':'Solicitud',
             'deuda_socio':'Deudas',
             'recargo':'Recargo',
             'cuota': 'Cuota de Campeonato',
@@ -108,13 +107,6 @@ class FormularioSolicitudView(forms.ModelForm):
                     'id': 'acompanantes',
                 }                
             ),
-            'descripcion': forms.Textarea(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'descripcion',
-                    'style': "height: 200px",
-                }                
-            ),
             'deuda_socio': forms.TextInput(
                 attrs = {
                     'class': 'form-control ',
@@ -187,7 +179,7 @@ class FormularioSolicitudView(forms.ModelForm):
 class FormularioSolicitudCreate(forms.ModelForm):
     class Meta:
         model = Solicitud
-        fields = ['indice','auto','patente','busCGM','carro','descripcion',
+        fields = ['indice','auto','patente','busCGM','carro',
                     'acompanantes','deuda_socio','recargo','cuota','monto']
         labels = {
             'usuario':'Usuario',
@@ -199,12 +191,11 @@ class FormularioSolicitudCreate(forms.ModelForm):
             'carro': '¿Participará en Carro? (NO/SI)',
             'indice':'Ingrese su Índice',
             'acompanantes':'¿Con quien va?',
-            'descripcion':'Solicitud',
             'deuda_socio':'Deudas',
             'recargo':'Recargo',
             'cuota': 'Cuota de Campeonato',
             'cancela_deuda_socio': 'Cancela Deuda socio (NO/SI)',
-            'monto': 'TOTAL'
+            'monto': 'TOTAL $ CLP: '
         }
         widgets = {
 
@@ -275,13 +266,6 @@ class FormularioSolicitudCreate(forms.ModelForm):
                 attrs = {
                     'class': 'form-control ',
                     'id': 'acompanantes',
-                }                
-            ),
-            'descripcion': forms.Textarea(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'descripcion',
-                    'style': "height: 200px",
                 }                
             ),
             'deuda_socio': forms.TextInput(

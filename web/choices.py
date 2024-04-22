@@ -60,3 +60,11 @@ grupo = (
     ('M', 'Miembros'),
     ('D', 'Directores'),
 )
+webs = (
+    ('H', 'Historia'),
+    ('D', 'Directorio'),
+    ('E', 'Estatutos'),
+    ('C', 'Comite'),
+    ('404', '404'),
+
+)

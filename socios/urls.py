@@ -2,9 +2,12 @@ from django.urls import path
 from django.contrib.auth.decorators import login_required
 from socios.views import *
 
-urlpatterns = [   
-    path('torneos', torneos.as_view(), name= 'torneos'),
+urlpatterns = [  
+    path('inicio', inicio.as_view(), name= 'inicio'), 
+    path('calendario', torneos.as_view(), name= 'torneos'),
     path('torneo', torneo.as_view(), name='torneo'),
+    path('multimedias', multimedias.as_view(), name = 'multimedias'),
+    path('multimedia/<slug:slug>/' , multimedia.as_view(), name = 'multimedia'),
     path('noticias', noticias.as_view(), name = 'noticias'),
     path('noticia/<slug:slug>/' , noticia.as_view(), name = 'noticia'),
     path('ranking', ranking.as_view(), name= 'ranking'),

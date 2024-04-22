@@ -19,155 +19,129 @@
 
 {% block body %}
       
-      <div class="container marketing" id="contacto">
-        <div class="row">
-          <div class="col-lg-12 text-center">
-            <img src="{% static 'web/assets/logos/laurelDorado.png' %}  " style="padding-bottom: 0px!important;" />
-            <h1 class="text-center">{{ titulo }}</h1>
+<div class="container marketing"  id="contacto">
+  <div class="row">
+    <div class="col-lg-12 text-center">
+      <img src="{% static 'web/assets/logos/laurelDorado.png' %}  " style="padding-bottom: 0px!important; margin-top: 40px;" />
+      <h1 class="text-center">{{ titulo }}</h1>
+    </div>
+  </div>
+  <div class="row justify-content-end" style="padding-bottom:30px; padding-top: -5px;">
+
+    
+    <div class="col-lg-8">
+      <h4> <p>Lugar:</p><strong> {{ torneo.direccion }}, {{ torneo.get_region_display}}.</strong> </h4>
+    </div> 
+    <div class="col-lg-4">
+      <h4> <p>Fecha:</p><strong> {{ torneo.fecha }}</strong> </h4>
+      
+    </div> 
+  </div>
+  <form enctype="multipart/form-data" id="form_edicion" class="contact-form c-mb-30 c-gutter-30 col-lg-12" action= "{{urlForm}}"  method="POST" > {% csrf_token %}
+    <div class="row">
+          
+
+          <div class="col-lg-12">
           </div>
-         <div class="row justify-content-end" style="padding-bottom:30px; padding-top: -5px;">
-
-          {% if rol == 'SECR' or rol == 'SUPER' %}
-              <div class="col-lg-2 dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  SECRETARIO
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="../bus">BUS</a></li>
-                  <li><a class="dropdown-item" href="../auto">AUTO</a></li>
-                  <li><a class="dropdown-item" href="{% url 'torneoUpdate'%}">EDITAR</a></li>
-                </ul>
-              </div>
+          {% if not local%}
+          <div class="col-lg-3" >
+             {{form.busCGM.label}}
+          </div>
+          <div class="col-lg-3 form-check form-switch">
+             {{form.busCGM}}
+          </div>
+          <div class="col-lg-12">
+          </div>
+          <div class="col-lg-3" id="autoLabel">
+             {{form.auto.label}}
+          </div>
+          <div class="col-lg-3 form-check form-switch">
+             {{form.auto}}
+          </div>
+          <div class="col-lg-3 form-floating">
+            {{form.patente}}
+            <label> {{form.patente.label}}</label>
+          </div>
+          <div class="col-lg-12">
+          </div>
           {%endif%}
-          {% if rol == 'T' or rol == 'SUPER' %}
-              <div class="col-lg-2 dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  TESORERO
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{% url 'solicitudes'%}">SOLICITUDES</a></li>
-                </ul>
-              </div>
-          {%endif%}
-          {% if rol == 'CAP' or rol == 'SUPER' and solAprobados%}
-              <div class="col-lg-2 dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  CAPITAN
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{% url 'export_csv_solicitudesAprobadas'%}">SOLICITUDES APROBADAS</a></li>
-                </ul>
-              </div>
-          {%endif%}
-          </div> 
-          <div class="col-lg-8">
-            <h4> <p>Lugar:</p><strong> {{ torneo.direccion }}, {{ torneo.get_region_display}}.</strong> </h4>
-          </div> 
-          <div class="col-lg-4">
-            <h4> <p>Fecha:</p><strong> {{ torneo.fecha }}</strong> </h4>
-            
+          <div class="col-lg-3">
+             {{form.carro.label}}
+          </div>
+          <div class="col-lg-3 form-check form-switch">
+             {{form.carro}}
+          </div>
+
+          
+
+          <div class="col-lg-3    form-floating">
+            {{form.acompanantes}}
+            <label> {{form.acompanantes.label}}</label>
+          </div>
+
+          <div class="col-lg-12">
+          </div>
+          
+          
+
+          
+         
+
+          <div class="col-lg-6 form-floating">
+            {{form.indice}}
+            <label> {{form.indice.label}}</label>
+          </div>
+          <div class="col-lg-3 form-floating">
+            <a href="https://fedegolf.cl/sistema" target="_blank" class="btn btn-sutil">Ver Indice</a>
+          </div>
+          
+          <div class="col-lg-12  form-floating">
+            {{form.descripcion}}
+            <label> {{form.descripcion.label}}</label>
+          </div>
+    </div>
+    <h3>Detalle:</h3>
+    <div class="row">
+          <div class="col-lg-3 form-floating">
+            {{form.deuda_socio}}
+            <label> {{form.deuda_socio.label}}</label>
+          </div>
+
+          <div class="col-lg-3" id="deudaLabel">
+             {{form.cancela_deuda_socio.label}}
+          </div>
+          <div class="col-lg-2 form-check form-switch">
+             {{form.cancela_deuda_socio}}
+          </div>
+          
+          <div class="col-lg-3 form-floating">
+            {{form.recargo}}
+            <label> {{form.recargo.label}}</label>
+          </div>
+          <div class="col-lg-3 form-floating">
+            {{form.cuota}}
+            <label> {{form.cuota.label}}</label>
           </div> 
 
-
-
+    </div>
+    <div class="row justify-content-end">
+        <div class="col-lg-3 form-floating">
+          <h1 style="padding-top: 0px!important;">{{form.monto.label}}</h1>
+        </div> 
+         <div class="col-lg-3 ">
+          {{form.monto}}
+        </div> 
+    </div>
+    <div class="row justify-content-end">
+        <div class="col-lg-3">
+            <button type="button" onclick="crearSolicitud()"  class="btn btn-primary"><strong>{{ btnAction }}</strong></button>
         </div>
-    <!-- Three columns of text below the carousel -->
-        <form enctype="multipart/form-data" id="form_edicion" class="contact-form c-mb-30 c-gutter-30 col-lg-12" action= "{{urlForm}}"  method="POST" > {% csrf_token %}
-          <div class="row">
-                <div class="col-lg-3">
-                   {{form.auto.label}}
-                </div>
-                <div class="col-lg-3 form-check form-switch">
-                   {{form.auto}}
-                </div>
-                <div class="col-lg-3 form-floating">
-                  {{form.patente}}
-                  <label> {{form.patente.label}}</label>
-                </div>
+ 
+    </div>
+  </form>
 
-                <div class="col-lg-12">
-                </div>
 
-                <div class="col-lg-3">
-                   {{form.carro.label}}
-                </div>
-                <div class="col-lg-3 form-check form-switch">
-                   {{form.carro}}
-                </div>
-
-                
-
-                <div class="col-lg-3    form-floating">
-                  {{form.acompanantes}}
-                  <label> {{form.acompanantes.label}}</label>
-                </div>
-
-                <div class="col-lg-12">
-                </div>
-                
-                <div class="col-lg-3">
-                   {{form.busCGM.label}}
-                </div>
-                <div class="col-lg-3 form-check form-switch">
-                   {{form.busCGM}}
-                </div>
-
-                
-               
-
-                <div class="col-lg-6 form-floating">
-                  {{form.indice}}
-                  <label> {{form.indice.label}}</label>
-                </div>
-                <div class="col-lg-3 form-floating">
-                  <a href="https://fedegolf.cl/sistema" target="_blank" class="btn btn-sutil">Ver Indice</a>
-                </div>
-                
-                <div class="col-lg-12  form-floating">
-                  {{form.descripcion}}
-                  <label> {{form.descripcion.label}}</label>
-                </div>
-          </div>
-          <h3>Detalle:</h3>
-          <div class="row">
-                <div class="col-lg-3 form-floating">
-                  {{form.deuda_socio}}
-                  <label> {{form.deuda_socio.label}}</label>
-                </div>
-
-                <div class="col-lg-3" id="deudaLabel">
-                   {{form.cancela_deuda_socio.label}}
-                </div>
-                <div class="col-lg-2 form-check form-switch">
-                   {{form.cancela_deuda_socio}}
-                </div>
-                
-                <div class="col-lg-3 form-floating">
-                  {{form.recargo}}
-                  <label> {{form.recargo.label}}</label>
-                </div>
-                <div class="col-lg-3 form-floating">
-                  {{form.cuota}}
-                  <label> {{form.cuota.label}}</label>
-                </div> 
-
-          </div>
-          <div class="row justify-content-end">
-              <div class="col-lg-3 form-floating">
-                <h1 style="padding-top: 0px!important;">{{form.monto.label}}</h1>
-              </div> 
-               <div class="col-lg-3 ">
-                {{form.monto}}
-              </div> 
-          </div>
-          <div class="row justify-content-end">
-              <div class="col-lg-3">
-                  <button type="button" onclick="crearSolicitud()"  class="btn btn-primary"><strong>{{ btnAction }}</strong></button>
-              </div>
-       
-          </div>
-        </form>
-      </div>
+</div>
 
      
 

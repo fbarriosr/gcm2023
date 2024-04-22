@@ -29,6 +29,9 @@
 <!-- Three columns of text below the carousel -->
   <form enctype="multipart/form-data" id="form_edicion2" class="contact-form c-mb-30 c-gutter-30 col-lg-12" action= "{{urlForm}}"  method="POST" enctype="multipart/form-data">{% csrf_token %}
     <div class="row">
+          <div class="col-lg-12 form-floating">
+            <h4> Información del Torneo</h4>
+          </div>
           <div class="col-lg-6 form-floating">
             {{form.titulo}}
             <label> {{form.titulo.label}}</label>
@@ -48,18 +51,16 @@
             {{form.region}}
             <label> {{form.region.label}}</label>
           </div>
-          <div class="col-lg-12 form-floating">
-            {{form.descripcion}}
-            <label> {{form.descripcion.label}}</label>
-          </div>
+
           <div class="col-lg-5 form-floating">
             {{form.cupos}} 
             <label> {{form.cupos.label}}</label>
           </div>
-          <div class="col-lg-5 form-floating">
-            {{form.inscritos}} 
-            <label> {{form.inscritos.label}}</label>
+          
+          <div class="col-lg-12 form-floating">
+            <h4> Estado del Torneo</h4>
           </div>
+
           <div class="col-lg-2">
              {{form.activo.label}}
           </div>
@@ -68,10 +69,12 @@
           </div>
 
           <div class="col-lg-2">
-             {{form.proximo.label}}
+             {{form.actual.label}}
           </div>
+
+          
           <div class="col-lg-2 form-check form-switch">
-             {{form.proximo }}
+             {{form.actual }}
           </div>
 
           <div class="col-lg-2">
@@ -79,9 +82,11 @@
           </div>
           <div class="col-lg-2 form-check form-switch">
              {{form.abierto }}
+          </div>  
+          <div class="col-lg-12 form-floating">
+            <h4> Archivos del Torneo</h4>
           </div>
-
-
+          
           <div class="col-lg-5 form-floating">
             {{form.bases}} 
             <label> {{form.bases.label}}</label>

@@ -5,6 +5,7 @@ from secretario.views import *
 urlpatterns = [   
     path('bus', bus.as_view(), name= 'bus'),
     path('auto', auto.as_view(), name= 'auto'),
+    path('carro', carro.as_view(), name= 'carro'),
     path('torneo/export_csv_bus',export_csv_bus, name= 'export_csv_bus'),
     path('torneo/export_csv_auto',export_csv_auto, name= 'export_csv_auto'),
     path('rankingUpdate', rankingUpdate.as_view(), name= 'rankingUpdate'),

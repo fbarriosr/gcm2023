@@ -165,9 +165,9 @@ class salida( CapitanMixin, TemplateView):
 
         contexto["title"] = "SALIDA"
         contexto['rol'] = self.request.user.perfil
-        front = Front.objects.filter(titulo="salida")
+        front = Paginas_Socio.objects.filter(titulo="salida")
         contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
-        torneoid = self.request.COOKIES.get('torneo') 
+ 
         
         return contexto
 
@@ -177,9 +177,9 @@ class cumpleanos(CapitanMixin,TemplateView):
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-        contexto["title"] = "CUMPLEAÑOS"
-        front = Front.objects.filter(titulo="cumpleaños")
-        contexto['front'] = list(front.values('titulo', 'img', 'contenido', 'order', 'file'))
+        dato = Paginas_Socio.objects.get(tipo ="Cump")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
         contexto['rol'] = self.request.user.perfil
 
         fecha_actual = datetime.now()

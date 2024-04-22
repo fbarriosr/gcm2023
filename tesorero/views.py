@@ -332,7 +332,9 @@ class resumenCuotas(TesoreroMixin, TemplateView):
         contexto["resumen_usuarios"] = self.get_queryset()
         # contexto["año_actual"] = año_actual
         print(f'contexto{contexto}') 
-
+        dato = Paginas_Socio.objects.get(tipo ="C")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
         return contexto
 
 

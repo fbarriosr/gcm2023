@@ -35,6 +35,7 @@ from .choices import estado_cuota
 import json
 import logging
 import csv
+from itertools import chain
 
 logger = logging.getLogger(__name__)
 
@@ -158,6 +159,9 @@ class PasswordUsuario(SocioMixin,UpdateView):
         contexto['titulo'] = 'Cambiar Password'
         contexto['name'] = self.request.user.primer_nombre +' ' +self.request.user.apellido_paterno + ' | ' + self.request.user.get_perfil_display()
         contexto['rol'] = self.request.user.perfil
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
         return contexto
         
     def post(self,request,*args,**kwargs):     # comunicacion entre en form y python para notificaciones
@@ -193,8 +197,10 @@ class perfil(SocioMixin,UpdateView):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
 
-        contexto["title"] = "perfil"
-        contexto["titulo"] = "perfil"
+        
+
+        contexto["title"] = 'PERFIL'
+
         contexto['name'] = self.request.user.primer_nombre +' ' +self.request.user.apellido_paterno + ' | ' + self.request.user.get_perfil_display()
 
         contexto['btnAction']   = 'ACTUALIZAR'
@@ -203,6 +209,10 @@ class perfil(SocioMixin,UpdateView):
         contexto['rol'] = self.request.user.perfil
 
         contexto['user']  = self.get_object()
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
         return contexto
 
     def get_object(self, **kwargs):
@@ -266,6 +276,9 @@ class noticia(SocioMixin,DetailView):
 
         contexto['rol'] = self.request.user.perfil
 
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
         return contexto
 
     def get_object(self, **kwargs):
@@ -294,7 +307,11 @@ class noticias(SocioMixin,TemplateView):
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-        contexto["title"] = "Noticias"
+        
+        dato = Paginas_Socio.objects.get(tipo ="Noti")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
+
         contexto['datos'] = self.get_queryset()
 
         if contexto['datos'].paginator.num_pages > 1 and contexto['datos'].number != contexto['datos'].paginator.num_pages : # tiene un next
@@ -310,7 +327,166 @@ class noticias(SocioMixin,TemplateView):
 
         contexto['rol'] = self.request.user.perfil
 
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
         return contexto
+
+
+# Create your views here.
+class multimedia(SocioMixin,DetailView):
+    model = Multimedia
+    template_name = "socio/views/multimedia.html"
+   
+    def get(self, *args, **kwargs):
+        dato =  self.get_object()
+        noticiaId = dato[0].id
+        response = super().get( *args, **kwargs)
+        return response
+
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto["nameWeb"] = nameWeb
+        contexto["title"] = "Multimedia"
+        dato =  self.get_object()
+        contexto['new'] =  dato[0]
+        dato = list(dato.values('titulo','fecha','info','slug','img'))
+        dato = dato[0]
+        lista = []
+
+        contexto['imgs']= lista
+        contexto['front']= [{'img': dato['img']}]
+
+        contexto['rol'] = self.request.user.perfil
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
+        return contexto
+
+    def get_object(self, **kwargs):
+        print('slug', self.kwargs.get('slug', None))
+        slug =  self.model.objects.filter(slug = self.kwargs.get('slug', None))
+        return slug
+
+# Create your views here.
+class multimedias(SocioMixin,TemplateView):
+    model = Multimedia
+    template_name = "socio/views/multimedias.html"
+    
+    def get_queryset(self):
+        rol = self.request.user.perfil
+        if rol =='SECR' or rol =='SUPER':
+            lNoticia = self.model.objects.order_by('fecha')
+        else:
+            lNoticia = self.model.objects.filter(is_active=True).order_by('fecha')
+        paginator = Paginator(lNoticia,9)
+        page = self.request.GET.get('page')
+        lNoticia = paginator.get_page(page)
+            
+        return lNoticia
+
+
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto["nameWeb"] = nameWeb
+        
+        dato = Paginas_Socio.objects.get(tipo ="Multi")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
+
+        contexto['datos'] = self.get_queryset()
+
+        if contexto['datos'].paginator.num_pages > 1 and contexto['datos'].number != contexto['datos'].paginator.num_pages : # tiene un next
+            if contexto['datos'].paginator.num_pages - contexto['datos'].next_page_number() > 1:
+                contexto['up'] = True     
+            else:
+                contexto['up'] = False 
+        if contexto['datos'].paginator.num_pages > 2 and contexto['datos'].number != 1 : # hay un previo
+            if contexto['datos'].previous_page_number()  - 1 > 1:
+                contexto['down'] = True     
+            else:
+                contexto['down'] = False 
+
+        contexto['rol'] = self.request.user.perfil
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
+        return contexto
+
+
+
+class inicio(SocioMixin,TemplateView):
+    template_name = "socio/views/inicio.html"
+
+    def get_context_data(self, **kwargs):
+        
+        contexto = super().get_context_data(**kwargs)
+        contexto["nameWeb"] = nameWeb
+        contexto["title"] = "Inicio"
+                     
+        galeria = Galeria.objects.order_by('order')
+        contexto['galeria']  = list(galeria.values('titulo','img', 'order'))
+
+        torneoCardMain = Torneo.objects.filter(activo=True).filter(actual = True).order_by('-fecha')[:1]  
+        actualImg =   CardsInicio.objects.filter(tipo='A')[:1]
+    
+        # Convertir los querysets a listas si es necesario
+        torneoCardMain = list(torneoCardMain)
+        actualImg = list(actualImg)
+
+        if (len(torneoCardMain)>0):
+
+            # Iterar simultáneamente sobre torneoCard y proxImg usando zip
+            for torneo, img in zip(torneoCardMain, actualImg):
+                torneo.img = img.img
+
+            contexto['torneoCardMain'] = torneoCardMain
+
+            torneoCard = Torneo.objects.filter(activo=True,  actual=False, fecha__gt=torneoCardMain[0].fecha).order_by('fecha')[:2]
+
+        else:
+
+            fecha_actual = timezone.now()
+                
+            torneoCard = Torneo.objects.filter(activo=True, abierto= True, actual=False, fecha__gt=fecha_actual).order_by('fecha')[:2]
+
+        if (len(torneoCard)>0):
+            if (len(torneoCard) == 2):
+                proxImg = CardsInicio.objects.filter(tipo='P')[:2]
+            if (len(torneoCard) == 1):
+                proxImg = CardsInicio.objects.filter(tipo='P')[:1]
+            
+            # Convertir los querysets a listas si es necesario
+        
+            torneoCard = list(torneoCard)
+            proxImg = list(proxImg)
+
+            # Iterar simultáneamente sobre torneoCard y proxImg usando zip
+            for torneo, img in zip(torneoCard, proxImg):
+                torneo.img = img.img
+
+
+            contexto['torneoCard'] = torneoCard
+
+        lNoticia = Noticia.objects.filter(is_active=True).order_by('-fecha')[:3]
+        contexto['datos'] = lNoticia
+
+        lClub= ElClub.objects.all().order_by('order')[:3]
+        contexto['datosClub'] = lClub
+
+
+        contexto['rol'] = self.request.user.perfil
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+        return contexto
+
+    def get(self, *args, **kwargs):
+        response = super().get( *args, **kwargs)
+        response.delete_cookie('torneoId')
+        return response
 
 
 class torneos(SocioMixin,TemplateView):
@@ -320,10 +496,37 @@ class torneos(SocioMixin,TemplateView):
         
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-        contexto["title"] = "Torneo"
-        mainCard = Torneo.objects.filter(activo=True).filter(proximo = True)
-        torneoCard = Torneo.objects.filter(activo=True).filter(proximo= False).order_by('-fecha')
+        contexto["title"] = "calendario"
+
+        contexto['rol'] = self.request.user.perfil
+      
+
+        if contexto['rol'] == 'SUPER' or contexto['rol'] == 'SECR' :
+            torneos = Torneo.objects.all().order_by('-fecha')
+        else:
+            torneos = Torneo.objects.filter(activo=True).order_by('-fecha')
         
+        
+        paginator = Paginator(torneos,8)
+        page = self.request.GET.get('page')
+        torneos = paginator.get_page(page)
+
+
+
+
+        contexto['datos'] = torneos
+
+        dato = Paginas_Socio.objects.get(tipo ="CALEN")
+
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
+
+        
+
+        front = Paginas_Socio.objects.filter(titulo="calendario")
+        contexto['front']  = list(front.values('titulo','img', 'contenido','file'))
+        
+
         diccionario_fechas = list(Torneo.objects.filter(activo=True).values('fecha'))
 
         if len(diccionario_fechas) > 0:
@@ -343,10 +546,23 @@ class torneos(SocioMixin,TemplateView):
         else:
             contexto['year'] = 'SIN FECHAS'
 
-        contexto['mainCard'] = mainCard
-        contexto['torneoCard'] = torneoCard
         
-        contexto['rol'] = self.request.user.perfil
+        
+
+        if contexto['datos'].paginator.num_pages > 1 and contexto['datos'].number != contexto['datos'].paginator.num_pages : # tiene un next
+            if contexto['datos'].paginator.num_pages - contexto['datos'].next_page_number() > 1:
+                contexto['up'] = True     
+            else:
+                contexto['up'] = False 
+        if contexto['datos'].paginator.num_pages > 2 and contexto['datos'].number != 1 : # hay un previo
+            if contexto['datos'].previous_page_number()  - 1 > 1:
+                contexto['down'] = True     
+            else:
+                contexto['down'] = False
+
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
 
         return contexto
 
@@ -397,7 +613,6 @@ class torneo(SocioMixin,DetailView):
         contexto['torneoEstado'] = torneoEstado
         contexto['torneoFecha']= str(dato.fecha)
         contexto['torneoLugar']= dato.direccion+'-' + dato.region
-        contexto['torneoInscritos']= dato.inscritos
         contexto['torneoCupos']= dato.cupos
         solicitud = Solicitud.objects.filter(usuario__email=self.request.user.email).filter(torneo__id=torneoid).order_by('-fecha') #ultima solicitud
         contexto['rol'] = self.request.user.perfil
@@ -424,6 +639,10 @@ class torneo(SocioMixin,DetailView):
                 if (torneoEstado==False): #torneo Cerrado
                     contexto['solicitudEstado']= 'C'
                     contexto['nombreTorneo'] = dato.titulo
+
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
 
         return contexto
 
@@ -470,16 +689,28 @@ class crearSolicitud(SocioMixin,CreateView):
 
         torneo   = self.get_object()
         contexto['torneo'] = torneo
-        torneoTitulo = str(torneo.titulo).upper().replace('TORNEO','') 
-        contexto['titulo'] = 'INSCRIPCIÓN  TORNEO '+ torneoTitulo
-        contexto['rol'] = self.request.user.perfil
 
-        solAprobados = Solicitud.objects.filter(torneo__id=torneo.id).filter(estado='A')
-        if (len(solAprobados)==0 ):
-            contexto['solAprobados']= False
-        else:
-            contexto['solAprobados']= True
-     
+        if torneo:
+
+            torneoTitulo = str(torneo.titulo).upper().replace('TORNEO','') 
+            contexto['titulo'] = 'INSCRIPCIÓN  TORNEO '+ torneoTitulo
+            contexto['rol'] = self.request.user.perfil
+
+            solAprobados = Solicitud.objects.filter(torneo__id=torneo.id).filter(estado='A')
+            if (len(solAprobados)==0 ):
+                contexto['solAprobados']= False
+            else:
+                contexto['solAprobados']= True
+         
+            elClubMenu = ElClub.objects.order_by('order')
+            contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
+            if torneo.region  =='XIII':
+                contexto['local']= True
+            else:
+                contexto['local']= False   
+
+
         return contexto
 
     def get_object(self, **kwargs):
@@ -501,7 +732,6 @@ class crearSolicitud(SocioMixin,CreateView):
                     carro =  form.cleaned_data.get('carro'),
                     indice       = form.cleaned_data.get('indice'),
                     acompanantes = self.request.POST.get('acompanantes'),
-                    descripcion  = form.cleaned_data.get('descripcion'),
                     deuda_socio  = form.cleaned_data.get('deuda_socio'),
                     cancela_deuda_socio = form.cleaned_data.get('cancela_deuda_socio'),
                     recargo      = form.cleaned_data.get('recargo'),
@@ -518,7 +748,7 @@ class crearSolicitud(SocioMixin,CreateView):
                 return response
             else:
                 print('errorAqui')
-                mensaje = 'not pe'
+                mensaje = 'Error:'
                 error = form.errors
                 response = JsonResponse({'mensaje': mensaje, 'error': error})
                 response.status_code = 400
@@ -544,7 +774,10 @@ class crearSolicitudSuspender(SocioMixin,CreateView):
         torneoTitulo = str(torneo.titulo).upper().replace('TORNEO','') 
         contexto['titulo'] = 'SOLICITUD DE SUSPENCION PARTICIPACIÓN '+ torneoTitulo
         contexto['rol'] = self.request.user.perfil
-     
+        
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
         return contexto
 
     def get_object(self, **kwargs):
@@ -605,17 +838,17 @@ class ranking(SocioMixin,TemplateView):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
 
-        contexto["title"] = "Ranking"
-        front = Front.objects.filter(titulo="ranking")
-        contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
+        dato = Paginas_Socio.objects.get(tipo ="R")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
+
         contexto['rol'] = self.request.user.perfil
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
         
         return contexto
-    def get(self, *args, **kwargs):
-        rankingId = Front.objects.filter(titulo="ranking")
-        response = super().get( *args, **kwargs)
-        response.set_cookie('rankingId', rankingId[0].id)
-        return response
+    
 
 
 # LA ESTRUCTURA DE LAS CUOTAS DE LOS SOCIOS DEL CLUB CGM
@@ -636,8 +869,10 @@ class cuotas_admin(SocioMixin,TemplateView, View):
         print(f'print buscar = {buscar}') 
         logger.info(f'logger buscar = {buscar}') 
 
+        
+       
         try:
-            front = Front.objects.filter(titulo="cuotas")  
+              
 
             if buscar:
                 if  buscar.upper() in ['TODO', 'TODOS', '*']:
@@ -674,7 +909,6 @@ class cuotas_admin(SocioMixin,TemplateView, View):
 
             return {
                 'cuotas': cuotas,
-                'front': list(front.values('titulo','img', 'contenido', 'order','file')),
                 'años_cuotas_socio': años_cuotas_socio,
                 'listado_usuarios': listado_usuarios,
                 'rol': self.request.user.perfil
@@ -707,13 +941,13 @@ class cuotas_admin(SocioMixin,TemplateView, View):
         datos = self.get_queryset()
 
         cuotas = datos['cuotas']
-        front = datos['front']
+    
         años_cuotas_socio = datos['años_cuotas_socio']
         listado_usuarios = datos['listado_usuarios']
 
+
         contexto = {
             'nameWeb': nameWeb,
-            'front': front,
             'title': 'cuotas_admin_mod',
             'rol': self.request.user.perfil,
             'datos': cuotas,
@@ -722,6 +956,10 @@ class cuotas_admin(SocioMixin,TemplateView, View):
             'listado_usuarios': listado_usuarios,
         }
         
+        dato = Paginas_Socio.objects.get(tipo ="C")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
+
         return contexto
 
     def post(self, request, *args, **kwargs):
@@ -782,7 +1020,7 @@ class cuotas(SocioMixin,TemplateView, View):
                 mostrar_promocion = mes_actual in meses_descuento
 
         # Establecer los QuerySet de front y Cuotas
-        front = Front.objects.filter(titulo="cuotas")
+        front = Paginas_Socio.objects.filter(titulo="cuotas")
         cuotas = Cuota.objects.filter(usuario__rut=rut).select_related('usuario')
 
         # Crear una lista de objetos datetime para representar los meses del año
@@ -797,13 +1035,15 @@ class cuotas(SocioMixin,TemplateView, View):
         contexto = {
             "nameWeb": nameWeb,
             "title": "cuotas",
-            "front": list(front.values('titulo', 'img', 'contenido', 'order','file')),
+            "front": list(front.values('titulo', 'img', 'contenido','file')),
             "cuotas": cuotas,
             "mostrar_promocion": mostrar_promocion,
             "descuento_anual": duracion_descuento.descuento,
             "rol": self.request.user.perfil
         }
-
+        dato = Paginas_Socio.objects.get(tipo ="C")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
         return self.render_to_response(contexto)
 
     def post(self, request, *args, **kwargs):

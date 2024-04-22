@@ -68,32 +68,74 @@ def export_csv_auto(request):
 
     return response
 
+def export_csv_carro(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="listado_carro.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre', 'Acompañantes'])
+
+    torneoid = request.COOKIES.get('torneo') 
+    sol = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(carro= True).order_by('usuario__apellido_paterno')
+       
+    for obj in sol:
+        writer.writerow([obj.usuario.apellido_paterno, obj.usuario.apellido_materno , obj.usuario.primer_nombre , obj.usuario.segundo_nombre , obj.acompanantes ])
+
+    return response
+
 class bus(SecretarioMixin, TemplateView):
     template_name = "secretario/views/bus.html"
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
-
-        contexto["title"] = "BUS"
         contexto['rol'] = self.request.user.perfil
-        front = Front.objects.filter(titulo="bus")
-        contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
-        torneoid = self.request.COOKIES.get('torneo') 
+
+        dato = Paginas_Socio.objects.get(tipo ="B")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
+
+        torneoid = self.request.COOKIES.get('torneoId') 
         listado = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(busCGM= True).order_by('usuario__apellido_paterno')
         paginator = Paginator(listado,1)
         page = self.request.GET.get('page')
         contexto['datos']= paginator.get_page(page)
 
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
+
+        return contexto
+
+class carro(SecretarioMixin, TemplateView):
+    template_name = "secretario/views/carro.html"
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto["nameWeb"] = nameWeb
+        contexto['rol'] = self.request.user.perfil
+
+        dato = Paginas_Socio.objects.get(tipo ="Ca")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
+
+        torneoid = self.request.COOKIES.get('torneoId') 
+        listado = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(carro= True).order_by('usuario__apellido_paterno')
+        paginator = Paginator(listado,1)
+        page = self.request.GET.get('page')
+        contexto['datos']= paginator.get_page(page)
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
+
         return contexto
 
 class rankingUpdate(SecretarioMixin,UpdateView):
-    model = Front
+    model = Paginas_Socio
     form_class = FormularioRankingUpdate
     template_name = "secretario/views/rankingUpdate.html"
 
     def get_object(self, **kwargs):
-        rankingId= self.request.COOKIES.get('rankingId') 
-        current = Front.objects.get(id= rankingId)
+        current = self.model.objects.get(titulo= 'ranking')
         return current 
 
     def get_context_data(self, **kwargs):
@@ -107,6 +149,10 @@ class rankingUpdate(SecretarioMixin,UpdateView):
         contexto['urlForm']     = self.request.path
 
         contexto['rol'] = self.request.user.perfil
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
 
         return contexto
 
@@ -138,15 +184,21 @@ class auto(SecretarioMixin, TemplateView):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
 
-        contexto["title"] = "AUTO"
-        front = Front.objects.filter(titulo="auto")
+        dato = Paginas_Socio.objects.get(tipo ="E")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
+
+
         contexto['rol'] = self.request.user.perfil
-        contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
-        torneoid = self.request.COOKIES.get('torneo') 
+        torneoid = self.request.COOKIES.get('torneoId') 
         listado = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(auto= True).order_by('usuario__apellido_paterno')
         paginator = Paginator(listado,1)
         page = self.request.GET.get('page')
         contexto['datos']= paginator.get_page(page)
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
         return contexto
 
 class noticiaUpdate(SecretarioMixin,UpdateView):
@@ -171,6 +223,10 @@ class noticiaUpdate(SecretarioMixin,UpdateView):
         contexto['urlForm']     = self.request.path
 
         contexto['rol'] = self.request.user.perfil
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
 
         return contexto
 
@@ -210,6 +266,9 @@ class noticiaCreate(SecretarioMixin,CreateView):
 
         contexto['titulo'] = 'CREAR NOTICIA'
         contexto['rol'] = self.request.user.perfil
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
      
         return contexto
 
@@ -280,6 +339,10 @@ class torneoCreate(SecretarioMixin,CreateView):
 
         contexto['titulo'] = 'CREAR TORNEO'
         contexto['rol'] = self.request.user.perfil
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
      
         return contexto
 
@@ -293,11 +356,9 @@ class torneoCreate(SecretarioMixin,CreateView):
                     fecha             = form.cleaned_data.get('fecha'),
                     direccion         = form.cleaned_data.get('direccion'),
                     region            = form.cleaned_data.get('region'),
-                    descripcion       = form.cleaned_data.get('descripcion'),
                     cupos             = form.cleaned_data.get('cupos'),
-                    inscritos         = form.cleaned_data.get('inscritos'),
                     activo            = form.cleaned_data.get('activo'),
-                    proximo           = form.cleaned_data.get('proximo'),
+                    actual            = form.cleaned_data.get('actual'),
                     abierto           = form.cleaned_data.get('abierto'),
                     bases             = form.cleaned_data.get('bases'),
                     list_inscritos    = form.cleaned_data.get('list_inscritos'),
@@ -345,6 +406,10 @@ class torneoUpdate(SecretarioMixin,UpdateView):
         contexto['urlForm']     = self.request.path
 
         contexto['rol'] = self.request.user.perfil
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
 
         return contexto
 
@@ -442,6 +507,9 @@ class listarUsuarios(SecretarioMixin, View):
             else:
                 contexto['down'] = False 
         
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
         return contexto
       
     def get(self,request,*args,**kwargs):
@@ -472,6 +540,10 @@ class usuarioUpdate(SecretarioMixin,UpdateView):
         contexto['urlForm']     = self.request.path
 
         contexto['rol'] = self.request.user.perfil
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
 
         return contexto
 
@@ -510,6 +582,10 @@ class usuarioCreate(SecretarioMixin,CreateView):
 
         contexto['titulo'] = 'CREAR USUARIO'
         contexto['rol'] = self.request.user.perfil
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
      
         return contexto
 

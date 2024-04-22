@@ -68,26 +68,28 @@ class LinksAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
 
 
 # CONTENIDO PRINCIPAL DE HISTORIA, ETC
-class Front(models.Model):
+
+class Paginas_Web(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    img = models.ImageField(upload_to="front/")
+    tipo = models.CharField(max_length=20, choices= webs, default="H") 
+    img = models.ImageField(upload_to="Paginas_Web/")
     titulo = models.CharField(max_length=200, blank=True, null=True)
     contenido = models.TextField(blank=True, null=True)
-    order = models.IntegerField(default=0)
-    file = models.FileField(upload_to="front/files/", max_length=254, blank=True)
+    file = models.FileField(upload_to="Paginas_Web/files/", max_length=254, blank=True)
+    tituloPestana = models.CharField(max_length=200, blank=True, null=True)
 
     class Meta:
-        verbose_name = "Front"
-        verbose_name_plural = "Fronts"
-        ordering = ["order"]
+        verbose_name = "Paginas_Web"
+        verbose_name_plural = "Paginas_Webs"
+        ordering = ["titulo"]
 
     def __str__(self):
         return self.titulo
 
 
-class FrontAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
+class Paginas_WebAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["titulo"]
-    list_display = ("titulo", "order")
+    list_display = ("tipo",'titulo')
     list_per_page = 10
 
 
@@ -180,98 +182,4 @@ class CardsAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     list_per_page = 10  # No of records per page
 
 
-# LISTADO DE CLUBES DONDE SE REALIZAN LOS TORNEOS, TAL VEZ SE CELEBREN MÁS DE 1 TORNEO POR CLUB
-class Club(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    nombre = models.CharField(
-        max_length=50, blank=False, null=False, verbose_name="Nombre del club"
-    )
-    abreviado = models.CharField(
-        max_length=10, blank=False, null=False, verbose_name="Nombre abreviado"
-    )
-    direccion = models.CharField(
-        max_length=200, blank=False, null=False, verbose_name="Direccion"
-    )
-    comuna = models.CharField(
-        max_length=50, blank=False, null=False, verbose_name="Comuna"
-    )
-    ciudad = models.CharField(
-        max_length=50, blank=False, null=False, verbose_name="Ciudad"
-    )
-    correo = models.EmailField(
-        max_length=200, blank=True, null=True, verbose_name="Correo electronico"
-    )
-    telefono = models.IntegerField(blank=True, null=True, verbose_name="Telefono")
-    order = models.IntegerField(default=0)
-
-    class Meta:
-        verbose_name = "Club"
-        verbose_name_plural = "Clubes"
-        ordering = ["order"]
-
-    def __str__(self):
-        return self.nombre
-
-
-class ClubesAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
-    search_fields = ["nombre"]
-    list_display = ("nombre", "order")
-    list_per_page = 10
-
-
-class Campeonato(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    nombre = models.CharField(
-        max_length=50, blank=False, null=False, verbose_name="Nombre del campeonato"
-    )
-    fecha = models.DateField(verbose_name="Fecha de torneo")
-    club = models.ForeignKey(
-        Club, blank=True, null=True, on_delete=models.CASCADE, verbose_name="Club"
-    )  # listado de clubes, deberia coincidir con el torneo
-    bases = models.FileField(upload_to="bases/")  # bases del toreno, pdf
-    #    inscritos       = models.ForeignKey() # listado de inscritos actuales del torneo
-    #    salidas         = models.ForeignKey() # esquema de salida de los jugadores en el torneo
-    #    resultados      = models.ForeignKey() # listado posiciones del torneo segun distintos parametros
-    #    premiacion      = models.ForeignKey() # resumen de los primeros lugares por categoria
-    #    galeria         = models.ForeignKey() # galeria de fotos relacionados al torneo
-    order = models.IntegerField(default=0)
-
-    class Meta:
-        verbose_name = "Campeonato"
-        verbose_name_plural = "Campeonatos"
-        ordering = ["order"]
-
-    def __str__(self):
-        return self.nombre
-
-
-class CampeonatosAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
-    search_fields = ["nombre"]
-    list_display = ("nombre", "order")
-    list_per_page = 10
-
-
-# ADMINISTRA EL LISTADO DE IMAGENES DE PRESIDENTES, COMITE, ETC...
-class NormaRegla(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    titulo = models.CharField(max_length=200, blank=False, null=False)
-    descripcion = models.TextField(
-        blank=True, null=True, verbose_name="Descripcion del perfil"
-    )
-    archivo = models.FileField(upload_to="normas_reglas/")  # normas y reglamentos, pdf
-    order = models.IntegerField(default=0)
-
-    class Meta:
-        verbose_name = "Norma_Regla"
-        verbose_name_plural = "Normas_Reglas"
-        ordering = ["titulo", "order"]
-
-    def __str__(self):
-        return self.titulo
-
-
-class NormasReglasAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
-    search_fields = ["titulo"]
-    list_display = ("titulo", "order")
-    list_per_page = 10  # No of records per page
 
