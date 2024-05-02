@@ -24,13 +24,7 @@ estado = (
     ('S', 'SUSPENDIDO'),
 )
 
-estado_solicitud = (
-    ('P', 'Pendiente'),
-    ('A', 'Aprobado'),
-    ('R', 'Rechazado'),
-    ('S', 'Suspender'),
 
-)
 
 estado_cuota = (
     ('P', 'Pendiente'),

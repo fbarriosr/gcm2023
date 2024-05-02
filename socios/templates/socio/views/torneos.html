@@ -98,7 +98,7 @@
               <td style="text-align: center;">
 
               {% if value.abierto %}
-               <button onclick="crearCookie('torneoId', '{{value.id}}', '{% url 'torneo'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
+               <button onclick="crearCookie('torneoId', '{{value.id}}', '{% url 'solicitud'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
                   <img src="{% static 'web/assets/botones/insc_ok.png' %}" style="padding: 0px !important; width: 30px!important;"> 
               </button>
               {% else %}
@@ -141,8 +141,8 @@
 
               
               <td style="text-align: center;">
-                {% if galeria %}
-                <a href="#"> <img src="{% static 'web/assets/botones/galeria_ok.png' %}" style="padding: 0px !important; width: 30px!important;"  ></a>
+                {% if value.galeria != 'No Disponible' %}
+                <a href="{{value.galeria}}" target="_blank"> <img src="{% static 'web/assets/botones/galeria_ok.png' %}" style="padding: 0px !important; width: 30px!important;"  ></a>
                 {%else%}
                 <img src="{% static 'web/assets/botones/galeria.png' %}" style="padding: 0px !important; width: 30px!important;">
                 {%endif%}
@@ -172,7 +172,7 @@
               {% if rol == 'T' or rol == 'SUPER' %}
               <td style="text-align: center;">
                 <button onclick="crearCookie('torneoId', 
-                '{{value.id}}', '{% url 'solicitudes'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
+                '{{value.id}}', '{% url 'solicitud'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
                   SOLICITUDES  
               </button> 
 

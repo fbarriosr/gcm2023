@@ -10,12 +10,13 @@ from usuarios.choices import grados, instituciones
 from datetime import datetime
 from django_recaptcha.fields import ReCaptchaField
 
+
+
 class FormularioSolicitudView(forms.ModelForm):
     class Meta:
         model = Solicitud
         fields = ['indice','auto','patente','busCGM','carro',
-                    'acompanantes','deuda_socio','recargo','cuota','monto','cancela_deuda_socio',
-                    'estado', 'motivo','suspende', 'motivoSuspencion']
+                    'acompanantes','deuda_socio','recargo','cuota','monto','cancela_deuda_socio']
         labels = {
             'usuario':'Usuario',
             'torneo': 'Torneo',
@@ -32,9 +33,6 @@ class FormularioSolicitudView(forms.ModelForm):
             'cancela_deuda_socio': 'Cancela Deuda socio (NO/SI)',
             'monto': 'Total($CLP)',
             'estado': 'Estado',
-            'motivo': 'Motivo',
-            'suspende': 'Suspende',
-            'motivoSuspencion': 'Motivo Suspención'
         }
         widgets = {
 
@@ -145,35 +143,8 @@ class FormularioSolicitudView(forms.ModelForm):
                     'style':'font-weight: bolder; font-size: 24px;',
                     'readonly':''
                 }                
-            ), 
-            'estado': forms.Select(
-                attrs={
-                    'class': 'form-control ',
-                    'choices': estado_solicitud,
-                    'id': 'estado',
-                }
-            ),
-            'motivo': forms.Textarea(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'motivo',
-                }                
-            ),
-            'suspende': forms.CheckboxInput(
-                attrs = {
-                    'class': 'form-check-input switch',
-                    'id': 'suspende',
-                    'type':'checkbox',
-                    'rol': 'switch'
+            )
 
-                }                
-            ),
-            'motivoSuspencion': forms.Textarea(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'motivoSuspencion',
-                }                
-            ),
         }
 
 class FormularioSolicitudCreate(forms.ModelForm):
@@ -315,23 +286,6 @@ class FormularioSolicitudCreate(forms.ModelForm):
             user.save()
         return user
 
-
-class FormularioSolicitudSuspenderCreate(FormularioSolicitudCreate):
-    class Meta:
-        model = Solicitud
-        fields = ['motivoSuspencion']
-        labels = {
-            'motivoSuspencion': 'Motivo'
-        }
-        widgets = {
-                    'motivoSuspencion': forms.Textarea(
-                                    attrs = {
-                                        'class': 'form-control ',
-                                        'id': 'motivoSuspencion',
-                                        'style': "height: 200px",
-                                    }                
-                                ),
-                  }
 
 
 

@@ -41,9 +41,9 @@
           </div>
           {% for value in imgs %}
           <div class="col-sm-12 col-md-4 col-lg-3 fotos">
-            <a href="/media/{{ value }}" target="_blank">
+            <a href="/media/{{ value.img }}" target="_blank">
 
-              <img src="/media/{{ value }}" class="img-thumbnail" alt="...">
+              <img src="/media/{{ value.img }}" class="img-thumbnail" alt="...">
             </a>
           </div>
           {% endfor %}

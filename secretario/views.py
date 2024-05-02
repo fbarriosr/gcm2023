@@ -201,79 +201,23 @@ class auto(SecretarioMixin, TemplateView):
 
         return contexto
 
-class noticiaUpdate(SecretarioMixin,UpdateView):
-    model = Noticia
-    form_class = FormularioNoticiaUpdate
-    template_name = "secretario/views/noticiaUpdate.html"
-
-    def get_object(self, **kwargs):
-        noticiaId= self.request.COOKIES.get('noticiaId') 
-        current = self.model.objects.get(id= noticiaId)
-        return current 
-
-
-    def get_context_data(self, **kwargs):
-        contexto = super().get_context_data(**kwargs)
-        contexto["nameWeb"] = nameWeb
-
-        contexto["title"] = "noticia"
-        contexto["titulo"] = "noticia"
-
-        contexto['btnAction']   = 'ACTUALIZAR'
-        contexto['urlForm']     = self.request.path
-
-        contexto['rol'] = self.request.user.perfil
-
-        elClubMenu = ElClub.objects.order_by('order')
-        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
-
-
-        return contexto
-
-
-    def post(self,request,*args,**kwargs):     # comunicacion entre en form y python para notificaciones
-        if request.is_ajax():
-            form = self.form_class(request.POST,request.FILES,instance = self.get_object())
-            if form.is_valid():
-                post = form.save(commit=False)
-                post.save()
-                mensaje = ' Actualizado correctamente!'
-                error = 'No hay error!'
-                response = JsonResponse({'mensaje': mensaje, 'error': error})
-                response.status_code = 201
-                return response
-            else:
-                mensaje = f'{self.model.__name__} no se ha podido actualizar!'
-                error = form.errors
-                response = JsonResponse({'mensaje': mensaje, 'error': error})
-                response.status_code = 400
-                return response
-        else:
-            return redirect('home')
-
-        
-class noticiaCreate(SecretarioMixin,CreateView):
+class noticiaCreate(SecretarioMixin, CreateView):   
     model = Noticia
     form_class = FormularioNoticiaCreate
     template_name = "secretario/views/noticiaCreate.html"
     
-    def get_context_data(self,**kwargs):
+    def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
-        contexto['nameWeb']     =  nameWeb
-        
-        contexto['btnAction']   = 'Enviar'
-        contexto['urlForm']     = self.request.path
-
+        contexto['nameWeb'] = nameWeb
+        contexto['btnAction'] = 'Enviar'
+        contexto['urlForm'] = self.request.path
         contexto['titulo'] = 'CREAR NOTICIA'
         contexto['rol'] = self.request.user.perfil
-
         elClubMenu = ElClub.objects.order_by('order')
         contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
-     
         return contexto
 
-
-    def post(self,request,*args,**kwargs):  
+    def post(self, request, *args, **kwargs):
         if request.is_ajax():
             form = self.form_class(request.POST, request.FILES)
             if form.is_valid():
@@ -285,26 +229,63 @@ class noticiaCreate(SecretarioMixin,CreateView):
                     resumen     = form.cleaned_data.get('resumen'),
                     info        = form.cleaned_data.get('info'),
                     img         = form.cleaned_data.get('img'),
-                    img1        = form.cleaned_data.get('img1'),
-                    img2        = form.cleaned_data.get('img2'),
-                    img3        = form.cleaned_data.get('img3'),
-                    img4        = form.cleaned_data.get('img4'),     
+                         
                 )
                 noticia.save()
-                mensaje = 'Noticia Enviada'
-                error = 'No hay error!'
-                response = JsonResponse({'mensaje': mensaje, 'error': error})
-                response.status_code = 201
-                return response
+                for img_file in request.FILES.getlist('img_files', []):
+                    NoticiaImg.objects.create(noticia=noticia, img=img_file)
+            
+                return JsonResponse({'mensaje': 'Noticia Enviada', 'error': 'No hay error!'}, status=201)
             else:
-                print('errorAqui')
                 mensaje = 'Error'
                 error = form.errors
-                response = JsonResponse({'mensaje': mensaje, 'error': error})
-                response.status_code = 400
-                return response
+                return JsonResponse({'mensaje': mensaje, 'error': error}, status=400)
         else:
-            return redirect('home')
+            return super().post(request, *args, **kwargs)
+
+class noticiaUpdate(SecretarioMixin, UpdateView):   
+    model = Noticia
+    form_class = FormularioNoticiaUpdate
+    template_name = "secretario/views/noticiaUpdate.html"
+    
+    def get_object(self, **kwargs):
+        noticiaId = self.request.COOKIES.get('noticiaId') 
+        return self.model.objects.get(id=noticiaId)
+        
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto['nameWeb'] = nameWeb
+        contexto['btnAction'] = 'Actualizar'
+        contexto['urlForm'] = self.request.path
+        contexto['titulo'] = 'EDITAR NOTICIA'
+        contexto['rol'] = self.request.user.perfil
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+        return contexto
+
+    def post(self, request, *args, **kwargs):
+        if request.is_ajax():
+            noticia = self.get_object()
+            form = self.form_class(request.POST, request.FILES, instance=noticia)
+            if form.is_valid():
+                form.save()
+                
+                # Eliminar imágenes anteriores de NoticiaImg asociadas a la noticia
+                listado = request.FILES.getlist('img_files', [])
+                if listado:
+                    NoticiaImg.objects.filter(noticia=noticia).delete()
+
+                    # Agregar las nuevas imágenes
+                    for img_file in listado:
+                        NoticiaImg.objects.create(noticia=noticia, img=img_file)
+                
+                return JsonResponse({'mensaje': 'Noticia actualizada', 'error': 'No hay error!'}, status=200)
+            else:
+                mensaje = 'Error'
+                error = form.errors
+                return JsonResponse({'mensaje': mensaje, 'error': error}, status=400)
+        else:
+            return super().post(request, *args, **kwargs)
 
 class noticiaDelete(SecretarioMixin,DeleteView):
     model = Noticia
@@ -324,6 +305,113 @@ class noticiaDelete(SecretarioMixin,DeleteView):
         noticiaId= self.request.COOKIES.get('noticiaId') 
         noticia = self.model.objects.get(id=noticiaId)
         return noticia
+
+
+
+class multimediaCreate(SecretarioMixin, CreateView):   
+    model = Multimedia
+    form_class = FormularioMultimediaCreate
+    template_name = "secretario/views/multimediaCreate.html"
+    
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto['nameWeb'] = nameWeb
+        contexto['btnAction'] = 'Enviar'
+        contexto['urlForm'] = self.request.path
+        contexto['titulo'] = 'CREAR MULTIMEDIA'
+        contexto['rol'] = self.request.user.perfil
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+        return contexto
+
+    def post(self, request, *args, **kwargs):
+        if request.is_ajax():
+            form = self.form_class(request.POST, request.FILES)
+            if form.is_valid():
+                multimedia = Multimedia(
+                    titulo      = form.cleaned_data.get('titulo'),
+                    fecha       = form.cleaned_data.get('fecha'),
+                    img         = form.cleaned_data.get('img'),
+                         
+                )
+                multimedia.save()
+                for img_file in request.FILES.getlist('img_files', []):
+                    MultimediaImg.objects.create(multimedia=multimedia, img=img_file)
+            
+                return JsonResponse({'mensaje': 'Galeria Enviada', 'error': 'No hay error!'}, status=201)
+            else:
+                mensaje = 'Error'
+                error = form.errors
+                return JsonResponse({'mensaje': mensaje, 'error': error}, status=400)
+        else:
+            return super().post(request, *args, **kwargs)
+
+class multimediaUpdate(SecretarioMixin, UpdateView):   
+    model = Multimedia
+    form_class = FormularioMultimediaUpdate
+    template_name = "secretario/views/multimediaUpdate.html"
+    
+    def get_object(self, **kwargs):
+        multimediaId = self.request.COOKIES.get('multimediaId') 
+        return self.model.objects.get(id=multimediaId)
+        
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto['nameWeb'] = nameWeb
+        contexto['btnAction'] = 'Actualizar'
+        contexto['urlForm'] = self.request.path
+        contexto['titulo'] = 'EDITAR GALERIA'
+        contexto['rol'] = self.request.user.perfil
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+        return contexto
+
+    def post(self, request, *args, **kwargs):
+        if request.is_ajax():
+            multimedia = self.get_object()
+            form = self.form_class(request.POST, request.FILES, instance=multimedia)
+            if form.is_valid():
+                form.save()
+                
+                # Eliminar imágenes anteriores de NoticiaImg asociadas a la noticia
+                listado = request.FILES.getlist('img_files', [])
+                if listado:
+                    MultimediaImg.objects.filter(multimedia=multimedia).delete()
+
+                    # Agregar las nuevas imágenes
+                    for img_file in listado:
+                        MultimediaImg.objects.create(multimedia=multimedia, img=img_file)
+                
+                return JsonResponse({'mensaje': 'Galeria actualizada', 'error': 'No hay error!'}, status=200)
+            else:
+                mensaje = 'Error'
+                error = form.errors
+                return JsonResponse({'mensaje': mensaje, 'error': error}, status=400)
+        else:
+            return super().post(request, *args, **kwargs)
+
+class multimediaDelete(SecretarioMixin,DeleteView):
+    model = Multimedia
+    template_name = "secretario/views/multimediaDelete.html"
+    def delete(self,request,*args,**kwargs):
+        if request.is_ajax():
+            multimedia = self.get_object()
+            multimedia.delete()
+            mensaje = f'{self.model.__name__} eliminado correctamente!'
+            error = 'No hay error!'
+            response = JsonResponse({'mensaje': mensaje, 'error': error})
+            response.status_code = 201
+            return response
+        else:
+            return redirect('multimedias')
+    def get_object(self, **kwargs):
+        multimediaId= self.request.COOKIES.get('multimediaId') 
+        multimedia = self.model.objects.get(id=multimediaId)
+        return multimedia
+
+
+
+
 
 class torneoCreate(SecretarioMixin,CreateView):
     model = Torneo
@@ -365,6 +453,7 @@ class torneoCreate(SecretarioMixin,CreateView):
                     list_salidas      = form.cleaned_data.get('list_salidas'),
                     resultados        = form.cleaned_data.get('resultados'),
                     premiacion        = form.cleaned_data.get('premiacion'),
+                    galeria           = form.cleaned_data.get('galeria'),
                 )
                 torneo.save()
                 mensaje = 'Torneo Enviado'

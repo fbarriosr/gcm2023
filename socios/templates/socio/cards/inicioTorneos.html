@@ -25,7 +25,7 @@
                         <h5> <small>INSCRIPCIONES </small></h5>
                         <h6><small> Ingresa al Formulario </small></h6>
                         {% if value.abierto %}
-                        <button onclick="crearCookie('torneoId', '{{value.id}}', '{% url 'torneo'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
+                        <button onclick="crearCookie('torneoId', '{{value.id}}', '{% url 'solicitud'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
                            <img src="{% static 'web/assets/botones/insc_ok.png' %}" style="padding: 0px!important; width: 25px!important; "> 
                         </button>
                         {% else %}

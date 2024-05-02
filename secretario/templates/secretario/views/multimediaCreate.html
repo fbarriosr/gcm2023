@@ -1,0 +1,72 @@
+{% extends "web/root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block header %} 
+
+      {% include "socio/header/header_socios.html" %}
+
+{% endblock %}
+
+{% block appJsCss %}
+
+<link href="{% static 'socio/css/toastr.min.css' %}" rel="stylesheet">
+
+{% endblock %}
+
+{% block body %}
+      
+<div class="container marketing" id="contacto" >
+  <div class="row">
+    <div class="col-lg-12 text-center" style="padding-top:40px">
+      <img src="{% static 'web/assets/logos/laurelDorado.png' %}  " style="padding-bottom: 0px!important;" />
+      <h1 class="text-center" style="padding:5px">{{ titulo | upper}}</h1>
+    </div>
+  </div>
+<!-- Three columns of text below the carousel -->
+  <form enctype="multipart/form-data" id="form_edicion2" class="contact-form c-mb-30 c-gutter-30 col-lg-12" action= "{{urlForm}}"  method="POST" enctype="multipart/form-data">{% csrf_token %}
+    <div class="row">
+          <div class="col-lg-6 form-floating">
+            {{form.titulo}}
+            <label> {{form.titulo.label}}</label>
+          </div>
+          <div class="col-lg-3 form-floating">
+            {{form.fecha}}
+            <label> {{form.fecha.label}}</label>
+          </div>
+          <div class="col-lg-12">
+          </div>
+          <div class="col-lg-12 form-floating">
+            {{form.img}} 
+            <label> {{form.img.label}}</label>
+          </div>
+          <div class="col-lg-12 form-floating">
+            {{form.img_files}} 
+            <label> {{form.img_files.label}}</label>
+          </div>
+
+    </div>
+    <div class="row justify-content-end" style="padding-top:30px">
+        <div class="col-lg-3">
+            <button type="button" onclick="createMultimedia()"  class="btn btn-primary"><strong>{{ btnAction }}</strong></button>
+        </div>
+ 
+    </div>
+  </form>
+</div>
+
+
+
+{% endblock %}
+
+
+{% block extraJs %} 
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script> 
+<script src="{% static 'socio/js/toastr.min.js' %}"></script> 
+<script src="{% static 'socio/js/notificaciones.js' %}"></script>
+<script src="{% static 'socio/js/solicitud.js' %}"></script>  
+
+{% endblock %}

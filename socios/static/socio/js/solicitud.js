@@ -67,26 +67,6 @@ $("#auto").change(function() {
 
 
 
-function crearSolicitud(){
-
-    var data = new FormData($('#form_edicion').get(0));
-    console.log(data);
-    $.ajax({
-        data: $('#form_edicion').serialize(),
-        url:  $('#form_edicion').attr('action'),
-        type: $('#form_edicion').attr('method'),
-        success: function (response) {
-            notificacionSuccessUrl(response.mensaje, '../calendario')
-            console.log(response.mensaje)  
-        },
-        error: function (error) {
-            console.log(error) 
-
-        }
-    });
-    
-
-}
 
 function updatePerfil(){
     var data = new FormData($('#form_edicion').get(0));
@@ -145,7 +125,41 @@ function updateNoticia(){
             console.log(response.mensaje)   
         },
         error: function (error) {
-            console.log(error)         
+            if (error.responseText){
+                mensaje= error.responseText
+                //console.log(mensaje)
+               
+                obj = $.parseJSON(mensaje);
+                if(obj.error.titulo){
+                    m = 'Titulo: '+ obj.error.titulo
+                    notificacionError(m)
+                }
+                if(obj.error.fecha){
+                    m = 'Fecha: '+ obj.error.fecha
+                    notificacionError(m)
+                }
+                if(obj.error.resumen){
+                    m = 'Resumen: '+ obj.error.resumen
+                    notificacionError(m)
+                }
+                if(obj.error.info){
+                    m = 'Información: '+ obj.error.info
+                    notificacionError(m)
+                }
+                if(obj.error.img){
+                    m = 'Imagen Principal: '+ obj.error.img
+                    notificacionError(m)
+                }
+                if(obj.error.img_files){
+                    m = 'Lista de imagenes: '+ obj.error.img_files
+                    notificacionError(m)
+                }
+                console.log(obj.error)
+                
+            }else{
+                console.log(error) 
+                notificacionError(error)
+            }        
         }
     });
  
@@ -165,12 +179,14 @@ function createNoticia(){
         cache: false,
         data: data,
         success: function (response) {
-            notificacionSuccessUrl('Actualizando', 'noticias')
+            notificacionSuccessUrl('Creando Noticias', 'noticias')
             console.log(response.mensaje)   
         },
         error: function (error) {
             if (error.responseText){
                 mensaje= error.responseText
+                //console.log(mensaje)
+               
                 obj = $.parseJSON(mensaje);
                 if(obj.error.titulo){
                     m = 'Titulo: '+ obj.error.titulo
@@ -188,7 +204,16 @@ function createNoticia(){
                     m = 'Información: '+ obj.error.info
                     notificacionError(m)
                 }
+                if(obj.error.img){
+                    m = 'Imagen Principal: '+ obj.error.img
+                    notificacionError(m)
+                }
+                if(obj.error.img_files){
+                    m = 'Lista de imagenes: '+ obj.error.img_files
+                    notificacionError(m)
+                }
                 console.log(obj.error)
+                
             }else{
                 console.log(error) 
                 notificacionError(error)
@@ -223,6 +248,134 @@ function eliminarNoticia(){
        
     }
 }
+
+function updateMultimedia(){
+    var data = new FormData($('#form_edicion2').get(0));
+    console.log(data)
+    $.ajax({
+        url:  $('#form_edicion2').attr('action'),
+        method: $('#form_edicion2').attr('method'),
+        type: $('#form_edicion2').attr('method'),
+        mimeType: $('#form_edicion2').attr('enctype'),
+        processData : false,
+        contentType: false,
+        cache: false,
+        data: data,
+        success: function (response) {
+            notificacionSuccessUrl('Actualizando', 'multimedias')
+            console.log(response.mensaje)   
+        },
+        error: function (error) {
+            if (error.responseText){
+                mensaje= error.responseText
+                //console.log(mensaje)
+               
+                obj = $.parseJSON(mensaje);
+                if(obj.error.titulo){
+                    m = 'Titulo: '+ obj.error.titulo
+                    notificacionError(m)
+                }
+                if(obj.error.fecha){
+                    m = 'Fecha: '+ obj.error.fecha
+                    notificacionError(m)
+                }
+                if(obj.error.img){
+                    m = 'Imagen Principal: '+ obj.error.img
+                    notificacionError(m)
+                }
+                if(obj.error.img_files){
+                    m = 'Lista de imagenes: '+ obj.error.img_files
+                    notificacionError(m)
+                }
+                console.log(obj.error)
+                
+            }else{
+                console.log(error) 
+                notificacionError(error)
+            }        
+        }
+    });
+ 
+}
+
+function createMultimedia(){
+    var data = new FormData($('#form_edicion2').get(0));
+    console.log('data')
+    console.log(data)
+    $.ajax({
+        url:  $('#form_edicion2').attr('action'),
+        method: $('#form_edicion2').attr('method'),
+        type: $('#form_edicion2').attr('method'),
+        mimeType: $('#form_edicion2').attr('enctype'),
+        processData : false,
+        contentType: false,
+        cache: false,
+        data: data,
+        success: function (response) {
+            notificacionSuccessUrl('Creando Multimedias', 'multimedias')
+            console.log(response.mensaje)   
+        },
+        error: function (error) {
+            if (error.responseText){
+                mensaje= error.responseText
+                //console.log(mensaje)
+               
+                obj = $.parseJSON(mensaje);
+                if(obj.error.titulo){
+                    m = 'Titulo: '+ obj.error.titulo
+                    notificacionError(m)
+                }
+                if(obj.error.fecha){
+                    m = 'Fecha: '+ obj.error.fecha
+                    notificacionError(m)
+                }
+                if(obj.error.img){
+                    m = 'Imagen Principal: '+ obj.error.img
+                    notificacionError(m)
+                }
+                if(obj.error.img_files){
+                    m = 'Lista de imagenes: '+ obj.error.img_files
+                    notificacionError(m)
+                }
+                console.log(obj.error)
+                
+            }else{
+                console.log(error) 
+                notificacionError(error)
+            }
+
+                    
+        }
+    });
+ 
+}
+
+function eliminarMultimedia(){
+    confirmEliminar= $('#eliminarMultimediaConfirm').val();
+    console.log('Eliminando'); 
+    if (confirmEliminar == 'Eliminar'){
+       console.log('Eliminado'); 
+       $.ajax({
+            data:{
+                csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val()
+            },
+            url: '/multimediaDelete',
+            type: 'post',
+            success: function (response) {
+                Cookies.remove('multimediaId');
+                notificacionSuccessUrl(response.mensaje,'multimedias')             
+            },
+            error: function (error) {
+                console.log(error) 
+                notificacionError(error);
+            }
+        });
+       
+    }
+}
+
+
+
 function abrir_modal_eliminacion(url) {
     id = '#'+url
     var newURL = window.location.protocol + "//" + window.location.host + "/" + url;

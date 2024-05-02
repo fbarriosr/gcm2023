@@ -21,7 +21,7 @@
                     SECRETARIO
                   </button>
                   <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="{% url 'noticiaUpdate'%}">EDITAR</a></li>
+                    <li><a class="dropdown-item" href="{% url 'multimediaUpdate'%}">EDITAR</a></li>
                   </ul>
                 </div>
             {%endif%}
@@ -31,19 +31,17 @@
         <!-- Three columns of text below the carousel -->
         <div class="row">
           <div class="col-lg-12 context">
-            <h1>NOTICIA</h1>
-            <p>{{ new.fecha }} -  {{ new.get_region_display }}
-              </p>
-            
-            {{ new.info|linebreaks }}
+            <h1>GALERIA</h1>
+            <p>{{ new.fecha }}</p>
+        
 
             <h1>FOTOS</h1>
           </div>
           {% for value in imgs %}
           <div class="col-sm-12 col-md-4 col-lg-3 fotos">
-            <a href="/media/{{ value }}" target="_blank">
+            <a href="/media/{{ value.img }}" target="_blank">
 
-              <img src="/media/{{ value }}" class="img-thumbnail" alt="...">
+              <img src="/media/{{ value.img }}" class="img-thumbnail" alt="...">
             </a>
           </div>
           {% endfor %}

@@ -47,97 +47,61 @@ class FormularioRankingUpdate(forms.ModelForm):
 
 
 class FormularioNoticiaCreate(forms.ModelForm):
+    img_files = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True, 'class': 'form-control'}))
+    
     class Meta:
         model = Noticia
-        fields = ['titulo','fecha',
-                 'resumen','info',
-                 'direccion','region',
-                 'img','img1','img2','img3','img4',
-                 'is_active']
+        fields = ['titulo', 'fecha', 'resumen', 'info', 'direccion', 'region', 'img', 'img_files']
         labels = {
-            'titulo': 'Titulo (requerido) ',
+            'titulo': 'Titulo (requerido)',
             'fecha': 'Fecha (requerido)',
-            'direccion': 'Dirección',
-            'region':'Region (requerido)',
             'resumen': 'Resumen (requerido)',
             'info': 'Información (requerido)',
-            'img': 'Imagen Principal',
-            'img1': 'Imagen 1',
-            'img2': 'Imagen 2',
-            'img3': 'Imagen 3',
-            'img4': 'Imagen 4',
-            'is_active':'Activar',
+            'direccion': 'Dirección',
+            'region': 'Región (requerido)',
+            'img': 'Imagen Principal'
         }
         widgets = {
-            'titulo': forms.TextInput(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'titulo',
-                }                
-            ),
-            'fecha':forms.DateInput(
+            'titulo': forms.TextInput(attrs={'class': 'form-control', 'id': 'titulo'}),
+            'fecha': forms.DateInput(
                 format=('%Y-%m-%d'),
-                attrs={'class': 'form-control', 
-                       'placeholder': 'Select a date',
-                       'type': 'date'
-                      }
+                attrs={'class': 'form-control', 'placeholder': 'Selecciona una fecha', 'type': 'date'}
             ),
-            'region': forms.Select(
-                attrs={
-                    'class': 'form-control ',
-                    'choices': regiones,
-                    'id': 'region',
-                }
+            'resumen': forms.TextInput(attrs={'class': 'form-control', 'id': 'resumen'}),
+            'info': forms.Textarea(attrs={'class': 'form-control', 'id': 'info', 'style': 'height: 200px'}),
+            'direccion': forms.TextInput(attrs={'class': 'form-control', 'id': 'direccion'}),
+            'region': forms.Select(attrs={'class': 'form-control', 'id': 'region'}),
+            'img': forms.FileInput(attrs={'class': 'form-control', 'id': 'img'}),
+        }
+
+
+class FormularioNoticiaUpdate(FormularioNoticiaCreate):
+    img_files = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'multiple': True, 'class': 'form-control'}))
+    
+    class Meta:
+        model = Noticia
+        fields = ['titulo', 'fecha', 'resumen', 'info', 'direccion', 'region', 'img', 'img_files', 'is_active']
+        labels = {
+            'titulo': 'Titulo (requerido)',
+            'fecha': 'Fecha (requerido)',
+            'resumen': 'Resumen (requerido)',
+            'info': 'Información (requerido)',
+            'direccion': 'Dirección',
+            'region': 'Región (requerido)',
+            'img': 'Imagen Principal',
+            'is_active': 'Activo'
+        }
+        widgets = {
+            'titulo': forms.TextInput(attrs={'class': 'form-control', 'id': 'titulo'}),
+            'fecha': forms.DateInput(
+                format=('%Y-%m-%d'),
+                attrs={'class': 'form-control', 'placeholder': 'Selecciona una fecha', 'type': 'date'}
             ),
-            'direccion': forms.TextInput(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'direccion',
-                }                
-            ),
-            'resumen': forms.TextInput(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'resumen',              
-                }                
-            ),
-            'info': forms.Textarea(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'info',
-                    'style': "height: 200px",
-                }                
-            ),
-            'img': forms.FileInput(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'img',
-                }                
-            ),
-            'img1': forms.FileInput(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'img1',
-                }                
-            ),
-            'img2': forms.FileInput(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'img2',
-                }                
-            ),
-            'img3': forms.FileInput(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'img3',
-                }                
-            ),
-            'img4': forms.FileInput(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'img4',
-                }                
-            ), 
+            'resumen': forms.TextInput(attrs={'class': 'form-control', 'id': 'resumen'}),
+            'info': forms.Textarea(attrs={'class': 'form-control', 'id': 'info', 'style': 'height: 200px'}),
+            'direccion': forms.TextInput(attrs={'class': 'form-control', 'id': 'direccion'}),
+            'region': forms.Select(attrs={'class': 'form-control', 'id': 'region'}),
+            'img': forms.FileInput(attrs={'class': 'form-control', 'id': 'img'}),
             'is_active': forms.CheckboxInput(
                 attrs = {
                     'class': 'form-check-input switch',
@@ -147,19 +111,60 @@ class FormularioNoticiaCreate(forms.ModelForm):
 
                 }                
             )
-
         }
 
 
-class FormularioNoticiaUpdate(FormularioNoticiaCreate):
-    def save(self,commit = True):
-        user = super().save(commit = False)
-        if commit:
-            user.save()
-        return user
+
+class FormularioMultimediaCreate(forms.ModelForm):
+    img_files = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True, 'class': 'form-control'}))
+    
+    class Meta:
+        model = Multimedia
+        fields = ['titulo', 'fecha', 'img', 'img_files']
+        labels = {
+            'titulo': 'Titulo (requerido)',
+            'fecha': 'Fecha (requerido)',
+            'img': 'Imagen Principal'
+        }
+        widgets = {
+            'titulo': forms.TextInput(attrs={'class': 'form-control', 'id': 'titulo'}),
+            'fecha': forms.DateInput(
+                format=('%Y-%m-%d'),
+                attrs={'class': 'form-control', 'placeholder': 'Selecciona una fecha', 'type': 'date'}
+            ),
+            'img': forms.FileInput(attrs={'class': 'form-control', 'id': 'img'}),
+        }
 
 
+class FormularioMultimediaUpdate(FormularioMultimediaCreate):
+    img_files = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'multiple': True, 'class': 'form-control'}))
+    
+    class Meta:
+        model = Multimedia
+        fields = ['titulo', 'fecha',  'img', 'img_files', 'is_active']
+        labels = {
+            'titulo': 'Titulo (requerido)',
+            'fecha': 'Fecha (requerido)',
+            'img': 'Imagen Principal',
+            'is_active': 'Activo'
+        }
+        widgets = {
+            'titulo': forms.TextInput(attrs={'class': 'form-control', 'id': 'titulo'}),
+            'fecha': forms.DateInput(
+                format=('%Y-%m-%d'),
+                attrs={'class': 'form-control', 'placeholder': 'Selecciona una fecha', 'type': 'date'}
+            ),
+            'img': forms.FileInput(attrs={'class': 'form-control', 'id': 'img'}),
+            'is_active': forms.CheckboxInput(
+                attrs = {
+                    'class': 'form-check-input switch',
+                    'id': 'is_active',
+                    'type':'checkbox',
+                    'rol': 'switch'
 
+                }                
+            )
+        }
 
 class FormularioTorneoCreate(forms.ModelForm):
     class Meta:
@@ -167,7 +172,7 @@ class FormularioTorneoCreate(forms.ModelForm):
         fields = [ 'titulo','fecha' ,'direccion','region',                     
                     'cupos','activo','actual','abierto',
                     'bases','list_inscritos','list_salidas','resultados',     
-                    'premiacion' ]
+                    'premiacion', 'galeria' ]
         labels = {
             'titulo'        : 'Titulo (requerido) ',
             'fecha'         : 'Fecha (requerido)',        
@@ -182,6 +187,7 @@ class FormularioTorneoCreate(forms.ModelForm):
             'list_salidas'  : 'Listado de Salidas',
             'resultados'    : 'Resultados',
             'premiacion'    : 'Premiación',
+            'galeria'       : 'Galeria',
         }
         widgets = {
             'titulo': forms.TextInput(
@@ -274,6 +280,12 @@ class FormularioTorneoCreate(forms.ModelForm):
                     'id': 'premiacion',
                 }                
             ),
+            'galeria': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'galeria',
+                }                
+            )
 
         }
 

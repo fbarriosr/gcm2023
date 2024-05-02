@@ -1,0 +1,86 @@
+{% load static %} {% static "" as baseUrl %}
+<div class="container ">
+   <h1 class=" ">MULTIMEDIA</h1>
+   <div class="d-flex justify-content-end">
+      {% if rol == 'SUPER' or rol == 'SECR' %}
+      <div class="col-lg-3 context">
+         <a href="{%url 'multimediaCreate'%}" class="btn btn-circle">+</a>
+      </div>
+      {% endif %}
+   </div>
+   <div class="row row-cols-1 row-cols-md-3 g-4">
+      {% for value in datos %}
+      <div class="col-sm-12">
+         <div class="card cardTorneo">
+            <a class="" href="{%url 'multimedia' value.slug %}">
+               <img src="media/{{ value.img }}" class="card-img-top" alt="...">
+               <div class="card-body cardTorneo" style="color: black;">
+                  <h5 class="card-title text-center"> {{ value.titulo | upper }}</h5>
+
+               </div>
+            </a>
+            <div class="card-footer">
+               <small class="text-body-secondary"> 
+               {% if rol == 'SECR' or rol == 'SUPER' %}
+                    {% if value.is_active %}
+                    <img src="{% static 'web/assets/logos/activo.png' %}" style="padding:0px!important">
+                    {%else%}
+                    <img src="{% static 'web/assets/logos/noActivo.png' %}" style="padding:0px!important">
+                    {%endif%}
+               {%endif%}
+               <img src="static/web/assets/logos/calendario.png" style="padding: 10px;">{{ value.fecha }}
+               </small>
+            </div>
+         </div>
+      </div>
+      {% endfor %}
+   </div>
+   <div class="d-flex justify-content-end">
+      {% if datos %}
+      <nav aria-label="Page navigation example">
+         <div class="nav-links">
+            {% if datos.has_previous %}
+            <a class="prev page-numbers" href="?page={{ datos.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+            <span aria-hidden="true">&laquo;</span>
+            </a>
+            {% if datos.previous_page_number != 1%}
+            <a class="page-numbers" href="?page=1{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}" class="btn btn-white">
+            <span class="meta-nav screen-reader-text"> 1 </span>
+            </a>
+            {% endif %}
+            {% if  down  %}
+            <a class="page-numbers disable" >
+            ...
+            </a>
+            {% endif %}
+            <a class="prev page-numbers" href="?page={{ datos.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+            {{ datos.previous_page_number }}
+            </a>
+            {% endif %}
+            <strong class="page-numbers current">
+            {{ datos.number }}
+            </strong>
+            {% if datos.has_next %}
+            <a class="next page-numbers" href="?page={{ datos.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+            {{ datos.next_page_number }}
+            </a>
+            {% if  up  %}
+            <a class="page-numbers disable" >
+            ...
+            </a>
+            {% endif %}
+            {% if datos.next_page_number != datos.paginator.num_pages %}
+            <a class="prev page-numbers" href="?page={{ datos.paginator.num_pages  }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+            {{ datos.paginator.num_pages  }}
+            </a>
+            {% endif %}
+            <a class="prev page-numbers" href="?page={{ datos.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}" >
+            <span aria-hidden="true">&raquo;</span>
+            </a>
+            {% endif %}
+         </div>
+      </nav>
+      {% endif %}
+   </div>
+</div>
+<!-- /.container -->

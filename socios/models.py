@@ -6,9 +6,8 @@ from autoslug import AutoSlugField
 from django.utils import timezone
 import uuid
 from usuarios.models import Usuario
-from .choices import estado, regiones, cards,estado_solicitud, estado_cuota, mes_num_texto, websSocio
+from .choices import estado, regiones, cards, estado_cuota, mes_num_texto, websSocio
 from import_export.admin import ImportExportModelAdmin
-from multiupload.fields import MultiImageField
 from djmoney.models.fields import MoneyField
 
 
@@ -75,12 +74,29 @@ class Multimedia (models.Model):
     def __str__(self):
         return self.titulo
 
+class MultimediaImg(models.Model):
+    multimedia = models.ForeignKey(Multimedia, default=None, on_delete=models.CASCADE)
+    img  = models.FileField(upload_to = 'multimedia/')
+    class Meta:
+        verbose_name = "MultimediaImg"
+        verbose_name_plural = "MultimediasImg"
+        ordering = ["img"]
+    def __str__(self):
+        return self.multimedia.titulo
+
+class MultimediaImgAdmin(admin.StackedInline):
+    model = MultimediaImg
+
 
 class MultimediaAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["titulo"]
+    inlines = [MultimediaImgAdmin]
     list_display = ( "fecha", "titulo", 'is_active')
     list_per_page = 10  # No of records per page
     list_filter = ('is_active',)
+
+class Image(models.Model):
+    image = models.ImageField(upload_to='noticias/')
 
 class Noticia (models.Model):
     id              = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -90,12 +106,7 @@ class Noticia (models.Model):
     region          = models.CharField(max_length=50,choices= regiones, default= 'XIII', verbose_name="Region")
     resumen         = models.CharField(max_length = 200, blank = False, null = False)
     info            = models.TextField()
-    img             = models.ImageField(upload_to='noticias/',blank = True)
-    img1            = models.ImageField(upload_to='noticias/',blank = True)
-    img2            = models.ImageField(upload_to='noticias/',blank = True)
-    img3            = models.ImageField(upload_to='noticias/',blank = True)
-    img4            = models.ImageField(upload_to='noticias/',blank = True)
-    img5            = models.ImageField(upload_to='noticias/',blank = True)
+    img             = models.ImageField(upload_to='noticias/',null = False, verbose_name='Imagen Principal')
     slug            = AutoSlugField(populate_from=slugify_two_fields,  unique_with=['titulo','fecha'])
     is_active       = models.BooleanField('Activo',default = True)
     class Meta:
@@ -106,12 +117,26 @@ class Noticia (models.Model):
     def __str__(self):
         return self.titulo
 
+class NoticiaImg(models.Model):
+    noticia = models.ForeignKey(Noticia, default=None, on_delete=models.CASCADE)
+    img  = models.FileField(upload_to = 'noticias/')
+    class Meta:
+        verbose_name = "NoticiaImg"
+        verbose_name_plural = "NoticiasImg"
+        ordering = ["img"]
+    def __str__(self):
+        return self.noticia.titulo
+
+class NoticiaImgAdmin(admin.StackedInline):
+    model = NoticiaImg
 
 class NoticiaAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["titulo"]
+    inlines = [NoticiaImgAdmin]
     list_display = ( "fecha", "titulo", "resumen", 'is_active')
     list_per_page = 10  # No of records per page
     list_filter = ('is_active',)
+
 
 # ADMINISTRA LOS CARDS DE TORNEO
 class Torneo (models.Model):
@@ -130,6 +155,7 @@ class Torneo (models.Model):
     list_salidas    = models.FileField(upload_to="torneos/salidas/", max_length=254, blank=True, verbose_name="Listado de Salidas")
     resultados      = models.FileField(upload_to="torneos/resultados/", max_length=254, blank=True)
     premiacion      = models.FileField(upload_to="torneos/premiacion/", max_length=254, blank=True)
+    galeria         = models.CharField(max_length=300, default='No Disponible', verbose_name="Url Galeria")
 
     def __str__(self):
         return self.titulo + str(self.fecha)
@@ -163,11 +189,6 @@ class Solicitud (models.Model):
     recargoInvitado = models.PositiveIntegerField(default=0, verbose_name="Recargo Invitado")
     cuota           = models.PositiveIntegerField(default=0,  verbose_name="Cuota de Campeonato")
     monto           = models.PositiveIntegerField(default=0,  verbose_name="Monto Pagado")
-    estado          = models.CharField(max_length=50,blank=True,choices= estado_solicitud, default= 'P', verbose_name="Estado")
-    motivo          = models.TextField(default='',blank=True, verbose_name='Motivo')
-    suspende        = models.BooleanField(default=False, verbose_name='Suspende Participación' )
-    motivoSuspencion= models.TextField(default='',blank=True, verbose_name='Motivo Suspención')
-
 
     class Meta:
         verbose_name    = 'Solicitud'
@@ -175,9 +196,9 @@ class Solicitud (models.Model):
         ordering    = ['-fecha']
 class SolicitudAdmin (SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields   = ['usuario']
-    list_display    = ('usuario','torneo','fecha','busCGM','carro','cancela_deuda_socio' ,'monto' , 'estado')
+    list_display    = ('usuario','torneo','fecha','busCGM','carro','cancela_deuda_socio' ,'monto' )
     list_per_page   = 10 # No of records per page
-    list_filter = ('torneo', 'estado', 'fecha')
+    list_filter = ('torneo', 'fecha')
     autocomplete_fields = ['usuario','torneo']
 
 # PLANTILLA PARA LOS LINKS DE EL CLUB EN HOME DEL SOCIO

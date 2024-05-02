@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'search_admin_autocomplete',
-    'multiupload',
     'import_export',
     'web',
     'usuarios',

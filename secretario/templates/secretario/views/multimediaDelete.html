@@ -1,0 +1,22 @@
+{% load static %}
+{% static "" as baseUrl %}
+<div class="modal-dialog modal-dialog-centered">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+      <p>Se elimará toda la información. Esta acción <strong>No es Reversible.</strong> </p>
+      <form>
+        <div class="form-group">
+          <label for="recipient-name" class="col-form-label">Por favor escriba "Eliminar" para confirmar</label>
+          <input type="text" class="form-control" id="eliminarMultimediaConfirm" placeholder="Eliminar">
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="width: 30%;">CANCELAR</button>
+      <button type="button" class="btn btn-primary" onclick="eliminarMultimedia()" style="width: 30%;">CONFIRMAR</button>
+    </div>
+  </div>
+</div>

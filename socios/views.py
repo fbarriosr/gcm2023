@@ -32,14 +32,55 @@ from .mixins import *
 from .forms import *
 from .utils import *
 from .choices import estado_cuota
-import json
-import logging
-import csv
+
 from itertools import chain
+from transbank.webpay.webpay_plus.transaction import Transaction
+import logging, random, json, requests , csv
 
 logger = logging.getLogger(__name__)
 
 nameWeb = "CGM"
+
+def crearTransaccion(buy_order, session_id, amount, return_url):
+    create_request = {
+        "buy_order": buy_order,
+        "session_id": session_id,
+        "amount": amount,
+        "return_url": return_url
+    }
+
+    response = (Transaction()).create(buy_order, session_id, amount, return_url)
+    print(f'response tipo {type(response)}')
+    print(f'response {response}')
+    print(f'url: {response["url"]}')
+    print(f'token: {response["token"]}')
+
+    token_ws=response["token"]
+    url = response["url"]
+    redirect_url = f'{url}?token_ws={token_ws}'
+    # response = requests.post(url, data={'token_ws': token_ws})
+    print(f'redirect url: {redirect_url}')
+
+    return create_request, response
+
+def procesar_transaccion(request):
+    # Obtener los datos de la sesión
+    create_request = request.session.get('create_request')
+    response = request.session.get('response')
+
+    # Construir el formulario HTML con los datos necesarios
+    form_html = f'''
+        <form id="webpayForm" action="{response['url']}" method="POST">
+            <input type="hidden" name="token_ws" value="{response['token']}" />
+        </form>
+        <script>
+            document.getElementById("webpayForm").submit();
+        </script>
+    '''
+
+    # Retornar el formulario HTML como una respuesta HTTP
+    return HttpResponse(form_html)
+
 
 
 #def generar_cuotas(request, año, valor):
@@ -257,22 +298,17 @@ class noticia(SocioMixin,DetailView):
         contexto["title"] = "Noticia"
         dato =  self.get_object()
         contexto['new'] =  dato[0]
-        dato = list(dato.values('titulo','img','fecha','resumen','info','slug','img1', 'img2', 'img3','img4','img5','region'))
-        dato = dato[0]
+        
         lista = []
-        if(dato['img1']!=''):
-            lista.append(dato['img1'])
-        if(dato['img2']!=''):
-            lista.append(dato['img2'])
-        if(dato['img3']!=''):
-            lista.append(dato['img3'])
-        if(dato['img4']!=''):
-            lista.append(dato['img4'])
-        if(dato['img5']!=''):
-            lista.append(dato['img5'])
 
+        lista = list(NoticiaImg.objects.filter(noticia = dato[0].id ))
+        
+        dato = list(dato.values('titulo','img','fecha','resumen','info','slug','region'))
+        dato = dato[0]
+
+        contexto['value'] = dato
         contexto['imgs']= lista
-        contexto['front']= [{'img': dato['img']}]
+        
 
         contexto['rol'] = self.request.user.perfil
 
@@ -302,7 +338,6 @@ class noticias(SocioMixin,TemplateView):
         lNoticia = paginator.get_page(page)
             
         return lNoticia
-
 
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
@@ -340,8 +375,9 @@ class multimedia(SocioMixin,DetailView):
    
     def get(self, *args, **kwargs):
         dato =  self.get_object()
-        noticiaId = dato[0].id
+        multimediaId = dato[0].id
         response = super().get( *args, **kwargs)
+        response.set_cookie('multimediaId', multimediaId )
         return response
 
     def get_context_data(self, **kwargs):
@@ -350,12 +386,17 @@ class multimedia(SocioMixin,DetailView):
         contexto["title"] = "Multimedia"
         dato =  self.get_object()
         contexto['new'] =  dato[0]
-        dato = list(dato.values('titulo','fecha','info','slug','img'))
-        dato = dato[0]
+        
         lista = []
 
+        lista = list(MultimediaImg.objects.filter(multimedia = dato[0].id ))
+        
+        dato = list(dato.values('titulo','img','fecha','slug'))
+        dato = dato[0]
+
+        contexto['value'] = dato
         contexto['imgs']= lista
-        contexto['front']= [{'img': dato['img']}]
+       
 
         contexto['rol'] = self.request.user.perfil
 
@@ -571,95 +612,6 @@ class torneos(SocioMixin,TemplateView):
         response.delete_cookie('torneoId')
         return response
 
-# Create your views here.
-class torneo(SocioMixin,DetailView):
-    model = Torneo
-    template_name = "socio/views/torneo.html"
-    
-    def get(self, *args, **kwargs):
-        dato =  self.get_object()
-        torneoId = dato.id
-        torneoEstado = dato.abierto
-        solicitud = Solicitud.objects.filter(usuario__email=self.request.user.email).filter(torneo__id=torneoId).order_by('-fecha')
-        
-        if (torneoEstado==True): #torneo abierto
-
-            if (len(solicitud)==0 ): # solicitud
-                response = redirect('solicitud') # para inscribir
-                response.set_cookie('torneoId', torneoId)
-                return response
-            else:
-                if(solicitud[0].estado =='S'): #arrependido
-                    response = redirect('solicitud') # para inscribir
-                    response.set_cookie('torneoId', torneoId)
-                    return response 
-                else: 
-                    response = super().get( *args, **kwargs)
-                    response.set_cookie('torneoId', torneoId)
-                    return response  
-        else: 
-            response = super().get( *args, **kwargs)
-            response.set_cookie('torneoId', torneoId)
-            return response
-        
-       
-    def get_context_data(self, **kwargs):
-
-        contexto = super().get_context_data(**kwargs)
-        contexto["nameWeb"] = nameWeb
-        dato =  self.get_object()
-        torneoid = dato.id
-        torneoEstado = dato.abierto
-        contexto['torneoEstado'] = torneoEstado
-        contexto['torneoFecha']= str(dato.fecha)
-        contexto['torneoLugar']= dato.direccion+'-' + dato.region
-        contexto['torneoCupos']= dato.cupos
-        solicitud = Solicitud.objects.filter(usuario__email=self.request.user.email).filter(torneo__id=torneoid).order_by('-fecha') #ultima solicitud
-        contexto['rol'] = self.request.user.perfil
-
-        solAprobados = Solicitud.objects.filter(torneo__id=torneoid).filter(estado='A')
-        if (len(solAprobados)==0 ):
-            contexto['solAprobados']= False
-        else:
-            contexto['solAprobados']= True
-
-        if (len(solicitud)==0 ): # no hay solicitud
-            if (torneoEstado==False): #torneo Cerrado
-                contexto['solicitudEstado']= 'C'
-                contexto['nombreTorneo'] = dato.titulo
-        else:  # si hay solictud
-            contexto['solicitud']= solicitud[0]
-            contexto['solicitudEstado']=solicitud[0].estado
-            if (solicitud[0].estado == 'A'):
-                contexto['bases']= solicitud[0].torneo.bases
-                contexto['premiacion']= solicitud[0].torneo.premiacion
-                contexto['resultados']= solicitud[0].torneo.resultados
-                contexto['listadoAceptados'] = dato.list_inscritos
-            elif (solicitud[0].estado == 'S'):
-                if (torneoEstado==False): #torneo Cerrado
-                    contexto['solicitudEstado']= 'C'
-                    contexto['nombreTorneo'] = dato.titulo
-
-
-        elClubMenu = ElClub.objects.order_by('order')
-        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
-
-        return contexto
-
-    
-
-    def get_object(self, **kwargs):
-        torneo_id = self.request.COOKIES.get('torneoId')
-        '''
-        if torneo_id:
-            current = Torneo.objects.get(id= torneo_id)
-        else:
-            print(self.kwargs.get('slug', None))
-            current =  Torneo.objects.get(slug = self.kwargs.get('slug', None))
-        
-        return current
-        '''
-        return Torneo.objects.get(id= torneo_id)
 
 class crearSolicitud(SocioMixin,CreateView):
     model = Solicitud
@@ -670,7 +622,7 @@ class crearSolicitud(SocioMixin,CreateView):
 
         deuda_socio = 3
         recargo = 5000
-        cuota = 7500
+        cuota = 250000000
 
         form = super().get_form(form_class)
 
@@ -680,6 +632,52 @@ class crearSolicitud(SocioMixin,CreateView):
 
         return form
     
+    def get(self, *args, **kwargs):
+        request = self.request
+        token = request.GET.get("token_ws")
+
+        # Si hubo una transaccion, procesa su respuesta y actualiza la DB.
+        if token:
+            print('token detectado')  
+            respuestaTransaccion = (Transaction()).commit(token=token)
+        
+            status = respuestaTransaccion['status']
+
+            if  status == 'AUTHORIZED':
+                # Almacena los datos del token y la respuesta de la transacción en la sesión
+                request.session['token'] = token
+                request.session['respuestaTransaccion'] = respuestaTransaccion
+                solicitud = Solicitud(
+                    usuario      = Usuario.objects.get(rut=  self.request.user.rut),
+                    torneo       = self.get_object(), 
+                    fecha        = datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    auto         = request.session['auto'], 
+                    patente      = request.session['patente'],
+                    busCGM       = request.session['busCGM'],
+                    carro        = request.session['carro'],
+                    indice       = request.session['indice'],
+                    acompanantes = request.session['acompanantes'],
+                    deuda_socio  = request.session['deuda_socio'],
+                    cancela_deuda_socio = request.session['cancela_deuda_socio'],
+                    recargo      = request.session['recargo'],
+                    cuota        = request.session['cuota'],
+                    monto        = request.session['monto'],
+                )
+                    
+                solicitud.save()
+                response = redirect('solicitud') # para inscribir
+                return response
+            elif status =='FAILED':
+                response = redirect(reverse('solicitud') + '?rechazopago=true')
+                return response
+
+        else: 
+            response = super().get( *args, **kwargs)
+            return response 
+        
+            
+
+
     def get_context_data(self,**kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto['nameWeb']     =  nameWeb
@@ -691,24 +689,40 @@ class crearSolicitud(SocioMixin,CreateView):
         contexto['torneo'] = torneo
 
         if torneo:
-
             torneoTitulo = str(torneo.titulo).upper().replace('TORNEO','') 
             contexto['titulo'] = 'INSCRIPCIÓN  TORNEO '+ torneoTitulo
-            contexto['rol'] = self.request.user.perfil
 
-            solAprobados = Solicitud.objects.filter(torneo__id=torneo.id).filter(estado='A')
-            if (len(solAprobados)==0 ):
-                contexto['solAprobados']= False
-            else:
-                contexto['solAprobados']= True
+            if self.request.GET.get("rechazopago")=="true":
+                contexto['subtitulo'] = '¡PAGO RECHAZADO VUELVA A INTENTAR!'
+            
+                
+            contexto['rol'] = self.request.user.perfil
          
             elClubMenu = ElClub.objects.order_by('order')
             contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
 
-            if torneo.region  =='XIII':
-                contexto['local']= True
+            solicitud = Solicitud.objects.filter(usuario__email=self.request.user.email).filter(torneo=torneo).order_by('-fecha')
+
+            if (len(solicitud)> 0 ):
+                contexto['pagado']= True
+
+                contexto['mensaje'] = f"""
+                Estimado {self.request.user.primer_nombre.capitalize()} {self.request.user.apellido_paterno.capitalize()}<br><br>
+                Nos complace informarte que tu inscripción al torneo de golf ha sido pagada con éxito. <br><br>
+                ¡Bienvenido al evento!
+                <br><br>
+                Atentamente <br><br>
+                <strong>El Capitan</strong>"""
+
             else:
-                contexto['local']= False   
+                contexto['pagado']= False
+               
+                if torneo.region  =='XIII':
+                    contexto['local']= True
+                else:
+                    contexto['local']= False  
+
+            
 
 
         return contexto
@@ -719,118 +733,113 @@ class crearSolicitud(SocioMixin,CreateView):
         return current
 
     def post(self,request,*args,**kwargs):  
-        if request.is_ajax():
-            form = self.form_class(request.POST)
-            if form.is_valid():
-                solicitud = Solicitud(
-                    usuario      = Usuario.objects.get(rut=  self.request.user.rut),
-                    torneo       = self.get_object(), 
-                    fecha        = datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                    auto = form.cleaned_data.get('auto'),
-                    patente = form.cleaned_data.get('patente'),
-                    busCGM = form.cleaned_data.get('busCGM'),
-                    carro =  form.cleaned_data.get('carro'),
-                    indice       = form.cleaned_data.get('indice'),
-                    acompanantes = self.request.POST.get('acompanantes'),
-                    deuda_socio  = form.cleaned_data.get('deuda_socio'),
-                    cancela_deuda_socio = form.cleaned_data.get('cancela_deuda_socio'),
-                    recargo      = form.cleaned_data.get('recargo'),
-                    cuota        = form.cleaned_data.get('cuota'),
-                    monto        = form.cleaned_data.get('monto'),
-                    
-                )
-                
-                solicitud.save()
-                mensaje = 'Solicitud Enviada'
-                error = 'No hay error!'
-                response = JsonResponse({'mensaje': mensaje, 'error': error})
-                response.status_code = 201
-                return response
-            else:
-                print('errorAqui')
-                mensaje = 'Error:'
-                error = form.errors
-                response = JsonResponse({'mensaje': mensaje, 'error': error})
-                response.status_code = 400
-                return response
-        else:
-            return redirect('home')
-
-
-class crearSolicitudSuspender(SocioMixin,CreateView):
-    model = Solicitud
-    form_class = FormularioSolicitudSuspenderCreate
-    template_name = "socio/views/suspender.html"
-
-    def get_context_data(self,**kwargs):
-        contexto = super().get_context_data(**kwargs)
-        contexto['nameWeb']     =  nameWeb
         
-        contexto['btnAction']   = 'Enviar'
-        contexto['urlForm']     = self.request.path
+        form = self.form_class(request.POST)
 
-        torneo   = self.get_object()
-        contexto['torneo'] = torneo
-        torneoTitulo = str(torneo.titulo).upper().replace('TORNEO','') 
-        contexto['titulo'] = 'SOLICITUD DE SUSPENCION PARTICIPACIÓN '+ torneoTitulo
-        contexto['rol'] = self.request.user.perfil
-        
-        elClubMenu = ElClub.objects.order_by('order')
-        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
-
-        return contexto
-
-    def get_object(self, **kwargs):
-        torneo= self.request.COOKIES.get('torneo') 
-        current = Torneo.objects.get(id= torneo)
-        return current 
-
-    def get_solicitud(self, **kwargs):
-        torneo   = self.get_object()
-        torneoid = torneo.id
-        current = Solicitud.objects.filter(usuario__rut=self.request.user.rut).filter(torneo__id=torneoid).filter(estado='A').order_by('-fecha')
-        return current
+        if form.is_valid():
+           
+            busCGM       = form.cleaned_data.get('busCGM'),
+            auto         = form.cleaned_data.get('auto'),
+            patente      = form.cleaned_data.get('patente'),
+            carro        = form.cleaned_data.get('carro'),
+            acompanantes = form.cleaned_data.get('acompanantes'),
+            indice       = form.cleaned_data.get('indice'),
+            
+            deuda_socio  = form.cleaned_data.get('deuda_socio'),
+            cancela_deuda_socio = form.cleaned_data.get('cancela_deuda_socio'),
+            recargo      = form.cleaned_data.get('recargo'),
+            cuota        = form.cleaned_data.get('cuota'),
+            monto        = form.cleaned_data.get('monto'),
 
 
-    def post(self,request,*args,**kwargs):  
-        if request.is_ajax():
-            solicitud = self.get_solicitud()[0]
-            form = self.form_class(request.POST)
-            if form.is_valid():
-                solicitud = Solicitud(
-                    usuario      = Usuario.objects.get(rut=  solicitud.rut),
-                    torneo       = self.get_object(), 
-                    fecha        = datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                    auto         = solicitud.auto,
-                    patente      = solicitud.patente,
-                    busCGM       = solicitud.busCGM,
-                    carro        = solicitud.carro,
-                    indice       = solicitud.indice,
-                    acompanantes = solicitud.acompanantes,
-                    descripcion  = solicitud.descripcion,
-                    deuda_socio  = solicitud.deuda_socio,
-                    cancela_deuda_socio = solicitud.cancela_deuda_socio,
-                    recargo      = solicitud.recargo,
-                    cuota        = solicitud.cuota,
-                    monto        = solicitud.monto,
-                    suspende     = True,
-                    motivoSuspencion =  form.cleaned_data.get('motivoSuspencion')
-                )
-                solicitud.save()
-                mensaje = 'Solicitud Enviada'
-                error = 'No hay error!'
-                response = JsonResponse({'mensaje': mensaje, 'error': error})
-                response.status_code = 201
-                return response
-            else:
-                print('errorAqui')
-                mensaje = 'not pe'
-                error = form.errors
-                response = JsonResponse({'mensaje': mensaje, 'error': error})
-                response.status_code = 400
-                return response
+            busCGM       = busCGM[0]
+            auto         = auto[0]
+            patente      = patente[0]
+            carro        = carro[0]
+            acompanantes = acompanantes[0]
+            indice       = indice[0]
+            
+            deuda_socio  = deuda_socio[0]
+            cancela_deuda_socio = cancela_deuda_socio[0]
+            recargo      = recargo[0]
+            cuota        = cuota[0]
+            monto        = monto[0]
+
+            buy_order = str(random.randrange(1000000, 99999999))
+            session_id = str(random.randrange(1000000, 99999999))
+            amount = str(monto)
+            return_url = request.build_absolute_uri(reverse('solicitud'))
+
+            create_request, response = crearTransaccion(buy_order, session_id, amount, return_url)
+
+
+            # Almacenar los datos en la sesion
+            request.session['create_request'] = create_request
+            request.session['response'] = response
+
+            request.session['busCGM'] = busCGM 
+            request.session['auto'] = auto 
+            request.session['patente'] = patente 
+            request.session['carro'] = carro 
+            request.session['acompanantes'] = acompanantes 
+            request.session['indice'] = indice 
+            request.session['deuda_socio'] = deuda_socio 
+            request.session['cancela_deuda_socio'] = cancela_deuda_socio 
+            request.session['recargo'] = recargo 
+            request.session['cuota'] = cuota 
+            request.session['monto'] = monto 
+
+            
+
+            # Redirigir a la vista de procesamiento de transacción
+            return redirect('procesar_transaccion')
+            
+            
         else:
-            return redirect('home')
+            print('errorAqui')
+            mensaje = 'Error:'
+            error = form.errors
+            response = JsonResponse({'mensaje': mensaje, 'error': error})
+            response.status_code = 400
+            return response
+      
+            '''
+            print("Webpay Plus Transaction.create")
+
+            buy_order = str(random.randrange(1000000, 99999999))
+            session_id = str(random.randrange(1000000, 99999999))
+            amount = str(monto)
+            return_url = request.build_absolute_uri(reverse('solicitud'))
+
+            create_request, response = crearTransaccion(buy_order, session_id, amount, return_url)
+
+            # Almacenar los datos en la sesion
+            request.session['create_request'] = create_request
+            request.session['response'] = response
+
+            request.session['busCGM'] = busCGM 
+            request.session['auto'] = auto 
+            request.session['patente'] = patente 
+            request.session['carro'] = carro 
+            request.session['acompanantes'] = acompanantes 
+            request.session['indice'] = indice 
+            request.session['deuda_socio'] = deuda_socio 
+            request.session['cancela_deuda_socio'] = cancela_deuda_socio 
+            request.session['recargo'] = recargo 
+            request.session['cuota'] = cuota 
+            request.session['monto'] = monto 
+
+
+            contexto = {}
+            contexto['request'] = create_request
+            contexto['response'] = response
+
+            # return redirect('cuotas')
+
+            # Redirigir al usuario a una vista intermedia que procesará los datos y realizará la redirección
+            return redirect('procesar_transaccion')
+                '''
+
 
 class ranking(SocioMixin,TemplateView):
     template_name = "socio/views/ranking.html"
