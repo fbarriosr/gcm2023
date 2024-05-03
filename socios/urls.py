@@ -12,7 +12,7 @@ urlpatterns = [
     path('ranking', ranking.as_view(), name= 'ranking'),
     
     path('solicitud', crearSolicitud.as_view(), name= 'solicitud'),
-
+    path('inscritos', inscritos.as_view(), name= 'inscritos'),
     path('procesar-transaccion/', procesar_transaccion, name='procesar_transaccion'),
    
 

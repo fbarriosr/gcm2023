@@ -45,8 +45,8 @@ def export_csv_bus( request):
     writer = csv.writer(response)
     writer.writerow(['Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre'])
 
-    torneoid = request.COOKIES.get('torneo') 
-    sol = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(busCGM= True).order_by('usuario__apellido_paterno')
+    torneoid = request.COOKIES.get('torneoId') 
+    sol = Solicitud.objects.filter(torneo__id=torneoid).filter(busCGM= True).order_by('usuario__apellido_paterno')
        
     for obj in sol:
         writer.writerow([obj.usuario.apellido_paterno, obj.usuario.apellido_materno , obj.usuario.primer_nombre , obj.usuario.segundo_nombre ])
@@ -60,8 +60,8 @@ def export_csv_auto(request):
     writer = csv.writer(response)
     writer.writerow(['Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre', 'Patente'])
 
-    torneoid = request.COOKIES.get('torneo') 
-    sol = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(auto= True).order_by('usuario__apellido_paterno')
+    torneoid = request.COOKIES.get('torneoId') 
+    sol = Solicitud.objects.filter(torneo__id=torneoid).filter(auto= True).order_by('usuario__apellido_paterno')
        
     for obj in sol:
         writer.writerow([obj.usuario.apellido_paterno, obj.usuario.apellido_materno , obj.usuario.primer_nombre , obj.usuario.segundo_nombre , obj.patente ])
@@ -75,8 +75,8 @@ def export_csv_carro(request):
     writer = csv.writer(response)
     writer.writerow(['Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre', 'Acompañantes'])
 
-    torneoid = request.COOKIES.get('torneo') 
-    sol = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(carro= True).order_by('usuario__apellido_paterno')
+    torneoid = request.COOKIES.get('torneoId') 
+    sol = Solicitud.objects.filter(torneo__id=torneoid).filter(carro= True).order_by('usuario__apellido_paterno')
        
     for obj in sol:
         writer.writerow([obj.usuario.apellido_paterno, obj.usuario.apellido_materno , obj.usuario.primer_nombre , obj.usuario.segundo_nombre , obj.acompanantes ])
@@ -95,7 +95,7 @@ class bus(SecretarioMixin, TemplateView):
         contexto["title"] = dato.tituloPestana
 
         torneoid = self.request.COOKIES.get('torneoId') 
-        listado = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(busCGM= True).order_by('usuario__apellido_paterno')
+        listado = Solicitud.objects.filter(torneo__id=torneoid).filter(busCGM= True).order_by('usuario__apellido_paterno')
         paginator = Paginator(listado,1)
         page = self.request.GET.get('page')
         contexto['datos']= paginator.get_page(page)
@@ -118,7 +118,7 @@ class carro(SecretarioMixin, TemplateView):
         contexto["title"] = dato.tituloPestana
 
         torneoid = self.request.COOKIES.get('torneoId') 
-        listado = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(carro= True).order_by('usuario__apellido_paterno')
+        listado = Solicitud.objects.filter(torneo__id=torneoid).filter(carro= True).order_by('usuario__apellido_paterno')
         paginator = Paginator(listado,1)
         page = self.request.GET.get('page')
         contexto['datos']= paginator.get_page(page)
@@ -191,7 +191,7 @@ class auto(SecretarioMixin, TemplateView):
 
         contexto['rol'] = self.request.user.perfil
         torneoid = self.request.COOKIES.get('torneoId') 
-        listado = Solicitud.objects.filter(torneo__id=torneoid).filter(estado = 'A').filter(auto= True).order_by('usuario__apellido_paterno')
+        listado = Solicitud.objects.filter(torneo__id=torneoid).filter(auto= True).order_by('usuario__apellido_paterno')
         paginator = Paginator(listado,1)
         page = self.request.GET.get('page')
         contexto['datos']= paginator.get_page(page)
@@ -449,7 +449,6 @@ class torneoCreate(SecretarioMixin,CreateView):
                     actual            = form.cleaned_data.get('actual'),
                     abierto           = form.cleaned_data.get('abierto'),
                     bases             = form.cleaned_data.get('bases'),
-                    list_inscritos    = form.cleaned_data.get('list_inscritos'),
                     list_salidas      = form.cleaned_data.get('list_salidas'),
                     resultados        = form.cleaned_data.get('resultados'),
                     premiacion        = form.cleaned_data.get('premiacion'),

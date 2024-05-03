@@ -170,7 +170,7 @@ def export_csv_solicitudesAprobadas(request):
    
     torneoid = request.COOKIES.get('torneoId')
 
-    lSolicitudes = Solicitud.objects.filter(torneo__id=torneoid).filter(estado='A').order_by('fecha')
+    lSolicitudes = Solicitud.objects.filter(torneo__id=torneoid).order_by('fecha')
 
     for obj in lSolicitudes:
         try:
@@ -803,42 +803,29 @@ class crearSolicitud(SocioMixin,CreateView):
             response.status_code = 400
             return response
       
-            '''
-            print("Webpay Plus Transaction.create")
 
-            buy_order = str(random.randrange(1000000, 99999999))
-            session_id = str(random.randrange(1000000, 99999999))
-            amount = str(monto)
-            return_url = request.build_absolute_uri(reverse('solicitud'))
+class inscritos(SocioMixin, TemplateView):
+    template_name = "socio/views/inscritos.html"
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto["nameWeb"] = nameWeb
+        contexto['rol'] = self.request.user.perfil
 
-            create_request, response = crearTransaccion(buy_order, session_id, amount, return_url)
+        dato = Paginas_Socio.objects.get(tipo ="Ins")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
 
-            # Almacenar los datos en la sesion
-            request.session['create_request'] = create_request
-            request.session['response'] = response
+        torneoid = self.request.COOKIES.get('torneoId') 
+        listado = Solicitud.objects.filter(torneo__id=torneoid).order_by('usuario__apellido_paterno')
+        paginator = Paginator(listado,1)
+        page = self.request.GET.get('page')
+        contexto['datos']= paginator.get_page(page)
 
-            request.session['busCGM'] = busCGM 
-            request.session['auto'] = auto 
-            request.session['patente'] = patente 
-            request.session['carro'] = carro 
-            request.session['acompanantes'] = acompanantes 
-            request.session['indice'] = indice 
-            request.session['deuda_socio'] = deuda_socio 
-            request.session['cancela_deuda_socio'] = cancela_deuda_socio 
-            request.session['recargo'] = recargo 
-            request.session['cuota'] = cuota 
-            request.session['monto'] = monto 
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
 
 
-            contexto = {}
-            contexto['request'] = create_request
-            contexto['response'] = response
-
-            # return redirect('cuotas')
-
-            # Redirigir al usuario a una vista intermedia que procesará los datos y realizará la redirección
-            return redirect('procesar_transaccion')
-                '''
+        return contexto      
 
 
 class ranking(SocioMixin,TemplateView):

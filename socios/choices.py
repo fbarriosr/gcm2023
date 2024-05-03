@@ -60,6 +60,7 @@ websSocio = (
     ('CALEN', 'Calendario'),
     ('Noti', 'Noticias'),
     ('Multi', 'Multimedia'),
+    ('Ins','Inscritos')
 
 )
 

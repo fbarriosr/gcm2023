@@ -37,6 +37,7 @@ import calendar
 from socios.mixins import *
 from django.utils import timezone
 from .choices import *
+from secretario.forms import FormularioTorneoUpdateCapitan
 
 nameWeb = "CGM"
 
@@ -157,19 +158,62 @@ def export_csv_listado(request):
                      obj.usuario.get_categoria_display(), obj.indice, obj.carro, obj.acompanantes])
     return response
 
-class salida( CapitanMixin, TemplateView):
+
+class salida( CapitanMixin, UpdateView):
+    model = Torneo
+    form_class = FormularioTorneoUpdateCapitan
     template_name = "capitan/views/salida.html"
+
+    def get_object(self, **kwargs):
+        torneoId= self.request.COOKIES.get('torneoId') 
+        current = self.model.objects.get(id= torneoId)
+        return current 
+
+
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto["nameWeb"] = nameWeb
 
-        contexto["title"] = "SALIDA"
-        contexto['rol'] = self.request.user.perfil
+        contexto["title"] = "Torneo"
+        contexto["titulo"] = "Torneo"
+
+        contexto['btnAction']   = 'ACTUALIZAR'
+        contexto['urlForm']     = self.request.path
+
         front = Paginas_Socio.objects.filter(titulo="salida")
-        contexto['front']  = list(front.values('titulo','img', 'contenido', 'order','file'))
+        contexto['front']  = list(front.values('titulo','img', 'contenido','file'))
  
-        
+        contexto['rol'] = self.request.user.perfil
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
+
         return contexto
+
+
+    def post(self,request,*args,**kwargs):     # comunicacion entre en form y python para notificaciones
+        if request.is_ajax():
+            form = self.form_class(request.POST,request.FILES,instance = self.get_object())
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.save()
+                mensaje = ' Actualizado correctamente!'
+                error = 'No hay error!'
+                response = JsonResponse({'mensaje': mensaje, 'error': error})
+                response.status_code = 201
+                return response
+            else:
+                mensaje = f'{self.model.__name__} no se ha podido actualizar!'
+                error = form.errors
+                response = JsonResponse({'mensaje': mensaje, 'error': error})
+                response.status_code = 400
+                return response
+        else:
+            return redirect('home')
+
+
+
 
 class cumpleanos(CapitanMixin,TemplateView):
     template_name = "capitan/views/cumpleanos.html"

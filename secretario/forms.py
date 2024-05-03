@@ -171,7 +171,7 @@ class FormularioTorneoCreate(forms.ModelForm):
         model = Torneo
         fields = [ 'titulo','fecha' ,'direccion','region',                     
                     'cupos','activo','actual','abierto',
-                    'bases','list_inscritos','list_salidas','resultados',     
+                    'bases','list_salidas','resultados',     
                     'premiacion', 'galeria' ]
         labels = {
             'titulo'        : 'Titulo (requerido) ',
@@ -183,7 +183,6 @@ class FormularioTorneoCreate(forms.ModelForm):
             'actual'        : 'Torneo Actual (No/Si)',  
             'abierto'       : 'Torneo Abierto (No/Si)',   
             'bases'         : 'Bases', 
-            'list_inscritos': 'Listado de Inscritos',
             'list_salidas'  : 'Listado de Salidas',
             'resultados'    : 'Resultados',
             'premiacion'    : 'Premiación',
@@ -255,12 +254,6 @@ class FormularioTorneoCreate(forms.ModelForm):
                     'id': 'bases',
                 }                
             ),
-            'list_inscritos': forms.FileInput(
-                attrs = {
-                    'class': 'form-control ',
-                    'id': 'list_inscritos',
-                }                
-            ),
 
             'list_salidas': forms.FileInput(
                 attrs = {
@@ -296,6 +289,58 @@ class FormularioTorneoUpdate(FormularioTorneoCreate):
         if commit:
             user.save()
         return user
+
+
+class FormularioTorneoUpdateCapitan(forms.ModelForm):
+    class Meta:
+        model = Torneo
+        fields = [ 'titulo','fecha' ,                     
+                    'list_salidas','resultados', 'premiacion' ]
+        labels = {
+            'titulo'        : 'Titulo (requerido) ',
+            'fecha'         : 'Fecha (requerido)',            
+            'list_salidas'  : 'Listado de Salidas',
+            'resultados'    : 'Resultados',
+            'premiacion'    : 'Premiación',
+        }
+        widgets = {
+            'titulo': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'titulo',
+                    'readonly':''
+                }                
+            ),
+            'fecha':forms.DateInput(
+                format=('%Y-%m-%d'),
+                attrs={'class': 'form-control', 
+                       'placeholder': 'Select a date',
+                       'type': 'date',
+                       'readonly':''
+                      }
+            ),
+            'list_salidas': forms.FileInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'list_salidas',
+                }                
+            ),
+            'resultados': forms.FileInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'resultados',
+                }                
+            ),
+            'premiacion': forms.FileInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'premiacion',
+                }                
+            ),
+        }
+
+
+
 
     
 class FormularioUsuariosView(forms.ModelForm):

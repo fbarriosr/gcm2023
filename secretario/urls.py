@@ -8,6 +8,7 @@ urlpatterns = [
     path('carro', carro.as_view(), name= 'carro'),
     path('torneo/export_csv_bus',export_csv_bus, name= 'export_csv_bus'),
     path('torneo/export_csv_auto',export_csv_auto, name= 'export_csv_auto'),
+    path('torneo/export_csv_carro',export_csv_carro, name= 'export_csv_carro'),
     path('rankingUpdate', rankingUpdate.as_view(), name= 'rankingUpdate'),
     path('noticiaUpdate', noticiaUpdate.as_view(), name= 'noticiaUpdate'),
     path('noticiaCreate', noticiaCreate.as_view(), name= 'noticiaCreate'),

@@ -106,12 +106,12 @@
               {%endif%}
               </td>
               <td style="text-align: center;">
-                {% if value.list_inscritos %}
-                <a href="media/{{value.list_inscritos}}" target="_blank"> <img src="{% static 'web/assets/botones/inscritos_ok.png' %}" style="padding: 0px !important; width: 30px!important;" ></a>
-                {%else%}
-                <img src="{% static 'web/assets/botones/inscritos.png' %}" style="padding: 0px !important; width: 30px!important;">
-                {%endif%}
-               
+             
+                <button onclick="crearCookie('torneoId', 
+                '{{value.id}}', '{% url 'inscritos'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
+                  <img src="{% static 'web/assets/botones/inscritos_ok.png' %}"style="padding: 0px !important; width: 30px!important;"> 
+                </button>
+
               </td>
               <td style="text-align: center;">
                 {% if value.list_salidas %}
@@ -167,12 +167,12 @@
                 '{{value.id}}', '{% url 'carro'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
                   CARRO
               </button>
-              </td> 
+              </td>  
               {%endif%}
               {% if rol == 'T' or rol == 'SUPER' %}
               <td style="text-align: center;">
                 <button onclick="crearCookie('torneoId', 
-                '{{value.id}}', '{% url 'solicitud'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
+                '{{value.id}}', '{% url 'export_csv_solicitudes'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
                   SOLICITUDES  
               </button> 
 
@@ -183,10 +183,13 @@
                 <button onclick="crearCookie('torneoId', 
                 '{{value.id}}', '{% url 'export_csv_solicitudesAprobadas'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
                   SOLICITUDES APROBADAS
+              </button> <br>
+              <button onclick="crearCookie('torneoId', 
+                '{{value.id}}', '{% url 'salida'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
+                  ACTUALIZAR SALIDAS
               </button>
-              {%endif%} 
-
               </td> 
+              {%endif%} 
 
             <tr>
            {% endfor%}
