@@ -1,8 +1,35 @@
 {% load static %} {% static "" as baseUrl %}
 
 <div class="container marketing cuotas33" id="links">
-  <!-- Three columns of text below the carousel -->
   <div class="row align-items-center">
+    <!-- SECCION DE VALIDACION DE TRANSACCION -->
+    {% comment %}
+      {% if create_request %}
+        <div class="alert alert-warning" role="alert">
+          <h3>request</h3>
+          {{ create_request }}
+        </div>
+      {% endif %}
+      {% if response %}
+        <div class="alert alert-primary" role="alert">
+          <h3 id="response_ws" data-response="{{ response }}">result</h3>
+          {{ response }}
+        </div>
+      {% endif %}
+      <!-- Despues de la transaccion -->
+      {% if token %}
+        <div class="alert alert-primary" role="alert">
+          <h3>Datos Devueltos de la Transaccion</h3>
+          {{ respuestaTransaccion }}
+        </div>
+        <div class="alert alert-primary" role="alert">
+          <h3>resultado transaccion</h3>
+          {{ resultado_transaccion }}
+        </div>
+      {% endif %}
+    {% endcomment %}
+    <!-- FIN DE VALIDACION DE TRANSACCION -->
+
     <div class="col-12">
       {% if messages %} {% for message in messages %}
       <div class="alert alert-success" role="alert">{{ message }}</div>
@@ -125,14 +152,9 @@
       <div class="row">
         <div class="col-12 columna-pago">
           <form>{% csrf_token %}</form>
-          <input
-            type="submit"
-            class="btn btn-primary btn-lg ml-auto btn-pagar-cuotas"
-            id="btn-cuotas-seleccionadas"
-            name=""
-            value="PAGAR CUOTAS"
-          />
+          <input type="submit" class="btn btn-primary btn-lg ml-auto btn-pagar-cuotas" id="btn-cuotas-seleccionadas" value="PAGAR CUOTAS"/>
         </div>
+        <br />
       </div>
     </div>
   </div>
@@ -178,7 +200,7 @@
     });
 
     // Aplicar el descuento anual si selecciono las 12 cuotas del año a pagar
-    if (sumarCuotasDescuento == 12 && descuentoActivo) {
+    if (sumarCuotasDescuento == 12 && descuentoActivo && descuentoPromocional.dataset.action == "mostrar") {
       descuentoPromocional.classList.remove("hidden-row");
       sumarCuotas = sumarCuotas - parseFloat(descuentoActivo.dataset.valorDescuento);
     } else {
@@ -207,7 +229,7 @@
         var commonValues = JSON.parse(cuotaRow.dataset.commonValues);
 
         // Verifica si la cuota es de años anteriores y está pendiente de pago
-        if (commonValues.año < añoActual && commonValues.estado_pago === "P") {
+        if (commonValues.año < añoActual && (commonValues.estado_pago === "P" || commonValues.estado_pago === "R")) {
           sumarDeudaAcumulada += parseFloat(commonValues.monto_cuota);
         }
       }
@@ -266,6 +288,9 @@
     init(cuotaRows, añoActual, deudaAcumuladaElement, checkboxes, descuentoPromocional, elementoDeudaAcumulada, mensajePromocional);
 
     const descuentoActivo = document.getElementById("descuento");
+    console.log("descuento anual:", descuentoActivo.innerText);
+    console.log("descuento promocional:", descuentoPromocional);
+    console.log("descuento mostrar:", descuentoPromocional.dataset.action);
 
     // Funcion para pagar las cuotas selecciondas por su checkbox
     btnPagarCuotas.addEventListener("click", () => {
@@ -310,7 +335,7 @@
         if (cuotaRow) {
           var commonValues = JSON.parse(cuotaRow.dataset.commonValues);
 
-          if (commonValues.estado_pago === "P" && commonValues.año == añoActual) {
+          if ( (commonValues.estado_pago === "P" || commonValues.estado_pago === "R")  && commonValues.año == añoActual) {
             checkbox.checked = switchCheckCuotas.checked;
           }
         }
@@ -329,7 +354,7 @@
           var commonValues = JSON.parse(cuotaRow.dataset.commonValues);
 
           // operacion ternaria
-          commonValues.estado_pago === "P"
+          (commonValues.estado_pago === "P" || commonValues.estado_pago === "R")
             ? actualizarSumaCuotas(checkboxes, checkboxDeuda, totalPagarElement, deudaAcumuladaElement, añoActual, descuentoActivo)
             : (checkbox.checked = !checkbox.checked);
         }
@@ -344,7 +369,7 @@
         if (cuotaRow) {
           var commonValues = JSON.parse(cuotaRow.dataset.commonValues);
 
-          if (commonValues.estado_pago === "P" && commonValues.año < añoActual) {
+          if ( (commonValues.estado_pago === "P" || commonValues.estado_pago === "R") && commonValues.año < añoActual) {
             checkbox.checked = checkboxDeuda.checked;
           }
         }

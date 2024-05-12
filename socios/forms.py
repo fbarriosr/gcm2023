@@ -482,6 +482,15 @@ class GenerarCuotasForm(forms.Form):
         widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '4000'})
     )
 
-
+class OperacionesCuotasForm(forms.Form):
+    rut = forms.CharField(
+        label='Ingrese su rut:',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '8000'})
+    )
+    
+    año = forms.IntegerField(
+        label='Ingrese el año:',
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '2024'})
+    )
 
 

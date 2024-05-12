@@ -41,124 +41,54 @@ logger = logging.getLogger(__name__)
 
 nameWeb = "CGM"
 
-def crearTransaccion(buy_order, session_id, amount, return_url):
-    create_request = {
-        "buy_order": buy_order,
-        "session_id": session_id,
-        "amount": amount,
-        "return_url": return_url
-    }
+# Plantilla con formulario para facilitar las operaciones masivas de las cuotas de usuarios
+class OperacionesCuotasView(View):
 
-    response = (Transaction()).create(buy_order, session_id, amount, return_url)
-    print(f'response tipo {type(response)}')
-    print(f'response {response}')
-    print(f'url: {response["url"]}')
-    print(f'token: {response["token"]}')
+    form = GenerarCuotasForm()
 
-    token_ws=response["token"]
-    url = response["url"]
-    redirect_url = f'{url}?token_ws={token_ws}'
-    # response = requests.post(url, data={'token_ws': token_ws})
-    print(f'redirect url: {redirect_url}')
+    def get(self, request, *args, **kwargs):
+        print('GET request')  
 
-    return create_request, response
+        return render(request, 'socio/views/operaciones_cuotas.html', {'form': self.form})
 
-def procesar_transaccion(request):
-    # Obtener los datos de la sesión
-    create_request = request.session.get('create_request')
-    response = request.session.get('response')
+    def post(self, request, *args, **kwargs):
+        print('POST request')
 
-    # Construir el formulario HTML con los datos necesarios
-    form_html = f'''
-        <form id="webpayForm" action="{response['url']}" method="POST">
-            <input type="hidden" name="token_ws" value="{response['token']}" />
-        </form>
-        <script>
-            document.getElementById("webpayForm").submit();
-        </script>
-    '''
+        form = None
+        action = request.POST.get('action')
 
-    # Retornar el formulario HTML como una respuesta HTTP
-    return HttpResponse(form_html)
+        if action == 'generar_cuotas_anuales_socios':
+            form = GenerarCuotasForm(request.POST)
+        elif action == 'borrar_cuotas_anuales_socios':
+            OperacionesCuotasForm.base_fields['rut'].required = False
+            form = OperacionesCuotasForm(request.POST)
+        else:
+            OperacionesCuotasForm.base_fields['rut'].required = True
+            form = OperacionesCuotasForm(request.POST)
 
-
-
-#def generar_cuotas(request, año, valor):
-def generar_cuotas(request):
-    print('ingresando a generar_cuotas..')
-    if request.method == 'POST':
-        form = GenerarCuotasForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
-            respuesta = generar_cuotas_grupal(data['año'], data['valor'], data['descuento'], data['cargo'])
-            print('respuesta:', respuesta)
-            if respuesta == 'Operacion exitosa':
-                messages.success(request, 'Las cuotas del año se generaron con éxito')
-                return HttpResponseRedirect(reverse('generar_cuotas_form'))
+
+            if action == 'generar_cuotas_anuales_socios':
+                es_valido, respuesta = generar_cuotas_grupal(data['año'], data['valor'], data['descuento'], data['cargo'])
+            elif action == 'restablecer_cuotas_anuales_socio':
+                es_valido, respuesta = restablecer_cuotas_individual(data['rut'], data['año'])
+            elif action == 'generar_cuotas_anuales_nuevo_socio':
+                es_valido, respuesta = generar_cuotas_individual(data['rut'], data['año'])
+            elif action == 'borrar_cuotas_anuales_socios':
+                es_valido, respuesta = borrar_cuotas_grupal(data['año'])
+            elif action == 'borrar_cuotas_anuales_socio':
+                es_valido, respuesta = borrar_cuotas_individual(data['rut'], data['año'])
+
+            if es_valido:
+                messages.success(request, respuesta)
             else:
                 messages.error(request, respuesta)
-                return render(request, 'error.html', {'mensaje_error': respuesta}) 
-    else:
-        form = GenerarCuotasForm()
 
-    print('saliendo de generar_cuotas..')
-    return render(request, 'socio/views/generar_cuotas_form.html', {'form': form})
+            # Redirigir al usuario a la misma página (GET)
+            return redirect('operaciones_cuotas')
 
-#def generar_cuotas(request, año, valor):
-def generar_cuotas2(request):
-    print('ingresando a generar_cuotas..')
-    if request.method == 'POST':
-        form = GenerarCuotasForm(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            respuesta = generar_cuotas_grupal(data['año'], data['valor'], data['descuento'], data['cargo'])
-            print('respuesta:', respuesta)
-            if respuesta == 'Operacion exitosa':
-                messages.success(request, 'Las cuotas del año se generaron con éxito')
-                return HttpResponseRedirect(reverse('generar_cuotas_form'))
-            else:
-                messages.error(request, respuesta)
-                return render(request, 'error.html', {'mensaje_error': respuesta}) 
-    else:
-        form = GenerarCuotasForm()
-
-    print('saliendo de generar_cuotas..')
-    return render(request, 'socio/views/generar_cuotas_form.html', {'form': form})
-
-
-
-def generar_cuotas_socio(request):
-    if request.method == 'POST':
-        rut = request.POST.get('rut')
-        año = request.POST.get('año')
-        respuesta = generar_cuotas_individual(rut, año)
-        return HttpResponse(respuesta)
-    return HttpResponse(f'algo anda mal')
-    #return render(request,'views/generar_cuotas_form.html')
-
-def borrar_cuotas(request):
-    if request.method == 'POST':
-        año = request.POST.get('año')
-        respuesta = borrar_cuotas_grupal(año)
-        return HttpResponse(respuesta)
-    return HttpResponse(f'Algo anda mal')
-
-def borrar_cuotas_socio(request):
-    if request.method == 'POST':
-        rut = request.POST.get('rut')
-        año = request.POST.get('año')
-        respuesta = borrar_cuotas_individual(rut, año)
-        return HttpResponse(respuesta)
-    return HttpResponse(f'algo anda mal')
-    #return render(request,'views/generar_cuotas_form.html')
-
-def restablecer_cuotas_socio(request):
-    if request.method == 'POST':
-        rut = request.POST.get('rut')
-        año = request.POST.get('año')
-        respuesta = restablecer_cuotas_individual(rut, año)
-        return HttpResponse(respuesta)
-    return HttpResponse(f'algo anda mal')
+        return render(request, 'socio/views/operaciones_cuotas.html', {'form': form})
 
 def export_csv_solicitudesAprobadas(request):
     response = HttpResponse(content_type='text/csv')
@@ -847,264 +777,235 @@ class ranking(SocioMixin,TemplateView):
     
 
 
-# LA ESTRUCTURA DE LAS CUOTAS DE LOS SOCIOS DEL CLUB CGM
+def crearTransaccion(buy_order, session_id, amount, return_url):
+    create_request = {
+        "buy_order": buy_order,
+        "session_id": session_id,
+        "amount": amount,
+        "return_url": return_url
+    }
 
-class cuotas_admin(SocioMixin,TemplateView, View):
+    response = (Transaction()).create(buy_order, session_id, amount, return_url)
     
-    ''' Vista para la administración de cuotas de los Secretarios
-        ---------------------------------------------------------
-        desde esta vista se aprueban o rechazan las cuotas en estado
-        de 'En Revision', enviadas por los socios del club. 
+    return create_request, response
+
+
+def procesar_transaccion(request):
+    # Obtener los datos de la sesión
+    response = request.session.get('response')
+    # Construir el formulario HTML con los datos necesarios
+    form_html = f'''
+        <form id="webpayForm" action="{response['url']}" method="POST">
+            <input type="hidden" name="token_ws" value="{response['token']}" />
+        </form>
+        <script>
+            document.getElementById("webpayForm").submit();
+        </script>
     '''
-    
-    template_name = "socio/views/cuotas_admin.html"
 
-    def get_queryset(self):
-
-        buscar = self.request.GET.get('buscar')
-        print(f'print buscar = {buscar}') 
-        logger.info(f'logger buscar = {buscar}') 
-
-        
-       
-        try:
-              
-
-            if buscar:
-                if  buscar.upper() in ['TODO', 'TODOS', '*']:
-                    cuotas = Cuota.objects.filter(estado_pago='E').select_related('usuario', 'año')
-                else:
-                    cuotas = Cuota.objects.filter(
-                        Q(usuario__rut__icontains=buscar) |
-                        Q(usuario__apellido_paterno__icontains=buscar) |
-                        Q(usuario__primer_nombre__icontains=buscar) 
-                    ).filter(Q(estado_pago='E')).select_related('usuario', 'año').distinct()
-            else:
-                cuotas = Cuota.objects.filter(estado_pago='E').select_related('usuario', 'año')
-            # Crear una lista de objetos datetime para representar los meses del año 
-            mes_cuota = [date(2000, mes, 1) for mes in range(1, 13)]
-
-            # Añadir el campo 'mes_datetime' a cada instancia de Cuota
-            for cuota in cuotas:
-                cuota.mes_cuota = mes_cuota[cuota.mes - 1]
-
-            # Obtener los años pertenecientes a las cuotas para el filtro de la plantilla.
-            años_cuotas_socio = Cuota.objects.values('año__año').distinct().order_by('año__año')
-            años_cuotas_socio = sorted([año['año__año'] for año in años_cuotas_socio], reverse=True)
-
-            # Incluir el valor del estado del socio, reemplazando la letra por el nombre
-            estado_dict = dict(estado)
-            
-            for cuota in cuotas:
-                if cuota.usuario.estado in estado_dict:
-                    cuota.usuario.estado_txt = estado_dict[cuota.usuario.estado]
-
-            # Obtener la lista de socios para el filtro de la plantilla
-            usuarios_con_cuotas = Usuario.objects.filter(cuota__isnull=False).distinct()
-            listado_usuarios = usuarios_con_cuotas.values_list('email', flat=True).order_by('-email')  
-
-            return {
-                'cuotas': cuotas,
-                'años_cuotas_socio': años_cuotas_socio,
-                'listado_usuarios': listado_usuarios,
-                'rol': self.request.user.perfil
-            }
-
-        
-        except Exception as e:
-            print(f"Error al obtener datos del contexto: {str(e)}")
-            
-            cuotas = []
-            front = []
-            años_cuotas_socio = []
-            listado_usuarios = []
-
-            # Imprimir detalles del error
-            import traceback
-            print(traceback.format_exc())
-
-            return {
-                'cuotas': cuotas,
-                'front': front,
-                'años_cuotas_socio': años_cuotas_socio,
-                'listado_usuarios': listado_usuarios,
-                'rol': self.request.user.perfil  # o el valor que prefieras en caso de error
-            }
-
-    def get_context_data(self, **kwargs):
-    
-        # contexto =  super().get_context_data(**kwargs)
-        datos = self.get_queryset()
-
-        cuotas = datos['cuotas']
-    
-        años_cuotas_socio = datos['años_cuotas_socio']
-        listado_usuarios = datos['listado_usuarios']
+    # Retornar el formulario HTML como una respuesta HTTP
+    return HttpResponse(form_html)
 
 
-        contexto = {
-            'nameWeb': nameWeb,
-            'title': 'cuotas_admin_mod',
-            'rol': self.request.user.perfil,
-            'datos': cuotas,
-            'cuotas': cuotas,
-            'años_cuotas_socio': años_cuotas_socio,
-            'listado_usuarios': listado_usuarios,
-        }
-        
-        dato = Paginas_Socio.objects.get(tipo ="C")
-        contexto['value']  = dato
-        contexto["title"] = dato.tituloPestana
-
-        return contexto
-
-    def post(self, request, *args, **kwargs):
-
-        # Verificar que se haya ejecutado el metodo POST antes de procesar
-        if request.method == 'POST': 
-            
-            # Establecer las variables necesarias que vienen del formulario
-            data_str = request.POST.get('data', '[]')
-            cuotasSeleccionadas = json.loads(data_str)
-
-            # Comprobamos la informacion y actualizamos el estado de las cuotas de 'Pendiente' a 'En Revision'
-            if cuotasSeleccionadas:                 
-                # Comprobamos el estado de las cuotas y las actualizamos en la bd
-                mapeo_estados = {'Aprobada': 'A', 'Rechazada': 'R'}
-                cuotas_a_actualizar = []
-                
-                for cuota in cuotasSeleccionadas: 
-                    cuota_id = cuota.get('id_cuota', None)
-                    estado_cuota = cuota.get('estado_cuota', None)  
-                        
-                    if estado_cuota and estado_cuota in mapeo_estados:
-                        cuotas_a_actualizar.append(Cuota(id=cuota_id, estado_pago=mapeo_estados[estado_cuota]))
-                try:
-                    # Actualizamos el estado de la cuota en la bd.
-                    Cuota.objects.bulk_update(cuotas_a_actualizar, fields=['estado_pago'])    
-                except Exception as e:
-                    print(f"Error al actualizar las cuotas: {str(e)}")
-                
-            return redirect("cuotas_admin") 
-
-
-#@login_required Si se usa con request, sin heredar de vistas
-@method_decorator(login_required, name='dispatch')
 class cuotas(SocioMixin,TemplateView, View):
     template_name = "socio/views/cuotas.html"
+    front = Paginas_Socio.objects.get(tipo ="C")
+    Paginas_Socio
 
-    def get(self, request, *args, **kwargs):
-        
-        # Indicador de descuento de cuotas por promocion
-        mostrar_promocion = False
-        
+    @staticmethod
+    def obtenerCuotasSocios(request):
+        """
+        Obtiene las cuotas de los socios para el usuario actual.
+
+        Parameters:
+        - request: El objeto de solicitud de Django.
+
+        Returns:
+        Una tupla con tres elementos:
+        - mostrar_promocion: Un indicador de si se debe mostrar la promoción.
+        - duracion_descuento: El objeto Año de duración del descuento.
+        - cuotas: Las cuotas del usuario actual.
+        """
         # Obtener el año y mes actual
         año_actual = datetime.now().year
         mes_actual = datetime.now().month
-        rut = self.request.user.rut
-
+        rut = request.user.rut
         # Verificar si el usuario tiene cuotas para el año actual
         cuotas_usuario = Cuota.objects.filter(usuario=request.user, año__año=año_actual)
-    
-        # Obtener el rango de duracion (inicio y fin) de la promoción del presente año.
+
+        # Comprobamos si se aplicara descuento por promocion primeros meses
+        mostrar_promocion = False
+        duracion_descuento = None
         if cuotas_usuario.exists():
             duracion_descuento = cuotas_usuario.first().año
-
-            # Obtenemos True si el mes actual esta en el rango de duracion del descuento
             if duracion_descuento:
                 meses_descuento = list(range(duracion_descuento.periodo_des_inicio, duracion_descuento.periodo_des_fin + 1))
                 mostrar_promocion = mes_actual in meses_descuento
 
-        # Establecer los QuerySet de front y Cuotas
-        front = Paginas_Socio.objects.filter(titulo="cuotas")
+        # Se obtienen las cuotas del usuario actual
         cuotas = Cuota.objects.filter(usuario__rut=rut).select_related('usuario')
-
-        # Crear una lista de objetos datetime para representar los meses del año
         mes_cuota = [datetime(2000, mes, 1) for mes in range(1, 13)]
-
         # Añadir el campo 'mes_datetime' a cada instancia de Cuota
         for cuota in cuotas:
             cuota.mes_cuota = mes_cuota[cuota.mes - 1]
 
-        print(f"valor del descuento: {duracion_descuento.descuento}") 
-        # Crear el contexto de la vista con los datos a renderizar
-        contexto = {
-            "nameWeb": nameWeb,
-            "title": "cuotas",
-            "front": list(front.values('titulo', 'img', 'contenido','file')),
-            "cuotas": cuotas,
-            "mostrar_promocion": mostrar_promocion,
-            "descuento_anual": duracion_descuento.descuento,
-            "rol": self.request.user.perfil
+        return mostrar_promocion, duracion_descuento, cuotas
+
+    @staticmethod
+    def enviarCorreoAvisoPago(request, cuotasSeleccionadas):
+        """
+        Envía correos de aviso de pago.
+
+        Parameters:
+        - request: El objeto de solicitud de Django.
+        - cuotas_seleccionadas: Lista de cuotas seleccionadas para pago.
+
+        Returns:
+        None
+        """
+        # Determinar el tipo de correo según la cantidad de cuotas seleccionadas
+        tipo_correo = 'pago_cuota' if len(cuotasSeleccionadas) == 1 else 'pago_cuotas'
+        cuota = cuotasSeleccionadas[0]
+        email = cuota['email']
+        mes = int(cuota['mes'])
+        año = int(cuota['año'])
+
+        # Construir el mensaje de correo
+        cuotas_a_pagar = {
+            "email": email,
+            "total_pagar": request.session.get('total_pagar'),
+            "mes": mes,
+            "año": año,
+            "descuento": request.session.get('descuento'),
         }
-        dato = Paginas_Socio.objects.get(tipo ="C")
-        contexto['value']  = dato
-        contexto["title"] = dato.tituloPestana
-        return self.render_to_response(contexto)
+
+        # Enviar el correo
+        contact(tipo_correo, None, cuotas_a_pagar)
+
+    @staticmethod
+    def actualizaEstadoCuotas(request, respuestaTransaccion):
+        """
+        Actualiza el estado de las cuotas después de una transacción exitosa.
+
+        Parameters:
+        - request: El objeto de solicitud de Django.
+        - response2: La respuesta de la transacción.
+
+        Returns:
+        Un mensaje indicando el resultado de la actualización.
+        """
+        # Recuperar los datos del formulario original de la sesión
+        cuotasSeleccionadas = request.session.get('cuotas_seleccionadas', [])
+
+        # Si la trasaccion fue exitosa, marcamos las cuotas como Aprobadas y enviamos correo de aviso
+        if respuestaTransaccion['status'] == 'AUTHORIZED':
+            # Obtener el ID de las cuotas seleccionadas
+            cuota_ids = [cuota.get('id_cuota') for cuota in cuotasSeleccionadas]
+            # Actualiza el estado de las cuotas en la BD
+            filas_afectadas = Cuota.objects.filter(id__in=cuota_ids).update(estado_pago='A', fecha_pago=datetime.now().date())
+            # Envia correo de aviso si se realizaron actualizaciones 
+            if filas_afectadas > 0:
+                cuotas.enviarCorreoAvisoPago(request, cuotasSeleccionadas)
+            else:
+                raise ValueError("No se realizaron actualizaciones, compruebe los datos datos del formulario.")
+            return True
+        # Mantener las cuotas como Pendientes si la transacción falló
+        elif respuestaTransaccion['status'] == 'FAILED':
+            return False
+
+    def get_context_data(self, **kwargs):
+        # Obtener los datos del token y la respuesta de la transacción de la sesión
+        token = self.request.session.pop('token', None)
+        respuestaTransaccion = self.request.session.pop('respuestaTransaccion', None)
+        resultadoTransaccion = self.request.session.pop('resultadoTransaccion', None)
+
+        # Crea el contexto de la vista con los datos a renderizar
+        contexto = {
+            'nameWeb': nameWeb,
+            'title': "cuotas",
+            # 'front': list(self.front.values('titulo', 'img', 'order')),
+            'value': self.front,
+            'rol': self.request.user.perfil,
+            'create_request': self.request.session.get('create_request'),
+            'response': self.request.session.get('response'),
+            'token': token,
+            'respuestaTransaccion': respuestaTransaccion,
+            'resultado_transaccion': 'TRANSACCION TERMINADA EXITOSAMENTE!' if resultadoTransaccion == True else 'OCURRIO UN PROBLEMA EN LE PAGO DE LA(S) CUOTAS, INTENTELO NUEVAMENTE',
+        }
+
+        # Obtener cuotas y promoción de descuento anual
+        mostrar_promocion, duracion_descuento, cuotas = self.obtenerCuotasSocios(self.request)
+        contexto['cuotas'] = cuotas
+        contexto['mostrar_promocion'] = mostrar_promocion
+        contexto['descuento_anual'] = duracion_descuento.descuento
+
+        # Se eliminan las variables de sesión relacionadas con la transacción para evitar que persistan
+        for key in ['create_request', 'response', 'total_pagar', 'descuento']:
+            if key in self.request.session:
+                del self.request.session[key]
+
+        return contexto
+
+
+    def get(self, request, *args, **kwargs):
+        # Comprobamos si hay un token presente producto de una transaccion
+        token = request.GET.get("token_ws")
+
+        if token: 
+        # Si hubo una transaccion, procesa su respuesta y actualiza la DB.
+            respuestaTransaccion = (Transaction()).commit(token=token)
+            resultadoTransaccion = cuotas.actualizaEstadoCuotas(request, respuestaTransaccion)
+            # Almacena los datos del token y la respuesta de la transacción en la sesión
+            request.session['token'] = token
+            request.session['respuestaTransaccion'] = respuestaTransaccion
+            request.session['resultadoTransaccion'] = resultadoTransaccion
+            
+            # Redirigir al usuario a la misma vista usando PRG
+            return HttpResponseRedirect(request.path)  # Redirigir a la misma URL sin agregar nada a la URL
+        else:
+        # Si no hay token presente, renderiza la página usando GET con los parámetros del contexto
+            return self.render_to_response(self.get_context_data())
+        
 
     def post(self, request, *args, **kwargs):
-        try:
-            # Verificar que se haya ejecutado el metodo POST antes de procesar
-            if request.method != 'POST':
-                raise ValueError("Invalid request method")
-            
-            estado_revision = next((code for code, value in estado_cuota if value == 'En Revision'), None)
+        descuento = None  # Inicializamos descuento como None
+        # Establecer las variables necesarias que vienen del formulario
+        data_str = request.POST.get('data', '[]')
+        cuotasSeleccionadas = json.loads(data_str)
+        # Almacenar los datos en la sesión del usuario
+        request.session['cuotas_seleccionadas'] = cuotasSeleccionadas
 
-            # Establecer las variables necesarias que vienen del formulario
-            data_str = request.POST.get('data', '[]')
-            cuotasSeleccionadas = json.loads(data_str)
+        # Resto del código para procesar los datos y obtener el descuento, si está presente
+        if 'descuento' in cuotasSeleccionadas[0]:
+            descuento_str = cuotasSeleccionadas[0]['descuento']
+            if descuento_str is not None:
+                try:
+                    descuento = int(descuento_str)
+                except ValueError as e:
+                    print(f'Error: el descuento no es un valor numérico o válido. Detalles: {e}')
+                    descuento = 0
 
-            # Comprobamos la informacion y actualizamos el estado de las cuotas de 'Pendiente' a 'En Revision'
-            if not cuotasSeleccionadas:
-                raise ValueError("No se encontraron cuotas seleccionadas")
+        # Sumamos el monto total de las cuotas a pagar y enviamos el correo.
+        total_pagar = sum(int(cuota.get('monto_cuota')) for cuota in cuotasSeleccionadas)
 
-            cuota_ids = [cuota.get('id_cuota') for cuota in cuotasSeleccionadas]
-            filas_afectadas = Cuota.objects.filter(id__in=cuota_ids).update(estado_pago=estado_revision)
+        if descuento:
+            total_pagar = total_pagar - descuento
 
-            # Si se aplicó la actualizacion, obtenemos los datos a enviar por correo
-            if filas_afectadas < 1:
-                raise ValueError("No se realizaron actualizaciones, compruebe los datos datos del formulario.")
+        print("Webpay Plus Transaction.create")
+        buy_order = str(random.randrange(1000000, 99999999))
+        session_id = str(random.randrange(1000000, 99999999))
+        amount = str(total_pagar)
+        return_url = request.build_absolute_uri(reverse('cuotas'))
+        create_request, response = crearTransaccion(buy_order, session_id, amount, return_url)
 
-            tipo='pago_cuota' if filas_afectadas == 1 else 'pago_cuotas'  
-            email=cuotasSeleccionadas[0]['email']
-            mes=int(cuotasSeleccionadas[0]['mes'])
-            año=int(cuotasSeleccionadas[0]['año'])
-            
-            if 'descuento' in cuotasSeleccionadas[0]:
-                descuento_str   = cuotasSeleccionadas[0]['descuento']
-                print(f'descuento activo?:{descuento_str}')
+        # Almacenar los datos en la sesion
+        request.session['create_request'] = create_request
+        request.session['response'] = response
+        request.session['total_pagar'] = total_pagar
+        request.session['descuento'] = 0 if descuento == None else descuento
+        contexto = {}
+        contexto['request'] = create_request
+        contexto['response'] = response
 
-                # Verificamos si se debe aplicar un descuento a las cuotas antes de enviar el correo
-                if descuento_str is None:
-                    descuento = None
-                else:
-                    try:
-                        descuento = int(descuento_str)
-                    except ValueError as e:
-                        # print('Error: el descuento no es un valor numérico o válido. Detalles: {e}') 
-                        descuento = 0
-            else:
-                descuento = None
-                print('Error: la variable descuento no esta en el diccionario') 
-
-            # Sumamos el monto total de las cuotas a pagar y enviamos el correo.
-            total_pagar = sum(int(cuota.get('monto_cuota')) for cuota in cuotasSeleccionadas)
-            resultado = contact(tipo, email=email, total_pagar=total_pagar, mes=mes, año=año, descuento=descuento)
-            
-            # Establecer un mensaje de aviso al volver a la plantilla html
-            messages.success(request, resultado)
-
-            return redirect('cuotas')
-        
-        except ValueError as ve:
-            print(f"Error en el proceso principal: {str(ve)}")
-
-        except json.JSONDecodeError as jde:
-            print(f"Error al decodificar JSON: {str(jde)}")
-            messages.error(request, "Ocurrió un error al decodificar JSON.")
-
-        except Exception as e:
-            print(f"Error en el proceso principal: {str(e)}")
-            messages.error(request, "Ocurrió un error en el proceso principal.")
-
-        return redirect('cuotas')
+        # Redirigir al usuario a una vista intermedia que procesará los datos y realizará la redirección
+        return redirect('procesar_transaccion')

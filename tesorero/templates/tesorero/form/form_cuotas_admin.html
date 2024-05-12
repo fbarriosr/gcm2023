@@ -1,0 +1,290 @@
+{% load static %} {% static "" as baseUrl %}
+
+<div class="container marketing" id="links">
+  <div class="row align-items-center" >
+    <!-- TITULO DE LA PLANTILLA -->
+    <div class="col-lg-12">
+      <h1 id="estadoCuota" data-estado-cuota = "{{ estado_cuota }}">ADMINISTRAR PAGO DE CUOTAS
+      </h1>
+    </div>
+
+    <!-- Buscar -->
+    <div class="my-4">
+      <form method="get" > 
+        {% csrf_token %}
+        <div class="row m-b-sm m-t-sm">
+          <div class="col-md-9">
+            <div class="input-group">
+              <input type="text"  class="form-control-sm form-control" placeholder="Buscar..." name="buscar" dato = "{{ request.GET.buscar }}">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div style="text-align: right">
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary"><i>Buscar</i></button> 
+              </span> 
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- ENCABEZADO PLANILLA DE DATOS DEL SOCIO -->
+    <div class="col-lg-12">
+      <table class="table">
+        <thead>
+          <tr>
+            <!-- SWITCH DE SELECCION DE REGISTROS -->
+            <th scope="col">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="SelectAllSwitch">
+                <label class="form-check-label" for="SelectAllSwitch">Todos</label>
+              </div>
+            </th>
+            <th scope="col">#</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Apellido</th>
+            <th scope="col">Email</th>
+            <th scope="col">Mes</th>
+            <th scope="col">Año</th>
+            <th scope="col">Deuda</th>
+          </tr>
+        </thead>
+        <!-- REGISTROS DE CUOTAS DEL SOCIO DE LA PLANILLA  -->
+        <tbody>
+          {% for elemento in cuotas %}
+            <tr class="expandable-row" id="registro-cuota-{{ elemento.id }}" data-common-values='{ "id": "{{ elemento.id }}", "email": "{{ elemento.usuario.email }}", "estado_pago": "{{ elemento.estado_pago }}", "mes": "{{ elemento.mes }}", "año": "{{ elemento.año.año }}", "monto_cuota": "{{ elemento.año.monto_cuota }}" }'>
+              <!-- CHECKBOX CON LA IDEA DE CAMBIAR EL ESTADO DE VARIAS CUOTAS A LA VEZ -->
+              <td>
+                <div class="form-check">
+                  <input class="form-check-input checkbox-element" type="checkbox" value="" id="flexCheckDefault{{ forloop.counter }}">
+                  <label class="form-check-label" for="flexCheckDefault{{ forloop.counter }}"></label>
+                </div>
+              </td>
+              <th scope="row">{{ forloop.counter }}</th>
+              <td>{{ elemento.usuario.primer_nombre}}</td>
+              <td>{{ elemento.usuario.apellido_paterno }}</td>
+              <td>{{ elemento.usuario.email }}</td>
+              <td>{{ elemento.mes_cuota|date:"F"}}</td>
+              <td>
+                {% if elemento.mes < 3 %}
+                {{ elemento.año.año|add:1 }}
+                {% else %}
+                {{ elemento.año.año}}
+                {% endif %}
+              </td>
+              <td>{{ elemento.año.monto_cuota }}</td>
+            </tr>
+            <tr class="expanded-row" style="display: none;">
+              <td colspan="8">
+                <!-- Detalles de la cuota -->
+                <!-- Aquí puedes colocar los detalles adicionales que desees mostrar -->
+                Detalles adicionales para la cuota del socio: {{ elemento.usuario.primer_nombre}} {{ elemento.usuario.apellido_paterno }}
+              </td>
+            </tr>
+          {% endfor%}  
+        </tbody>
+        </table>
+    </div>
+    <div class="col-lg-4 mt-4 mb-4"></div>
+    <div class="col-lg-4 mt-6 mb-4">
+      <!-- DROPDOWN DE CAMBIO DE ESTADO DE LA CUOTA -->
+      <div class="btn-group" role="group" id="btn-cuotas-seleccionadas">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          Actualizar 
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">Aprobada</a></li>
+          <li><a class="dropdown-item" href="#">Rechazada</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  function init(cuotaRows, añoActual, socioSeleccionado) {
+    ocultarMostrarCuotas(cuotaRows, añoActual, socioSeleccionado)
+  }
+
+  function ocultarMostrarCuotas (cuotaRows, añoActual, socioSeleccionado) {
+    // Ocultar todas las filas de las cuotas
+      cuotaRows.forEach(cuota => cuota.classList.add('hidden-row'));
+
+    // Mostrar solo las filas que no esten Aprobadas (Pagadas)
+      cuotaRows.forEach((cuota, index) => {
+        var commonValues = JSON.parse(cuota.dataset.commonValues);
+      
+        // console.log('index:', index + 1, 'id: ', commonValues.id, 'añoActual:', añoActual, 'commonValues.año:', commonValues.año, ' socioSeleccionado:', socioSeleccionado, ' commonValues.email:', commonValues.email);
+        if (añoActual == 'todos' && socioSeleccionado == 'todos') {
+          cuota.classList.remove('hidden-row')
+        } 
+        else if (commonValues.email == socioSeleccionado && añoActual == 'todos') {
+          cuota.classList.remove('hidden-row')
+        }
+        else if (socioSeleccionado == 'todos' && commonValues.año == añoActual) {
+          cuota.classList.remove('hidden-row')
+        }
+        else if (commonValues.email == socioSeleccionado && commonValues.año == añoActual) {
+          cuota.classList.remove('hidden-row')
+        }
+    });
+  } 
+
+  // Funcion que crea el formulario con los datos para actualizar las cuotas
+  function crearFormulario(cuotasSeleccionadas) {
+    var form = document.createElement('form');
+    var actionUrl = '/cuotas_admin/'
+    form.method = 'POST';
+    form.action = actionUrl;
+
+    var csrfTokenInput = document.createElement('input');
+    csrfTokenInput.type = 'hidden';
+    csrfTokenInput.name = 'csrfmiddlewaretoken';
+    csrfTokenInput.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    form.appendChild(csrfTokenInput);
+
+    var data = document.createElement('input');
+    data.type = 'hidden';
+    data.name = 'data';
+    data.value = JSON.stringify(cuotasSeleccionadas);
+    form.appendChild(data)
+
+    return form
+  }
+
+  // Funcion que envia el formulario para actualizar las cuotas seleccionadas
+  function enviarFormulario(form) {
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=> {
+    const switchSelected = document.getElementById('SelectAllSwitch');
+    const checkboxes = document.querySelectorAll('.checkbox-element');
+    const filtroPlantilla = document.getElementById('estadoCuota').dataset.estadoCuota;
+    const dropDownContainer = document.querySelectorAll('[id*="dropdown-container-"]');
+    const dropdownAnual = document.getElementById('dropdown_anual');
+    const dropdownSocios = document.getElementById('dropdown_socios');
+    const cuotaRows = document.querySelectorAll('[id^="registro-cuota-"]');
+    const btnConfirmarCuotas = document.getElementById("btn-cuotas-seleccionadas");
+    var añoActual = 'todos';
+    var socioSeleccionado = 'todos';
+    var token = document.querySelector('[name=csrfmiddlewaretoken]')
+    const expandableRows = document.querySelectorAll('.expandable-row');
+
+    expandableRows.forEach(row => {
+      row.addEventListener('click', () => {
+        const nextRow = row.nextElementSibling;
+        if (nextRow.classList.contains('expanded-row')) {
+          nextRow.style.display = (nextRow.style.display === 'none') ? 'table-row' : 'none';
+        }
+      });
+    });
+
+    init(cuotaRows, 'todos', 'todos')
+
+    // Evento para la seleccion de los registros por el control Switch
+    switchSelected.addEventListener('change', ()=> {
+      console.log('switch activado')
+      checkboxes.forEach((checkbox)=> checkbox.checked = switchSelected.checked);
+    });
+
+    //
+    btnConfirmarCuotas.addEventListener('click', (event) => {
+      var elemento = event.target;
+
+      if(elemento.classList.contains('dropdown-item')) {
+        var valorSeleccionado = elemento.textContent.trim();
+        console.log('oh maigosh:',valorSeleccionado)
+
+        if(valorSeleccionado) {
+          var cuotasSeleccionadas = Array.from(checkboxes)
+          .filter(checkbox => checkbox.checked)
+          .reduce((acumulator, checkbox) => {
+            var cuotaRow = checkbox.closest('[id^="registro-cuota-"]');
+
+            if(cuotaRow && !cuotaRow.classList.contains('hidden-row')){
+              var commonValues = JSON.parse(cuotaRow.dataset.commonValues);
+              
+              console.log('id:', commonValues.id, 'email:', commonValues.email, ' monto:', commonValues.monto_cuota, 'estado:', commonValues.estado_pago);
+              acumulator.push({
+                id_cuota: commonValues.id,
+                email: commonValues.email,
+                mes: commonValues.mes,
+                año: commonValues.año,
+                monto_cuota: parseInt(commonValues.monto_cuota),
+                estado_cuota: valorSeleccionado,
+              });
+            }
+
+            return acumulator;
+          }, []);
+          
+          if(cuotasSeleccionadas && cuotasSeleccionadas.length > 0) {
+            var formulario = crearFormulario(cuotasSeleccionadas);
+            enviarFormulario(formulario);
+          }
+
+        }
+      }
+    })
+
+    // Evento para aprobar/rechazar las cuotas a traves del boton 'Actualizar' de cada registro
+    dropDownContainer.forEach(dropdownElement => {
+      if(dropdownElement) {
+        dropdownElement.addEventListener('click', (event) => {
+          var elemento = event.target;
+
+          if(elemento.classList.contains('dropdown-item')) {
+            var selectedItemText = elemento.textContent;
+            var actionUrl = elemento.getAttribute('data-action-url');
+            var actionValue = elemento.getAttribute('data-action-value');
+            var registro_id = elemento.getAttribute('data-registro-id');
+            
+            console.log('text:', selectedItemText, registro_id);
+
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = actionUrl;
+
+            var csrfTokenInput = document.createElement('input');
+            csrfTokenInput.type = 'hidden';
+            csrfTokenInput.name = 'csrfmiddlewaretoken';
+            csrfTokenInput.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            form.appendChild(csrfTokenInput);
+
+            var id_registro = document.createElement('input');
+            id_registro.type = 'hidden';
+            id_registro.name = 'id_cuota_mod';
+            id_registro.value = registro_id;
+            form.appendChild(id_registro);
+
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'value';
+            input.value = actionValue;
+            form.appendChild(input);
+
+            var est_cuota = document.createElement('input');
+            est_cuota.type = 'hidden';
+            est_cuota.name = 'filtro';
+            est_cuota.value = filtroPlantilla;
+            form.appendChild(est_cuota);
+
+            document.body.appendChild(form);
+            form.submit();
+          }
+        })
+      }
+    })
+  });
+</script>
+
+
+<style>
+  .hidden-row {
+    display: none;
+  }
+</style>

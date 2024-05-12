@@ -6,6 +6,8 @@ urlpatterns = [
 
     path('resumen_cuotas', resumenCuotas.as_view(), name='resumenCuotas'),
     path('export_csv_solicitudes', export_csv_solicitudes, name='export_csv_solicitudes'),
-    
+    path('cuotas_admin/', cuotas_admin.as_view(), name='cuotas_admin'),
+    path('resumen_cuotas', resumenCuotas.as_view(), name='resumenCuotas'),
+    path('cuotas_admin/', cuotas_admin.as_view(), name='cuotas_admin'),
 
 ]

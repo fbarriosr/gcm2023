@@ -98,10 +98,10 @@
               {% if rol == 'SUPER' or rol == 'SECR' %}
               <li><a class="dropdown-item menu" href="{% url 'listarUsuarios'%}">Admin Usuarios</a></li>
               {% endif %}
-              {% if rol == 'SUPER' or rol == 'SECR' %}
+              {% if rol == 'SUPER' or rol == 'T' %}
               <li><a class="dropdown-item menu" href="{% url 'cuotas_admin'%}">Admin Cuotas</a></li>
               {% endif %}
-              {% if rol == 'SUPER' or rol == 'SECR' %}
+              {% if rol == 'SUPER' or rol == 'SECR' or rol == 'T' %}
               <li><a class="dropdown-item menu" href="{% url 'resumenCuotas'%}">Resumen Cuotas</a></li>
               {% endif %}
 

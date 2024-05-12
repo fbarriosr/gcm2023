@@ -55,7 +55,7 @@ def generar_cuotas_individual(rut, año):
     # Verificamos que el usuario exista
     usuario = Usuario.objects.filter(rut=rut).first()
     if usuario is None:
-        return f'Usuario {usuario} no encontrado'
+        return False, f'Usuario {usuario} no encontrado'
     
     # Si no se ingresó el año, se usa el año en curso
     if not año:
@@ -64,17 +64,23 @@ def generar_cuotas_individual(rut, año):
     # Se verifica que el año sea valido o exista
     año = CuotaAnual.objects.filter(año=año).first()
     if año is None:
-        return f'Año invalido o aún no se ha registrado el año actual'
+        return False, f'Año invalido o aún no se ha registrado el año actual'
     
+    cuotas = []
     # Generamos las 12 cuotas para el usuario    
-    for mes in range(1,13):
-        # Verificamos que las cuotas no existan para el usuario
-        cuota_existe = Cuota.objects.filter(usuario=usuario, año=año, mes=mes).exists()
-        
-        if not cuota_existe:
-            cuota, created = Cuota.objects.get_or_create(usuario=usuario, año=año, mes=mes)
-            cuota.save()
-    return f'Usuario encontrado, se generaron las cuotas par el año {año}'
+    # Verificamos si ya existe una CuotaAnual para el usuario y el año especificados
+    cuota_existente = Cuota.objects.filter(usuario=usuario, año=año).exists()
+    
+    if not cuota_existente:
+        for num_cuota in range(1,13):
+            mes_cuota = num_cuota + 2 if num_cuota <= 10 else num_cuota - 10
+            # Cuota.objects.create(usuario=usuario, año=cuota_anual, numero_cuota=num_cuota, mes=mes_cuota, order=num_cuota)
+            cuotas.append(Cuota(usuario=usuario, año=año, numero_cuota=num_cuota, mes=mes_cuota, order=num_cuota))
+
+    # Solo creamos las cuotas si no existen para el usuario y el año especificados
+    if cuotas:
+        Cuota.objects.bulk_create(cuotas)
+        return True, f'Usuario encontrado, se generaron las cuotas par el año {año}'
         
 
 def borrar_cuotas_grupal(año):
@@ -90,7 +96,7 @@ def borrar_cuotas_individual(rut, año):
     # Verificamos que el usuario exista
     usuario = Usuario.objects.filter(rut=rut).first()
     if usuario is None:
-        return f'Usuario {usuario} no encontrado'
+        return False, f'Usuario {usuario} no encontrado'
     
     # Si no se ingresó el año, se usa el año en curso
     if not año:
@@ -99,10 +105,10 @@ def borrar_cuotas_individual(rut, año):
     # Se verifica que el año sea valido o exista
     año = CuotaAnual.objects.filter(año=año).first()
     if año is None:
-        return f'Año invalido o aún no se ha registrado el año actual'
+        return False, f'Año invalido o aún no se ha registrado el año actual'
     
     Cuota.objects.filter(usuario=usuario, año=año).delete()
-    return f'Las cuotas de {usuario} del año {año} fueron eliminados con éxito!'
+    return True, f'Las cuotas de {usuario} del año {año} fueron eliminados con éxito!'
 
 
 def actualiza_cuota(email, año, mes):

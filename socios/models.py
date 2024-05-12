@@ -256,7 +256,7 @@ class CuotasAnualesAdmin(ImportExportModelAdmin, SearchAutoCompleteAdmin, admin.
 class Cuota(models.Model):
     id                      = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     mes                     = models.IntegerField()
-    numero_cuota            = models.IntegerField() 
+    numero_cuota            = models.IntegerField(null=True) 
     año                     = models.ForeignKey(CuotaAnual, blank=True, null=True, on_delete=models.CASCADE)  # monto fijo anual aplicable a cada cuota del mes de dicho año.
     usuario                 = models.ForeignKey(Usuario, blank=False, null=False, on_delete=models.CASCADE, verbose_name="socio club")
     monto_pago              = models.PositiveIntegerField(blank=True, null=True, verbose_name="Monto total a pagar")  # monto_pago = monto_cuota - monto_descuento + monto_cargo
