@@ -550,15 +550,39 @@ class crearSolicitud(SocioMixin,CreateView):
 
     def get_form(self, form_class=None):
 
-        deuda_socio = 3
-        recargo = 5000
-        cuota = 250000000
+        
+        fecha_actual = datetime.now()
+
+
+        deuda_socio_anos_anteriores = Cuota.objects.filter(usuario__rut= self.request.user.rut).filter(año__año__lt= fecha_actual.year).filter(estado_pago='P').order_by('año__año').order_by('numero_cuota')
+
+        deuda_socia_ano_actual = Cuota.objects.filter(usuario__rut= self.request.user.rut).filter(año__año = fecha_actual.year).filter(mes__lte=fecha_actual.month).filter(estado_pago='P').order_by('numero_cuota')
+
+        total_lista = list(deuda_socio_anos_anteriores) + list(deuda_socia_ano_actual) 
+
+        total = 0
+
+        ano_valor = list(CuotaAnual.objects.all())
+
+        for t in total_lista:
+            for j in ano_valor:
+                if t.año.año== j.año:
+                    total = total + j.monto_cuota
+
+
+        deuda_socio = total
+        recargo = self.get_object().recargo
+        cuota = self.get_object().ticket
 
         form = super().get_form(form_class)
 
+        tuplas = [(t.año.año, t.numero_cuota ) for t in total_lista]
+
+        form.fields['detalle_cuotas_pagadas'].initial = tuplas
         form.fields['deuda_socio'].initial = deuda_socio
         form.fields['recargo'].initial = recargo
         form.fields['cuota'].initial = cuota
+
 
         return form
     
@@ -577,24 +601,54 @@ class crearSolicitud(SocioMixin,CreateView):
                 # Almacena los datos del token y la respuesta de la transacción en la sesión
                 request.session['token'] = token
                 request.session['respuestaTransaccion'] = respuestaTransaccion
-                solicitud = Solicitud(
-                    usuario      = Usuario.objects.get(rut=  self.request.user.rut),
-                    torneo       = self.get_object(), 
-                    fecha        = datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                    auto         = request.session['auto'], 
-                    patente      = request.session['patente'],
-                    busCGM       = request.session['busCGM'],
-                    carro        = request.session['carro'],
-                    indice       = request.session['indice'],
-                    acompanantes = request.session['acompanantes'],
-                    deuda_socio  = request.session['deuda_socio'],
-                    cancela_deuda_socio = request.session['cancela_deuda_socio'],
-                    recargo      = request.session['recargo'],
-                    cuota        = request.session['cuota'],
-                    monto        = request.session['monto'],
-                )
-                    
-                solicitud.save()
+                if request.session['cancela_deuda_socio'] == True:
+                    solicitud = Solicitud(
+                        usuario      = Usuario.objects.get(rut=  self.request.user.rut),
+                        torneo       = self.get_object(), 
+                        fecha        = datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                        auto         = request.session['auto'], 
+                        patente      = request.session['patente'],
+                        busCGM       = request.session['busCGM'],
+                        carro        = request.session['carro'],
+                        indice       = request.session['indice'],
+                        acompanantes = request.session['acompanantes'],
+                        deuda_socio  = request.session['deuda_socio'],
+                        cancela_deuda_socio = request.session['cancela_deuda_socio'],
+                        recargo      = request.session['recargo'],
+                        cuota        = request.session['cuota'],
+                        monto        = request.session['monto'],
+                        detalle_cuotas_pagadas  = request.session['detalle_cuotas_pagadas'],
+                    )
+                        
+                    solicitud.save()
+
+                
+                    tupla = tuple(eval(request.session['detalle_cuotas_pagadas']))
+                    for t in tupla:
+                        obj = Cuota.objects.get(usuario__rut = self.request.user.rut, numero_cuota = t[1], año__año=t[0])
+                        obj.estado_pago = 'A'
+                        obj.save()
+                else:
+                    solicitud = Solicitud(
+                        usuario      = Usuario.objects.get(rut=  self.request.user.rut),
+                        torneo       = self.get_object(), 
+                        fecha        = datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                        auto         = request.session['auto'], 
+                        patente      = request.session['patente'],
+                        busCGM       = request.session['busCGM'],
+                        carro        = request.session['carro'],
+                        indice       = request.session['indice'],
+                        acompanantes = request.session['acompanantes'],
+                        deuda_socio  = request.session['deuda_socio'],
+                        cancela_deuda_socio = request.session['cancela_deuda_socio'],
+                        recargo      = request.session['recargo'],
+                        cuota        = request.session['cuota'],
+                        monto        = request.session['monto'],
+                    )
+                        
+                    solicitud.save()
+
+
                 response = redirect('solicitud') # para inscribir
                 return response
             elif status =='FAILED':
@@ -680,6 +734,7 @@ class crearSolicitud(SocioMixin,CreateView):
             recargo      = form.cleaned_data.get('recargo'),
             cuota        = form.cleaned_data.get('cuota'),
             monto        = form.cleaned_data.get('monto'),
+            detalle_cuotas_pagadas = form.cleaned_data.get('detalle_cuotas_pagadas')
 
 
             busCGM       = busCGM[0]
@@ -694,6 +749,7 @@ class crearSolicitud(SocioMixin,CreateView):
             recargo      = recargo[0]
             cuota        = cuota[0]
             monto        = monto[0]
+            
 
             buy_order = str(random.randrange(1000000, 99999999))
             session_id = str(random.randrange(1000000, 99999999))
@@ -718,6 +774,7 @@ class crearSolicitud(SocioMixin,CreateView):
             request.session['recargo'] = recargo 
             request.session['cuota'] = cuota 
             request.session['monto'] = monto 
+            request.session['detalle_cuotas_pagadas'] = detalle_cuotas_pagadas
 
             
 

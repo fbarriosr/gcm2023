@@ -155,7 +155,8 @@ class Torneo (models.Model):
     resultados      = models.FileField(upload_to="torneos/resultados/", max_length=254, blank=True)
     premiacion      = models.FileField(upload_to="torneos/premiacion/", max_length=254, blank=True)
     galeria         = models.CharField(max_length=300, default='No Disponible', verbose_name="Url Galeria")
-
+    ticket          = models.IntegerField(default=7000)
+    recargo          = models.IntegerField(default=5000)
     def __str__(self):
         return self.titulo + str(self.fecha)
 
@@ -166,7 +167,7 @@ class Torneo (models.Model):
 
 class TorneoAdmin (ImportExportModelAdmin,SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields   = ['titulo']
-    list_display    = ('id','slug','titulo','fecha','region','activo','abierto','actual','cupos' )
+    list_display    = ('id','slug','titulo','fecha','region','activo','abierto','actual','cupos','ticket' )
     list_per_page   = 10 # No of records per page
     list_filter = ('activo','actual','abierto')
 
@@ -188,13 +189,13 @@ class Solicitud (models.Model):
     recargoInvitado = models.PositiveIntegerField(default=0, verbose_name="Recargo Invitado")
     cuota           = models.PositiveIntegerField(default=0,  verbose_name="Cuota de Campeonato")
     monto           = models.PositiveIntegerField(default=0,  verbose_name="Monto Pagado")
-
+    detalle_cuotas_pagadas = models.TextField(default='[]', verbose_name='Detalle cuotas Pendientes')   
     class Meta:
         verbose_name    = 'Solicitud'
         verbose_name_plural = 'Solicitudes'
         ordering    = ['-fecha']
 class SolicitudAdmin (SearchAutoCompleteAdmin, admin.ModelAdmin):
-    search_fields   = ['usuario']
+    search_fields   = ['usuario__rut']
     list_display    = ('usuario','torneo','fecha','busCGM','carro','cancela_deuda_socio' ,'monto' )
     list_per_page   = 10 # No of records per page
     list_filter = ('torneo', 'fecha')
@@ -267,7 +268,7 @@ class Cuota(models.Model):
     class Meta:
         verbose_name = "Cuota"
         verbose_name_plural = "Cuotas"
-        ordering = ["año",'order']
+        ordering = ['usuario__rut',"año",'numero_cuota']
 
     def nombre_mes(self):
         return timezone.datetime(self.año.año, self.mes, 1).strftime("%B")
@@ -291,7 +292,9 @@ class Cuota(models.Model):
 
 
 class CuotasAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
-    list_display = ('año', 'order', 'numero_cuota', 'mes','usuario', 'estado_pago')
+    list_display = ('usuario','año' , 'numero_cuota', 'mes', 'estado_pago')
     autocomplete_fields = ['usuario']
-    list_filter = ('año','usuario')
+    list_filter = ('año','numero_cuota','mes')
     list_per_page = 12
+    search_fields = ["usuario__rut"]
+    list_editable = ('estado_pago',)

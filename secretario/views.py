@@ -453,6 +453,8 @@ class torneoCreate(SecretarioMixin,CreateView):
                     resultados        = form.cleaned_data.get('resultados'),
                     premiacion        = form.cleaned_data.get('premiacion'),
                     galeria           = form.cleaned_data.get('galeria'),
+                    ticket            = form.cleaned_data.get('ticket'),
+                    recargo           = form.cleaned_data.get('recargo'),
                 )
                 torneo.save()
                 mensaje = 'Torneo Enviado'

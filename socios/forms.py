@@ -16,7 +16,7 @@ class FormularioSolicitudView(forms.ModelForm):
     class Meta:
         model = Solicitud
         fields = ['indice','auto','patente','busCGM','carro',
-                    'acompanantes','deuda_socio','recargo','cuota','monto','cancela_deuda_socio']
+                    'acompanantes','deuda_socio','recargo','cuota','monto','cancela_deuda_socio', 'detalle_cuotas_pagadas']
         labels = {
             'usuario':'Usuario',
             'torneo': 'Torneo',
@@ -33,6 +33,7 @@ class FormularioSolicitudView(forms.ModelForm):
             'cancela_deuda_socio': 'Cancela Deuda socio (NO/SI)',
             'monto': 'Total($CLP)',
             'estado': 'Estado',
+            'detalle_cuotas_pagadas': 'Detalle Cuotas Pendientes'
         }
         widgets = {
 
@@ -109,6 +110,14 @@ class FormularioSolicitudView(forms.ModelForm):
                 attrs = {
                     'class': 'form-control ',
                     'id': 'deuda',
+                    'readonly':''
+                    
+                }                
+            ),
+            'detalle_cuotas_pagadas': forms.Textarea(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'detalle_cuotas_pagadas',
                     'readonly':''
                     
                 }                
@@ -151,7 +160,7 @@ class FormularioSolicitudCreate(forms.ModelForm):
     class Meta:
         model = Solicitud
         fields = ['indice','auto','patente','busCGM','carro',
-                    'acompanantes','deuda_socio','recargo','cuota','monto']
+                    'acompanantes','deuda_socio','recargo','cuota','monto','detalle_cuotas_pagadas']
         labels = {
             'usuario':'Usuario',
             'torneo': 'Torneo',
@@ -166,7 +175,8 @@ class FormularioSolicitudCreate(forms.ModelForm):
             'recargo':'Recargo',
             'cuota': 'Cuota de Campeonato',
             'cancela_deuda_socio': 'Cancela Deuda socio (NO/SI)',
-            'monto': 'TOTAL $ CLP: '
+            'monto': 'TOTAL $ CLP: ',
+            'detalle_cuotas_pagadas': 'Detalle Cuotas Pagadas'
         }
         widgets = {
 
@@ -276,6 +286,14 @@ class FormularioSolicitudCreate(forms.ModelForm):
                     'id': 'total',
                     'style':'font-weight: bolder; font-size: 24px;',
                     'readonly':''
+                }                
+            ),
+             'detalle_cuotas_pagadas ': forms.Textarea(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'detalle_cuotas_pagadas',
+                    'readonly':''
+                    
                 }                
             ), 
             

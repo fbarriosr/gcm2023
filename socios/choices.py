@@ -28,9 +28,7 @@ estado = (
 
 estado_cuota = (
     ('P', 'Pendiente'),
-    ('E', 'En Revision'),
     ('A', 'Aprobada'),
-    ('R', 'Rechazada')
 )
 
 
