@@ -292,9 +292,9 @@ class Cuota(models.Model):
 
 
 class CuotasAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
-    list_display = ('usuario','año' , 'numero_cuota', 'mes', 'estado_pago')
+    list_display = ('usuario','año' , 'numero_cuota', 'estado_pago')
     autocomplete_fields = ['usuario']
-    list_filter = ('año','numero_cuota','mes')
+    list_filter = ('estado_pago','año','numero_cuota')
     list_per_page = 12
     search_fields = ["usuario__rut"]
     list_editable = ('estado_pago',)

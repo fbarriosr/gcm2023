@@ -28,6 +28,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.shortcuts import HttpResponse
 from datetime import datetime, date
+from dateutil.relativedelta import relativedelta
 from .mixins import *
 from .forms import *
 from .utils import *
@@ -553,10 +554,12 @@ class crearSolicitud(SocioMixin,CreateView):
         
         fecha_actual = datetime.now()
 
+        fecha_cuotas = fecha_actual - relativedelta(months=2)  # es la actual -2 meses
 
-        deuda_socio_anos_anteriores = Cuota.objects.filter(usuario__rut= self.request.user.rut).filter(año__año__lt= fecha_actual.year).filter(estado_pago='P').order_by('año__año').order_by('numero_cuota')
 
-        deuda_socia_ano_actual = Cuota.objects.filter(usuario__rut= self.request.user.rut).filter(año__año = fecha_actual.year).filter(mes__lte=fecha_actual.month).filter(estado_pago='P').order_by('numero_cuota')
+        deuda_socio_anos_anteriores = Cuota.objects.filter(usuario__rut= self.request.user.rut).filter(año__año__lt= fecha_cuotas.year).filter(estado_pago='P').order_by('año__año').order_by('numero_cuota')
+
+        deuda_socia_ano_actual = Cuota.objects.filter(usuario__rut= self.request.user.rut).filter(año__año = fecha_cuotas.year).filter(numero_cuota__lte=fecha_cuotas.month).filter(estado_pago='P').order_by('numero_cuota')
 
         total_lista = list(deuda_socio_anos_anteriores) + list(deuda_socia_ano_actual) 
 
