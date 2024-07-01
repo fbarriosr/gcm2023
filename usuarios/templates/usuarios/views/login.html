@@ -27,11 +27,13 @@
           <div class="form-floating">
           <div class="form-group  has-placeholder" style="padding:5px; margin:10px">
             {{ form.username}}
+            <small class="form-text text-muted">Ejemplo: 16105158-7</small>
           </div>
           <div class="form-group  has-placeholder" style="padding:5px; margin:10px">
             {{ form.password }}
+             
           </div>
-          <div style="padding:5px; margin:10px"><a href="{% url 'password_reset' %}">¿has olvidado tu contraseña?</a></div>
+          <div style="padding:5px; margin:10px"><a href="{% url 'password_reset' %}">¿Has olvidado tu contraseña?</a></div>
 
           <div class="d-flex justify-content-end">
             <div class="col-lg-3 ">

@@ -68,6 +68,21 @@ def export_csv_auto(request):
 
     return response
 
+def export_csv_inscritos(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="listado_inscritos.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre','Carro' ,'Acompañantes','Estacionamiento' ,'Patente', 'Bus'])
+
+    torneoid = request.COOKIES.get('torneoId') 
+    sol = Solicitud.objects.filter(torneo__id=torneoid).order_by('usuario__apellido_paterno')
+       
+    for obj in sol:
+        writer.writerow([obj.usuario.apellido_paterno, obj.usuario.apellido_materno , obj.usuario.primer_nombre , obj.usuario.segundo_nombre ,obj.carro, obj.acompanantes, obj.auto, obj.patente, obj.busCGM ])
+
+    return response
+
 def export_csv_carro(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="listado_carro.csv"'

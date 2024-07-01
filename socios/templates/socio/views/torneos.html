@@ -38,7 +38,7 @@
               <th scope="col">ESTADO</th> 
               <th scope="col">FECHA</th>
               <th scope="col">CLUB</th>
-              <th scope="col">CAMPEONATO</th>
+              <th scope="col">REGIÓN</th>
               <th scope="col">BASES</th>
               <th scope="col">INSCRIPCIONES</th>
               <th scope="col">INSCRITOS</th>
@@ -88,7 +88,7 @@
 
               </td>
               <td>{{ value.titulo | upper }}</td>
-              <td>{{ value.get_region_display }}</td>
+              <td>{{ value.region }}</td>
               <td style="text-align: center;"> 
                 {% if value.bases %}
                 <a href="media/{{value.bases}}" target="_blank"> <img src="{% static 'web/assets/botones/bases_ok.png' %}" style="padding: 0px !important; width: 30px!important;"></a>
@@ -153,7 +153,7 @@
               <td style="text-align: center;">
                 <button onclick="crearCookie('torneoId', 
                 '{{value.id}}', '{% url 'torneoUpdate'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
-                  EDITAR  
+                  TORNEO
               </button> <br>
               <button onclick="crearCookie('torneoId', 
                 '{{value.id}}', '{% url 'bus'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
@@ -167,13 +167,20 @@
                 '{{value.id}}', '{% url 'carro'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
                   CARRO
               </button>
+              <button onclick="crearCookie('torneoId', 
+                '{{value.id}}', '{% url 'export_csv_inscritos'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
+                  LISTADO
+              </button>
+              
+
+
               </td>  
               {%endif%}
               {% if rol == 'T' or rol == 'SUPER' %}
               <td style="text-align: center;">
                 <button onclick="crearCookie('torneoId', 
                 '{{value.id}}', '{% url 'export_csv_solicitudes'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
-                  SOLICITUDES  
+                  INSCRITOS  
               </button> 
 
               </td> 
@@ -182,11 +189,11 @@
               <td style="text-align: center;">
                 <button onclick="crearCookie('torneoId', 
                 '{{value.id}}', '{% url 'export_csv_solicitudesAprobadas'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
-                  SOLICITUDES APROBADAS
+                  INSCRITOS
               </button> <br>
               <button onclick="crearCookie('torneoId', 
                 '{{value.id}}', '{% url 'salida'%}')" style="border-color: transparent;padding: 0px;border-width: 0px;"> 
-                  ACTUALIZAR SALIDAS
+                  SALIDAS
               </button>
               </td> 
               {%endif%} 

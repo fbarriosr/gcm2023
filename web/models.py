@@ -12,6 +12,7 @@ import uuid
 from usuarios.models import Usuario
 from .choices import *
 from import_export.admin import ImportExportModelAdmin
+from django.utils.html import format_html
 
 
 # Create your models here.
@@ -37,9 +38,10 @@ class Galeria(models.Model):
 
 class GaleriaAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["titulo"]
-    list_display = ("titulo", "order")
+    list_display = ("titulo", "order", 'foto')
     list_per_page = 10  # No of records per page
-
+    def foto(self, obj):
+        return format_html( '<img src ={} width="120px" />', obj.img.url  )
 
 # PLANTILLA PARA LOS LINKS EN HOME
 class Links(models.Model):
@@ -63,9 +65,10 @@ class Links(models.Model):
 
 class LinksAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["titulo"]
-    list_display = ("titulo","banner",'tipo', "order")
+    list_display = ("titulo","banner",'tipo', "order",'foto')
     list_per_page = 10  # No of records per page
-
+    def foto(self, obj):
+        return format_html( '<img src ={} width="40px" />', obj.img.url  )
 
 # CONTENIDO PRINCIPAL DE HISTORIA, ETC
 
@@ -89,8 +92,10 @@ class Paginas_Web(models.Model):
 
 class Paginas_WebAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["titulo"]
-    list_display = ("tipo",'titulo')
+    list_display = ("tipo",'titulo', 'foto')
     list_per_page = 10
+    def foto(self, obj):
+        return format_html( '<img src ={} width="120px" />', obj.img.url  )
 
 
 # CLASIFICA A QUE PERTENECEN LAS LISTAS DE IMAGENES DEL MODELO 'LISTA'
@@ -140,9 +145,10 @@ class Listado (models.Model):
 class ListadosAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
 
     search_fields   = ['titulo']
-    list_display    =('titulo', 'grupo', 'tipo', 'actual')
+    list_display    =('titulo', 'grupo', 'tipo', 'actual', 'foto')
     list_per_page   = 10 # No of records per page
-
+    def foto(self, obj):
+        return format_html( '<img src ={} width="60px" />', obj.img.url  )
 
 
 # ADMINISTRA LOS CARDS DE TORNEO

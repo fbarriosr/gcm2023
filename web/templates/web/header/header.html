@@ -63,8 +63,16 @@
           </li>
         </ul>
       </div>
-      <img src="{% static '/web/assets/logos/beta.png' %}">
-      <a class="nav-link" href="{% url 'login'%}"> <img src="{% static '/web/assets/logos/login.png' %}" style="padding: 10px;"></a>
+      <a class="nav-link" href="{% url 'login'%}"> 
+          INGRESO
+          <img
+            src="{% static 'web/assets/logos/loginBall.png' %}"
+            width="20px"
+            class="rounded"
+            alt="..."
+          /> 
+        
+        </a>
     </div>
   </nav>
 </header>

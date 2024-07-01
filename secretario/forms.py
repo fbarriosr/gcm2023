@@ -187,8 +187,8 @@ class FormularioTorneoCreate(forms.ModelForm):
             'resultados'    : 'Resultados',
             'premiacion'    : 'Premiación',
             'galeria'       : 'Galeria',
-            'ticket'        : 'Ticket',
-            'recargo'       : 'Recargo',
+            'ticket'        : 'Inscripción Campeonato',
+            'recargo'       : 'Multa',
         }
         widgets = {
             'titulo': forms.TextInput(

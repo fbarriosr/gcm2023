@@ -128,29 +128,29 @@ def export_csv_listado(request):
      'Categoria', 'Indice', 'Carro', 'Acompañante'
        ])
 
-    torneo= request.COOKIES.get('torneo') 
+    torneo= request.COOKIES.get('torneoId') 
     current = Torneo.objects.get(id= torneo)
 
-    sol = Solicitud.objects.filter(torneo=current).filter(estado='A').order_by('fecha')
+    sol = Solicitud.objects.filter(torneo=current).order_by('fecha')
        
     for indice, obj in enumerate(sol, start=1):
         try:
-            apellido_paterno = obj.apellido_paterno.capitalize()
+            apellido_paterno = obj.usuario.apellido_paterno.capitalize()
         except AttributeError:
             apellido_paterno = ''
 
         try:
-            apellido_materno = obj.apellido_materno.capitalize()
+            apellido_materno = obj.usuario.apellido_materno.capitalize()
         except AttributeError:
             apellido_materno = ''
 
         try:
-            primer_nombre = obj.primer_nombre.capitalize()
+            primer_nombre = obj.usuario.primer_nombre.capitalize()
         except AttributeError:
             primer_nombre = ''
 
         try:
-            segundo_nombre = obj.segundo_nombre.capitalize()
+            segundo_nombre = obj.usuario.segundo_nombre.capitalize()
         except AttributeError:
             segundo_nombre = ''
 

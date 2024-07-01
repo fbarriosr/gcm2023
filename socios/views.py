@@ -699,7 +699,11 @@ class crearSolicitud(SocioMixin,CreateView):
                 ¡Bienvenido al evento!
                 <br><br>
                 Atentamente <br><br>
-                <strong>El Capitan</strong>"""
+                <strong>El Capitan</strong>
+                <br><br>
+
+                Nota: <br>Las fotos del Torneo se pueden enviar al email secretario@golfmilitar.cl
+                """
 
             else:
                 contexto['pagado']= False

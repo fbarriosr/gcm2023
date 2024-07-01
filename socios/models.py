@@ -9,6 +9,7 @@ from usuarios.models import Usuario
 from .choices import estado, regiones, cards, estado_cuota, mes_num_texto, websSocio
 from import_export.admin import ImportExportModelAdmin
 from djmoney.models.fields import MoneyField
+from django.utils.html import format_html
 
 
 def slugify_two_fields(self):
@@ -33,8 +34,12 @@ class CardsInicio(models.Model):
 
 class CardsInicioAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["titulo"]
-    list_display = ("tipo",'titulo')
+    list_display = ("tipo",'titulo', 'foto')
     list_per_page = 10
+
+
+    def foto(self, obj):
+        return format_html( '<img src ={} width="120px" />', obj.img.url  )
 
 class Paginas_Socio(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -56,8 +61,10 @@ class Paginas_Socio(models.Model):
 
 class Paginas_SocioAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["titulo"]
-    list_display = ("tipo",'titulo')
+    list_display = ("tipo",'titulo','foto')
     list_per_page = 10
+    def foto(self, obj):
+        return format_html( '<img src ={} width="120px" />', obj.img.url  )
 
 class Multimedia (models.Model):
     id              = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -91,9 +98,11 @@ class MultimediaImgAdmin(admin.StackedInline):
 class MultimediaAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["titulo"]
     inlines = [MultimediaImgAdmin]
-    list_display = ( "fecha", "titulo", 'is_active')
+    list_display = ( "fecha", "titulo", 'is_active', 'foto')
     list_per_page = 10  # No of records per page
     list_filter = ('is_active',)
+    def foto(self, obj):
+        return format_html( '<img src ={} width="120px" />', obj.img.url  )
 
 class Image(models.Model):
     image = models.ImageField(upload_to='noticias/')
@@ -133,10 +142,12 @@ class NoticiaImgAdmin(admin.StackedInline):
 class NoticiaAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["titulo"]
     inlines = [NoticiaImgAdmin]
-    list_display = ( "fecha", "titulo", "resumen", 'is_active')
+    list_display = ( "fecha", "titulo", "resumen", 'is_active', 'foto')
     list_per_page = 10  # No of records per page
     list_filter = ('is_active',)
 
+    def foto(self, obj):
+        return format_html( '<img src ={} width="60px" />', obj.img.url  )
 
 # ADMINISTRA LOS CARDS DE TORNEO
 class Torneo (models.Model):
@@ -155,7 +166,7 @@ class Torneo (models.Model):
     resultados      = models.FileField(upload_to="torneos/resultados/", max_length=254, blank=True)
     premiacion      = models.FileField(upload_to="torneos/premiacion/", max_length=254, blank=True)
     galeria         = models.CharField(max_length=300, default='No Disponible', verbose_name="Url Galeria")
-    ticket          = models.IntegerField(default=7000)
+    ticket          = models.IntegerField(default=7000, verbose_name='Multa')
     recargo          = models.IntegerField(default=5000)
     def __str__(self):
         return self.titulo + str(self.fecha)
@@ -221,8 +232,10 @@ class ElClub(models.Model):
 
 class ElClubAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
     search_fields = ["titulo"]
-    list_display = ("titulo", "order")
+    list_display = ("titulo", "order", 'foto')
     list_per_page = 10  # No of records per page
+    def foto(self, obj):
+        return format_html( '<img src ={} width="120px" />', obj.img.url  )
 
 # LA ESTRUCTURA DE LAS CUOTAS ANUALES DE LOS SOCIOS DEL CLUB CGM
 class CuotaAnual(models.Model):

@@ -50,7 +50,7 @@ def export_csv_solicitudes(request):
 
     writer = csv.writer(response)
     writer.writerow(['Fecha','Rut','Apellido Paterno', 'Primer Nombre', 
-        'Deudas', 'Recargo','Cuota', 'Cancela Deuda socio (NO/SI)','TOTAL'])
+        'Deudas', 'Recargo','Cuota', 'Cancela Deuda socio (NO/SI)','TOTAL', 'Detalle'])
 
     buscar = request.GET.get('buscar')
     estado = request.GET.get('estado')
@@ -86,7 +86,7 @@ def export_csv_solicitudes(request):
             primer_nombre = ''
 
         writer.writerow([ obj.fecha,obj.usuario.rut,apellido_paterno, primer_nombre , 
-             obj.deuda_socio, obj.recargo, obj.cuota , obj.cancela_deuda_socio, obj.monto])
+             obj.deuda_socio, obj.recargo, obj.cuota , obj.cancela_deuda_socio, obj.monto, obj.detalle_cuotas_pagadas])
 
     return response
 

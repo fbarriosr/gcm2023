@@ -7,10 +7,9 @@ class FormularioLogin(AuthenticationForm):
 	def __init__(self,*args,**kwargs):
 	    super(FormularioLogin,self).__init__(*args,**kwargs)
 	    self.fields['username'].widget.attrs['class'] = 'form-control'
-	    self.fields['username'].widget.attrs['placeholder'] = 'Usuario'
-	    self.fields['username'].widget.attrs['label'] = 'Usuarios'
+	    self.fields['username'].widget.attrs['placeholder'] = 'Ingrese su RUT'
+
 
 
 	    self.fields['password'].widget.attrs['class'] = 'form-control'
 	    self.fields['password'].widget.attrs['placeholder'] = 'Ingrese Contraseña'
-	    self.fields['password'].widget.attrs['label'] = 'Contraseñas'
