@@ -14,8 +14,26 @@
     {% include "socio/banner/banner_general.html" %}
     {% include "web/front/front.html" %}
 
+
+
+  <div class="container">
+  <div class="row">
+    <div class="col align-self-end">
+      <div>
+        <a class="navbar-brand"  href="{% url 'exportar_resumen_cuotas'%}"
+          ><img src="{% static 'web/assets/logos/excel.png' %}"
+        width="70px" /></a>
+      </div>
+      <div>
+        <strong>Exportar</strong>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="container marketing" id="links">
   <h3>Situacion al 17 Febrero 2024</h3>
+
+
   <div class="row">
     <div class="col resumen-local">
       <h3>Situación año 2024</h3>

@@ -91,6 +91,43 @@ def export_csv_solicitudes(request):
     return response
 
 
+
+
+def export_csv_resumen_cuotas(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="resumen_cuotas.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Nombre', 'RUT', 'Deuda Pendiente', 'Cuotas Pagadas', 'Monto Pagado', 'Cuotas Impagas', 'Monto Impago', 'Al Día', 'Deuda Total', 'Pendiente'])
+
+    # Crear una instancia de la clase resumenCuotas y pasarle el request
+    vista_resumen_cuotas = resumenCuotas()
+    resumen_cuotas = vista_resumen_cuotas.get_queryset(request=request)  # Pasar el request aquí
+
+    for usuario in resumen_cuotas:
+        writer.writerow([
+            usuario['nombre'],
+            usuario['rut'],
+            usuario['deuda_pendiente'],
+            usuario['cuotas_pagadas'],
+            usuario['monto_pagado'],
+            usuario['cuotas_impagas'],
+            usuario['monto_impago'],
+            usuario['al_dia'],
+            usuario['deuda_total'],
+            usuario['pendiente']
+        ])
+
+    return response
+
+
+
+
+
+
+
+
+
 class resumenCuotas(TesoreroMixin, TemplateView):
 
     ''' Vista para la administración de socios
@@ -109,8 +146,11 @@ class resumenCuotas(TesoreroMixin, TemplateView):
     def calcular_monto_total(self, cuotas):
         return cuotas.aggregate(Sum('año__monto_cuota'))['año__monto_cuota__sum'] or 0
 
-    def get_queryset(self):
-        buscar = self.request.GET.get('buscar')
+    def get_queryset(self, request=None):
+        if request is None:
+            request = self.request
+
+        buscar = request.GET.get('buscar')
         año_actual = int(datetime.now().year)
 
         # Obtener la lista de usuarios únicos con cuota en el año actual
@@ -178,8 +218,8 @@ class resumenCuotas(TesoreroMixin, TemplateView):
         
         return contexto
 
-
-   # LA ESTRUCTURA DE LAS CUOTAS DE LOS SOCIOS DEL CLUB CGM
+   
+# LA ESTRUCTURA DE LAS CUOTAS DE LOS SOCIOS DEL CLUB CGM
 
 class cuotas_admin(SocioMixin,TemplateView, View):
 
