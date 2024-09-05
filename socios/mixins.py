@@ -4,9 +4,16 @@ from django.urls import reverse_lazy
 
 
 
-class SocioMixin(object):
+class AutentificadoMixin(object):
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+        else:
+            return redirect('login')
+
+class SociosMixin(object):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.perfil != 'I':
             return super().dispatch(request, *args, **kwargs)
         else:
             return redirect('login')

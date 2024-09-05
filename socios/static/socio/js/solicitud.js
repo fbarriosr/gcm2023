@@ -5,29 +5,58 @@ $(document).ready(function () {
    $("#autoLabel").hide()
 
    deuda = $('#deuda').val()
-   if (Number(deuda)== 0){
-       $('#recargo').val(0)
-       $("#cancela_deuda_socio").hide()
-       $('#deudaLabel').hide()
+   recargo = $('#recargo').val()
+
+   if (Number($('#recargo_invitado').val())== 0 ){
+
+        $('#recargo_invitado').parent().hide()
+        $("#cancela_deuda_socio").show()
+        $('#deudaLabel').show()
+        $('#recargo').parent().show()
+        $('#deuda').parent().show()
+        $('#detalle_cuotas_pagadas').parent().show()
+        
+        if (Number(deuda)== 0){
+           $('#recargo').val(0)
+           $("#cancela_deuda_socio").hide()
+           $('#deudaLabel').hide()
+           $('#recargoInvitado').hide()
+
+       }
+
+
+
+   }else{
+        $("#cancela_deuda_socio").hide()
+        $('#deudaLabel').hide()
+        $('#recargo').parent().hide()
+        $('#deuda').parent().hide()
+        $('#detalle_cuotas_pagadas').parent().hide()
 
    }
-   recargo = $('#recargo').val()
+
+
+   
+   
+   recargoInvitado = $('#recargo_invitado').val()
    cuota = $('#cuota').val()
-   total =  Number(recargo) + Number(cuota)
+   total =  Number(recargo) + Number(cuota) +Number(recargoInvitado) 
    $('#total').val(total)
 
 });
 
 $("#cancela_deuda_socio").change(function() {
     if(this.checked) {
+      recargoInvitado = $('#recargo_invitado').val()
       deuda = $('#deuda').val()
       cuota = $('#cuota').val()
-      total =  Number(deuda) + Number(cuota)
+      total =  Number(deuda) + Number(cuota)+ Number(recargoInvitado) 
       $('#total').val(total)
     }else{
       recargo = $('#recargo').val()
+      recargoInvitado = $('#recargo_invitado').val()
       cuota = $('#cuota').val()
-      total =  Number(recargo) + Number(cuota)
+      total =  Number(recargo) + Number(cuota)+ Number(recargoInvitado) 
       $('#total').val(total)
     }
 });

@@ -166,8 +166,10 @@ class Torneo (models.Model):
     resultados      = models.FileField(upload_to="torneos/resultados/", max_length=254, blank=True)
     premiacion      = models.FileField(upload_to="torneos/premiacion/", max_length=254, blank=True)
     galeria         = models.CharField(max_length=300, default='No Disponible', verbose_name="Url Galeria")
-    ticket          = models.IntegerField(default=7000, verbose_name='Multa')
-    recargo          = models.IntegerField(default=5000)
+    ticket          = models.IntegerField(default=7000, verbose_name='Ticket Campeonato')
+    recargo         = models.IntegerField(default=5000, verbose_name='Recargo Socio')
+    ticket_inv          = models.IntegerField(default=8000, verbose_name='Recargo Invitado')
+    
     def __str__(self):
         return self.titulo + str(self.fecha)
 
@@ -196,8 +198,8 @@ class Solicitud (models.Model):
     indice          = models.IntegerField(blank=True, null=True, verbose_name="Indice")
     deuda_socio     = models.PositiveIntegerField(default=0, verbose_name="Deuda Socio")
     cancela_deuda_socio  = models.BooleanField(default=False)
-    recargo         = models.PositiveIntegerField(default=0, verbose_name="Recargo")
-    recargoInvitado = models.PositiveIntegerField(default=0, verbose_name="Recargo Invitado")
+    recargo         = models.PositiveIntegerField(default=0, verbose_name="Recargo Socio")
+    recargo_invitado = models.PositiveIntegerField(default=0, verbose_name="Recargo Invitado")
     cuota           = models.PositiveIntegerField(default=0,  verbose_name="Cuota de Campeonato")
     monto           = models.PositiveIntegerField(default=0,  verbose_name="Monto Pagado")
     detalle_cuotas_pagadas = models.TextField(default='[]', verbose_name='Detalle cuotas Pendientes')   

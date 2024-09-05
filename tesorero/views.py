@@ -50,16 +50,13 @@ def export_csv_solicitudes(request):
 
     writer = csv.writer(response)
     writer.writerow(['Fecha','Rut','Apellido Paterno', 'Primer Nombre', 
-        'Deudas', 'Recargo','Cuota', 'Cancela Deuda socio (NO/SI)','TOTAL', 'Detalle'])
+        'Deudas', 'Recargo Socio', 'Recargo Invitado','Cuota', 'Cancela Deuda socio (NO/SI)','TOTAL', 'Detalle'])
 
     buscar = request.GET.get('buscar')
     estado = request.GET.get('estado')
     torneoid = request.COOKIES.get('torneoId')
 
     lSolicitudes = Solicitud.objects.filter(torneo__id=torneoid)
-
-    if estado in ['P', 'A', 'S', 'R']:
-        lSolicitudes = lSolicitudes.filter(estado=estado)
 
     if buscar:
         buscar_upper = buscar.upper()
@@ -86,7 +83,7 @@ def export_csv_solicitudes(request):
             primer_nombre = ''
 
         writer.writerow([ obj.fecha,obj.usuario.rut,apellido_paterno, primer_nombre , 
-             obj.deuda_socio, obj.recargo, obj.cuota , obj.cancela_deuda_socio, obj.monto, obj.detalle_cuotas_pagadas])
+             obj.deuda_socio, obj.recargo,obj.recargo_invitado ,obj.cuota , obj.cancela_deuda_socio, obj.monto, obj.detalle_cuotas_pagadas])
 
     return response
 
@@ -221,7 +218,7 @@ class resumenCuotas(TesoreroMixin, TemplateView):
    
 # LA ESTRUCTURA DE LAS CUOTAS DE LOS SOCIOS DEL CLUB CGM
 
-class cuotas_admin(SocioMixin,TemplateView, View):
+class cuotas_admin(SecretarioMixin,TemplateView, View):
 
     ''' Vista para la administración de cuotas de los Secretarios
         ---------------------------------------------------------

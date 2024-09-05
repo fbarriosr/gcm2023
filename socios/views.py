@@ -119,7 +119,7 @@ def export_csv_solicitudesAprobadas(request):
     return response
 
 
-class PasswordUsuario(SocioMixin,UpdateView):
+class PasswordUsuario(AutentificadoMixin,UpdateView):
     model = Usuario
     form_class = FormularioUsuarioPassword
     template_name = 'socio/views/password.html'
@@ -159,7 +159,7 @@ class PasswordUsuario(SocioMixin,UpdateView):
         current_user =  Usuario.objects.get(rut=self.request.user.rut)
         return current_user
  
-class perfil(SocioMixin,UpdateView):
+class perfil(AutentificadoMixin,UpdateView):
 
     model = Usuario
     form_class = FormularioPerfilUpdate
@@ -212,7 +212,7 @@ class perfil(SocioMixin,UpdateView):
 
 
 # Create your views here.
-class noticia(SocioMixin,DetailView):
+class noticia(AutentificadoMixin,DetailView):
     model = Noticia
     template_name = "socio/views/noticia.html"
    
@@ -254,7 +254,7 @@ class noticia(SocioMixin,DetailView):
         return slug
 
 # Create your views here.
-class noticias(SocioMixin,TemplateView):
+class noticias(AutentificadoMixin,TemplateView):
     model = Noticia
     template_name = "socio/views/noticias.html"
     
@@ -300,7 +300,7 @@ class noticias(SocioMixin,TemplateView):
 
 
 # Create your views here.
-class multimedia(SocioMixin,DetailView):
+class multimedia(AutentificadoMixin,DetailView):
     model = Multimedia
     template_name = "socio/views/multimedia.html"
    
@@ -342,7 +342,7 @@ class multimedia(SocioMixin,DetailView):
         return slug
 
 # Create your views here.
-class multimedias(SocioMixin,TemplateView):
+class multimedias(AutentificadoMixin,TemplateView):
     model = Multimedia
     template_name = "socio/views/multimedias.html"
     
@@ -389,7 +389,7 @@ class multimedias(SocioMixin,TemplateView):
 
 
 
-class inicio(SocioMixin,TemplateView):
+class inicio(AutentificadoMixin,TemplateView):
     template_name = "socio/views/inicio.html"
 
     def get_context_data(self, **kwargs):
@@ -461,7 +461,7 @@ class inicio(SocioMixin,TemplateView):
         return response
 
 
-class torneos(SocioMixin,TemplateView):
+class torneos(AutentificadoMixin,TemplateView):
     template_name = "socio/views/torneos.html"
 
     def get_context_data(self, **kwargs):
@@ -544,7 +544,7 @@ class torneos(SocioMixin,TemplateView):
         return response
 
 
-class crearSolicitud(SocioMixin,CreateView):
+class crearSolicitud(AutentificadoMixin,CreateView):
     model = Solicitud
     form_class = FormularioSolicitudView
     template_name = "socio/views/solicitud.html"
@@ -567,24 +567,38 @@ class crearSolicitud(SocioMixin,CreateView):
 
         ano_valor = list(CuotaAnual.objects.all())
 
-        for t in total_lista:
-            for j in ano_valor:
-                if t.año.año== j.año:
-                    total = total + j.monto_cuota
+        if self.request.user.perfil == 'I':
+            cuota = self.get_object().ticket
+            recargoInvitado =  self.get_object().ticket_inv 
+            form = super().get_form(form_class)
+            form.fields['detalle_cuotas_pagadas'].initial = []
+            form.fields['deuda_socio'].initial = 0
+            form.fields['recargo'].initial = 0
+            form.fields['recargo_invitado'].initial = recargoInvitado
+            form.fields['cuota'].initial = cuota
+
+        else:
+
+            for t in total_lista:
+                for j in ano_valor:
+                    if t.año.año== j.año:
+                        total = total + j.monto_cuota
 
 
-        deuda_socio = total
-        recargo = self.get_object().recargo
-        cuota = self.get_object().ticket
+            deuda_socio = total
 
-        form = super().get_form(form_class)
+            recargo = self.get_object().recargo
+            cuota = self.get_object().ticket
 
-        tuplas = [(t.año.año, t.numero_cuota ) for t in total_lista]
+            form = super().get_form(form_class)
 
-        form.fields['detalle_cuotas_pagadas'].initial = tuplas
-        form.fields['deuda_socio'].initial = deuda_socio
-        form.fields['recargo'].initial = recargo
-        form.fields['cuota'].initial = cuota
+            tuplas = [(t.año.año, t.numero_cuota ) for t in total_lista]
+
+            form.fields['detalle_cuotas_pagadas'].initial = tuplas
+            form.fields['deuda_socio'].initial = deuda_socio
+            form.fields['recargo'].initial = recargo
+            form.fields['recargo_invitado'].initial = 0
+            form.fields['cuota'].initial = cuota
 
 
         return form
@@ -618,6 +632,7 @@ class crearSolicitud(SocioMixin,CreateView):
                         deuda_socio  = request.session['deuda_socio'],
                         cancela_deuda_socio = request.session['cancela_deuda_socio'],
                         recargo      = request.session['recargo'],
+                        recargo_invitado      = request.session['recargo_invitado'],
                         cuota        = request.session['cuota'],
                         monto        = request.session['monto'],
                         detalle_cuotas_pagadas  = request.session['detalle_cuotas_pagadas'],
@@ -645,6 +660,7 @@ class crearSolicitud(SocioMixin,CreateView):
                         deuda_socio  = request.session['deuda_socio'],
                         cancela_deuda_socio = request.session['cancela_deuda_socio'],
                         recargo      = request.session['recargo'],
+                        recargo_invitado      = request.session['recargo_invitado'],
                         cuota        = request.session['cuota'],
                         monto        = request.session['monto'],
                     )
@@ -739,6 +755,7 @@ class crearSolicitud(SocioMixin,CreateView):
             deuda_socio  = form.cleaned_data.get('deuda_socio'),
             cancela_deuda_socio = form.cleaned_data.get('cancela_deuda_socio'),
             recargo      = form.cleaned_data.get('recargo'),
+            recargo_invitado      = form.cleaned_data.get('recargo_invitado'),
             cuota        = form.cleaned_data.get('cuota'),
             monto        = form.cleaned_data.get('monto'),
             detalle_cuotas_pagadas = form.cleaned_data.get('detalle_cuotas_pagadas')
@@ -754,6 +771,8 @@ class crearSolicitud(SocioMixin,CreateView):
             deuda_socio  = deuda_socio[0]
             cancela_deuda_socio = cancela_deuda_socio[0]
             recargo      = recargo[0]
+            recargo_invitado      = recargo_invitado[0]
+
             cuota        = cuota[0]
             monto        = monto[0]
             
@@ -779,6 +798,7 @@ class crearSolicitud(SocioMixin,CreateView):
             request.session['deuda_socio'] = deuda_socio 
             request.session['cancela_deuda_socio'] = cancela_deuda_socio 
             request.session['recargo'] = recargo 
+            request.session['recargo_invitado'] = recargo_invitado 
             request.session['cuota'] = cuota 
             request.session['monto'] = monto 
             request.session['detalle_cuotas_pagadas'] = detalle_cuotas_pagadas
@@ -798,7 +818,7 @@ class crearSolicitud(SocioMixin,CreateView):
             return response
       
 
-class inscritos(SocioMixin, TemplateView):
+class inscritos(AutentificadoMixin, TemplateView):
     template_name = "socio/views/inscritos.html"
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
@@ -822,7 +842,7 @@ class inscritos(SocioMixin, TemplateView):
         return contexto      
 
 
-class ranking(SocioMixin,TemplateView):
+class ranking(AutentificadoMixin,TemplateView):
     template_name = "socio/views/ranking.html"
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
@@ -871,7 +891,7 @@ def procesar_transaccion(request):
     return HttpResponse(form_html)
 
 
-class cuotas(SocioMixin,TemplateView, View):
+class cuotas(SociosMixin,TemplateView, View):
     template_name = "socio/views/cuotas.html"
     front = Paginas_Socio.objects.get(tipo ="C")
     Paginas_Socio

@@ -90,7 +90,9 @@
             </button>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item menu" href="{% url 'perfil' %}">Perfil</a></li>
+              {% if rol != 'I' %}
               <li><a class="dropdown-item menu" href="{% url 'cuotas' %}">Ver mis Cuotas</a></li>
+              {% endif %}
               <li><a class="dropdown-item menu" href="{% url 'cambiar_password' %}">Contraseña</a></li>
               {% if rol == 'SUPER' or rol == 'CAP' %}
               <li><a class="dropdown-item menu" href="{% url 'cumpleanos'%}">Cumpleaños</a></li>
