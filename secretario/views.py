@@ -703,7 +703,7 @@ class usuarioCreate(SecretarioMixin,CreateView):
                 usuario = Usuario(
                     rut                 = form.cleaned_data.get('rut'),
                     primer_nombre       = form.cleaned_data.get('primer_nombre'),
-                    segundo_nombre       = form.cleaned_data.get('segundo_nombre'),
+                    segundo_nombre      = form.cleaned_data.get('segundo_nombre'),
                     apellido_paterno    = form.cleaned_data.get('apellido_paterno'),
                     apellido_materno    = form.cleaned_data.get('apellido_materno'),
                     email               = form.cleaned_data.get('email'),
@@ -718,13 +718,14 @@ class usuarioCreate(SecretarioMixin,CreateView):
                     fundador            = form.cleaned_data.get('fundador'),
                     is_admin            = form.cleaned_data.get('is_admin'),
                     is_active           = form.cleaned_data.get('is_active'),
+                    tiempoGracia        = form.cleaned_data.get('tiempoGracia'),
                     institucion         = form.cleaned_data.get('institucion'),
                     grado               = form.cleaned_data.get('grado'),
                     profesion           = form.cleaned_data.get('profesion'),
                     condicion           = form.cleaned_data.get('condicion'),
                     fecha_incorporacion = form.cleaned_data.get('fecha_incorporacion'),
                 )
-                usuario.set_password(form.cleaned_data.get('rut'))
+                usuario.set_password('cgm2024')
                 usuario.save()
                 mensaje = 'Usuario Creado'
                 error = 'No hay error!'

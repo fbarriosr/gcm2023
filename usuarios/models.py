@@ -50,7 +50,7 @@ class Usuario(AbstractBaseUser):
     apellido_paterno        = models.CharField(max_length=200, blank=True, null=False, verbose_name="Apellido paterno")
     apellido_materno        = models.CharField(max_length=200, blank=True, null=False, verbose_name="Apellido materno")
     fecha_nacimiento        = models.DateField(blank=True, null=True, verbose_name="Fecha de nacimiento")
-    telefono                = models.IntegerField(blank=True, null=True, verbose_name="Celular")
+    telefono                = models.CharField(max_length=200,blank=True, null=True, verbose_name="Celular")
     sexo                    = models.CharField(max_length=1, choices=sexos, default="M", verbose_name="Genero")
     eCivil                  = models.CharField(max_length=30, choices=civil, default="NI", verbose_name="Estado Civil")  
     perfil                  = models.CharField(max_length=20, choices=perfil, default="S") # ej. socio,invitado, capitan, tesorero...
@@ -64,12 +64,14 @@ class Usuario(AbstractBaseUser):
     condicion               = models.CharField(max_length=20, choices=condicion, default="NI", blank=True)  # en que estado se encuentra la cuenta ej. activa, inactiva, suspendida
 
     profesion               = models.CharField(max_length=200, blank=True, null=True, verbose_name="Profesión")
-    fecha_incorporacion     = models.DateField(blank=True, null=True, default=datetime.date.today, verbose_name="Fecha de nacimiento")
+    fecha_incorporacion     = models.DateField(blank=True, null=True, default=datetime.date.today, verbose_name="Fecha de incorporacion")
 
 
     direccion       = models.CharField(max_length=200, blank=True, null= True, verbose_name="Direccion")
     region          = models.CharField(max_length=50,choices= regiones, blank=True, default= ' ', verbose_name="Region")
     
+    tiempoGracia    = models.IntegerField(default=30, verbose_name="Tiempo Gracia")
+
     objects = MyUserManager()
 
     USERNAME_FIELD = "rut"

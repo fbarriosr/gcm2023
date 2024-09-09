@@ -370,7 +370,7 @@ class FormularioUsuariosView(forms.ModelForm):
         fields = ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',
                     'rut','email','telefono', 'region','direccion','fecha_nacimiento',
                     'estado','categoria','sexo','eCivil','perfil','situacionEspecial','fundador',
-                    "is_admin",'is_active',
+                    "is_admin",'is_active','tiempoGracia',
                     'institucion','grado','profesion', 'condicion','fecha_incorporacion' ]
         labels = {
             'primer_nombre':'Primer Nombre',
@@ -391,6 +391,7 @@ class FormularioUsuariosView(forms.ModelForm):
             'fundador':'Fundador',
             "is_admin": 'is_admin',
             'is_active': 'is_active',
+            'tiempoGracia': 'tiempoGracia',
             'categoria': 'Categoria',
             'institucion': 'Institucion',
             'grado':'Grado',
@@ -520,6 +521,12 @@ class FormularioUsuariosView(forms.ModelForm):
                     'rol': 'switch'
 
                 }                
+            ),
+            'tiempoGracia': forms.TextInput(
+                attrs={
+                    'class': 'form-control ',
+                    'id': 'tiempoGracia',
+                }
             ),
 
             'is_active': forms.CheckboxInput(

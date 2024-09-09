@@ -46,17 +46,22 @@
         
       </div>
       {% if error %}
-     
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
-          <strong>Advertencia:</strong> 
-            {{ form.get_invalid_login_error }}
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="onButtonPress()">
-            <span aria-hidden="true">&times;</span>
-          </button>
+            <strong>Advertencia:</strong>
+
+            {% if grace_period_expired %}
+                <!-- Mostrar mensaje de vencimiento del tiempo de gracia -->
+                {{ error_message }}
+            {% else %}
+                <!-- Mostrar mensaje de error de login (credenciales incorrectas) -->
+                {{ form.get_invalid_login_error }}
+            {% endif %}
+            
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="onButtonPress()">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
-
-
-        {% endif %}
+    {% endif %}
     </div>
   </div>
 {% endblock %}

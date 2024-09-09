@@ -78,7 +78,7 @@ class UserAdmin(ImportExportModelAdmin,BaseUserAdmin):
         ('Principal', {"fields": ["rut",'password']}),
         ("Personal", {"fields": ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',"email",'fecha_nacimiento']}),
         ('Info', {"fields": ["telefono",'region','direccion','sexo','eCivil','perfil','estado','categoria','situacionEspecial','fundador']}),
-        ("Permisos", {"fields": ["is_admin",'is_active']}),
+        ("Permisos", {"fields": ["is_admin",'is_active', 'tiempoGracia']}),
         ("Personal Uniformado", {"fields": ["institucion",'grado', 'condicion','profesion','fecha_incorporacion']}),
     ]
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
@@ -87,7 +87,7 @@ class UserAdmin(ImportExportModelAdmin,BaseUserAdmin):
         ('Datos', {"fields": ["rut", "password1",'password2']}),
         ("Personal", {"fields": ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',"email",'fecha_nacimiento']}),
         ('Info', {"fields": ["telefono",'region','direccion','sexo','eCivil','perfil','estado','categoria','situacionEspecial','fundador']}),
-        ("Permisos", {"fields": ["is_admin",'is_active']}),
+        ("Permisos", {"fields": ["is_admin",'is_active','tiempoGracia']}),
         ("Personal Uniformado", {"fields": ["institucion",'grado', 'condicion','profesion','fecha_incorporacion']}),
     ]
     search_fields = ["email",'apellido_paterno','rut']
