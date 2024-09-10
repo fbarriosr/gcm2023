@@ -15,7 +15,7 @@ from django_recaptcha.fields import ReCaptchaField
 class FormularioSolicitudView(forms.ModelForm):
     class Meta:
         model = Solicitud
-        fields = ['indice','auto','patente','busCGM','carro',
+        fields = ['indice','auto','patente','busCGM','carro','caddy',
                     'acompanantes','deuda_socio','recargo','recargo_invitado','cuota','monto','cancela_deuda_socio', 'detalle_cuotas_pagadas']
         labels = {
             'usuario':'Usuario',
@@ -25,6 +25,7 @@ class FormularioSolicitudView(forms.ModelForm):
             'patente': 'Registre la Patente',
             'busCGM':'¿Usará BUS CGM? (NO/SI)',
             'carro': '¿Participará en Carro? (NO/SI)',
+            'caddy': '¿Necesita Caddy? (NO/SI)',
             'indice':'Ingrese su Índice',
             'acompanantes':'¿Con quien va?',
             'deuda_socio':'Deudas ($CLP)',
@@ -94,7 +95,15 @@ class FormularioSolicitudView(forms.ModelForm):
 
                 }                
             ),
-            
+            'caddy': forms.CheckboxInput(
+                attrs = {
+                    'class': 'form-check-input switch',
+                    'id': 'caddy',
+                    'type':'checkbox',
+                    'rol': 'switch'
+
+                }                
+            ),
             'indice': forms.TextInput(
                 attrs = {
                     'class': 'form-control ',
@@ -167,7 +176,7 @@ class FormularioSolicitudView(forms.ModelForm):
 class FormularioSolicitudCreate(forms.ModelForm):
     class Meta:
         model = Solicitud
-        fields = ['indice','auto','patente','busCGM','carro',
+        fields = ['indice','auto','patente','busCGM','carro','caddy',
                     'acompanantes','deuda_socio','recargo','recargo_invitado','cuota','monto','detalle_cuotas_pagadas']
         labels = {
             'usuario':'Usuario',
@@ -177,6 +186,7 @@ class FormularioSolicitudCreate(forms.ModelForm):
             'patente': 'Registre la Patente',
             'busCGM':'¿Usará BUS CGM? (NO/SI)',
             'carro': '¿Participará en Carro? (NO/SI)',
+            'caddy': '¿Necesita Caddy? (NO/SI)',
             'indice':'Ingrese su Índice',
             'acompanantes':'¿Con quien va?',
             'deuda_socio':'Deudas',
@@ -245,7 +255,15 @@ class FormularioSolicitudCreate(forms.ModelForm):
 
                 }                
             ),
-            
+            'caddy': forms.CheckboxInput(
+                attrs = {
+                    'class': 'form-check-input switch',
+                    'id': 'caddy',
+                    'type':'checkbox',
+                    'rol': 'switch'
+
+                }                
+            ),
             'indice': forms.TextInput(
                 attrs = {
                     'class': 'form-control ',

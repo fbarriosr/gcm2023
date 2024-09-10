@@ -61,6 +61,22 @@ def export_csv_auto(request):
     writer.writerow(['Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre', 'Patente'])
 
     torneoid = request.COOKIES.get('torneoId') 
+    sol = Solicitud.objects.filter(torneo__id=torneoid).filter(caddy= True).order_by('usuario__apellido_paterno')
+       
+    for obj in sol:
+        writer.writerow([obj.usuario.apellido_paterno, obj.usuario.apellido_materno , obj.usuario.primer_nombre , obj.usuario.segundo_nombre ])
+
+    return response
+
+
+def export_csv_caddy(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="listado_caddy.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre'])
+
+    torneoid = request.COOKIES.get('torneoId') 
     sol = Solicitud.objects.filter(torneo__id=torneoid).filter(auto= True).order_by('usuario__apellido_paterno')
        
     for obj in sol:
@@ -143,6 +159,30 @@ class carro(SecretarioMixin, TemplateView):
 
 
         return contexto
+
+class caddy(SecretarioMixin, TemplateView):
+    template_name = "secretario/views/caddy.html"
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto["nameWeb"] = nameWeb
+        contexto['rol'] = self.request.user.perfil
+
+        dato = Paginas_Socio.objects.get(tipo ="Caddy")
+        contexto['value']  = dato
+        contexto["title"] = dato.tituloPestana
+
+        torneoid = self.request.COOKIES.get('torneoId') 
+        listado = Solicitud.objects.filter(torneo__id=torneoid).filter(carro= True).order_by('usuario__apellido_paterno')
+        paginator = Paginator(listado,1)
+        page = self.request.GET.get('page')
+        contexto['datos']= paginator.get_page(page)
+
+        elClubMenu = ElClub.objects.order_by('order')
+        contexto['elClub'] = list(elClubMenu.values('archivo', 'titulo'))
+
+
+        return contexto
+
 
 class rankingUpdate(SecretarioMixin,UpdateView):
     model = Paginas_Socio

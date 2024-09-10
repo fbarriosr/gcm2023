@@ -194,6 +194,7 @@ class Solicitud (models.Model):
     auto            = models.BooleanField(default=False, verbose_name= "Estacionamiento")
     patente         = models.CharField(max_length=12, blank= True , verbose_name="Patente")
     carro           = models.BooleanField(default=False)
+    caddy           = models.BooleanField(default=False)
     acompanantes    = models.TextField(blank=True, verbose_name='¿Con quién va?')   
     indice          = models.IntegerField(blank=True, null=True, verbose_name="Indice")
     deuda_socio     = models.PositiveIntegerField(default=0, verbose_name="Deuda Socio")

@@ -1,0 +1,131 @@
+{% extends "web/root/origin.html" %} 
+{% load static %} 
+{% static "" as baseUrl %} 
+{% block title %} 
+  {{nameWeb}} {{ title }} 
+{% endblock %} 
+
+{% block header %} 
+
+      {% include "socio/header/header_socios.html" %}
+
+{% endblock %}
+
+{% block body %}
+
+ {% include "socio/banner/banner_general.html" %}
+
+ {% include "web/front/front.html" %}
+  <!-- /.container -->
+{%if datos %}
+
+  <div class="container">
+    <div class="row">
+      <div class="col align-self-end">
+        <a class="navbar-brand"  href="{% url 'export_csv_caddy'%}"
+            ><img src="{% static 'web/assets/logos/excel.png' %}"
+          width="70px" /></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container marketing" id="links">
+      <div class="row table-responsive" >
+          <table class="table table-striped ">
+            <thead>
+              <tr>
+                <th scope="col">Apellido Paterno</th>
+                <th scope="col">Apellido Materno</th>
+                <th scope="col">Primer Nombre</th>
+                <th scope="col">Segundo Nombre</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for t in datos %}
+              <tr>
+                <td>{{ t.usuario.apellido_paterno  | upper   }}</td>
+                <td>{{ t.usuario.apellido_materno  | upper   }}</td>
+                <td>{{ t.usuario.primer_nombre | upper  }}</td>
+                <td>{{ t.usuario.segundo_nombre | upper  }}</td>
+              <tr>
+             {% endfor%}
+            </tbody>
+          </table>
+
+       </div>
+      </div>
+  </div>
+
+  <div class="container marketing">      
+    <div class="row">
+      <div class="col align-self-end">
+        {% if datos %}
+        <nav class="navigation pagination" role="navigation">
+              <div class="nav-links">
+              {% if datos.has_previous %}
+                  <a class="prev page-numbers" href="?page={{ datos.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+                    <i class="fa fa-chevron-left"></i>
+                   </a>
+                  {% if datos.previous_page_number != 1%}
+
+                    <a class="page-numbers" href="?page=1{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}" class="btn btn-white">
+                        <span class="meta-nav screen-reader-text">Page </span>
+                        1
+                    </a>
+                {% endif %}
+                    {% if  down  %}
+                    <a class="page-numbers disable" >
+                      ...
+                  </a>
+                  {% endif %}
+                  <a class="prev page-numbers" href="?page={{ datos.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+                    {{ datos.previous_page_number }}
+                   </a>
+              
+              {% endif %}
+
+                <span class="page-numbers current">
+                    {{ datos.number }}
+                </span>
+               {% if datos.has_next %}
+
+                <a class="next page-numbers" href="?page={{ datos.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+                    {{ datos.next_page_number }}
+                </a>
+                {% if  up  %}
+                  <a class="page-numbers disable" >
+                    ...
+                </a>
+                {% endif %}
+
+                {% if datos.next_page_number != datos.paginator.num_pages %}
+                <a class="prev page-numbers" href="?page={{ datos.paginator.num_pages  }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}">
+                  {{ datos.paginator.num_pages  }}
+                 </a>
+
+                {% endif %}
+                <a class="prev page-numbers" href="?page={{ datos.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar}}{% endif %}" >
+                  <i class="fa fa-chevron-right"></i>
+                 </a>
+
+
+                {% endif %}
+            </div>
+        </nav>
+        {% endif %}
+      </div>  
+    </div>
+  </div>
+{%else%}
+  <div class="container" style="padding-top:0px">
+    <div class="row">
+      <div class="col-lg-12">
+        <h2>No hay gente que necesita caddy para el torneo</h2>
+      </div>
+    </div>
+  </div>
+{%endif%}
+
+<!-- /.container -->
+
+{% endblock %}

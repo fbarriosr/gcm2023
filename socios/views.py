@@ -627,6 +627,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
                         patente      = request.session['patente'],
                         busCGM       = request.session['busCGM'],
                         carro        = request.session['carro'],
+                        caddy        = request.session['caddy'],
                         indice       = request.session['indice'],
                         acompanantes = request.session['acompanantes'],
                         deuda_socio  = request.session['deuda_socio'],
@@ -655,6 +656,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
                         patente      = request.session['patente'],
                         busCGM       = request.session['busCGM'],
                         carro        = request.session['carro'],
+                        caddy        = request.session['caddy'],
                         indice       = request.session['indice'],
                         acompanantes = request.session['acompanantes'],
                         deuda_socio  = request.session['deuda_socio'],
@@ -765,6 +767,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
             auto         = auto[0]
             patente      = patente[0]
             carro        = carro[0]
+            caddy        = caddy[0]
             acompanantes = acompanantes[0]
             indice       = indice[0]
             
@@ -793,6 +796,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
             request.session['auto'] = auto 
             request.session['patente'] = patente 
             request.session['carro'] = carro 
+            request.session['caddy'] = caddy 
             request.session['acompanantes'] = acompanantes 
             request.session['indice'] = indice 
             request.session['deuda_socio'] = deuda_socio 

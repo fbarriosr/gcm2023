@@ -51,6 +51,7 @@ websSocio = (
     ('B', 'Bus'),
     ('E', 'Estacionamiento'),
     ('Ca', 'Carro'),
+    ('Caddy', 'Caddy'),
     ('Cump', 'Cumpleaños'),
     ('C', 'Cuotas'),
     ('S', 'Salida'),
