@@ -1,4 +1,5 @@
 regiones = (
+    ('XIII', 'Región Metropolitana de Santiago'),
     ('I', 'Región de Tarapacá'),
     ('II', 'Región de Antofagasta'),
     ('III', 'Región de Atacama'),
@@ -11,19 +12,11 @@ regiones = (
     ('X', 'Región de Los Lagos'),
     ('XI', 'Región Aysén del General Carlos Ibáñez del Campo'),
     ('XII', 'Región de Magallanes y Antártica Chilena'),
-    ('XIII', 'Región Metropolitana de Santiago'),
     ('XIV', 'Región de Los Ríos'),
     ('XV', 'Región de Arica y Parinacota'),
-    ('XVI', 'Región de Ñuble')
+    ('XVI', 'Región de Ñuble'),
+    ('NI', 'NO INFORMAR'),
 )
-estado = (
-    ('A', 'ACTIVO'),
-    ('H', 'HONORARIO'),
-    ('C', 'COOPERADOR'),
-    ('PCS', 'PERDIDA CATEGORIA SOCIO'),
-    ('S', 'SUSPENDIDO'),
-)
-
 
 
 estado_cuota = (

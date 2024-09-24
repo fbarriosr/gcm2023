@@ -72,8 +72,8 @@ class UserAdmin(ImportExportModelAdmin,BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ['rut','apellido_paterno','primer_nombre',"email",'institucion','grado']
-    list_filter = ["is_admin"]
+    list_display = ['rut','apellido_paterno','primer_nombre',"email",'perfil', 'condicion','estado','categoria','is_admin','situacionEspecial']
+    list_filter = ['perfil','condicion', 'estado', 'categoria',"is_admin", 'situacionEspecial']
     fieldsets = [
         ('Principal', {"fields": ["rut",'password']}),
         ("Personal", {"fields": ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',"email",'fecha_nacimiento']}),
@@ -90,8 +90,8 @@ class UserAdmin(ImportExportModelAdmin,BaseUserAdmin):
         ("Permisos", {"fields": ["is_admin",'is_active','tiempoGracia']}),
         ("Personal Uniformado", {"fields": ["institucion",'grado', 'condicion','profesion','fecha_incorporacion']}),
     ]
-    search_fields = ["email",'apellido_paterno','rut']
-    ordering = ['rut',"email"]
+    search_fields = ['apellido_paterno','rut','primer_nombre']
+    ordering = ["apellido_paterno",'rut']
     filter_horizontal = []
 
 

@@ -12,7 +12,7 @@ admin.site.register(CuotaAnual, CuotasAnualesAdmin)
 admin.site.register(Cuota, CuotasAdmin)
 admin.site.register(ElClub, ElClubAdmin)
 admin.site.register(Paginas_Socio, Paginas_SocioAdmin)
-
+admin.site.register(Parametro, ParametroAdmin)
 
 
 

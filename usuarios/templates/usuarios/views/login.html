@@ -22,6 +22,27 @@
       <div class="col-lg-12 text-center">
         <h1 style="text-align: center!important;">{{ title }}</h1>
       </div>
+      <!-- Mostrar el mensaje de error si hay uno -->
+      {% if error %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Advertencia:</strong>
+            
+            <!-- Mostrar mensaje si hay un error de estado (cuenta suspendida, fallecido, etc.) -->
+            {% if error_message %}
+                {{ error_message }}
+            {% elif grace_period_expired %}
+                <!-- Mostrar mensaje de vencimiento del tiempo de gracia -->
+                Se venció tu tiempo de gracia.
+            {% else %}
+                <!-- Mostrar mensaje de error de login (credenciales incorrectas) -->
+                {{ form.non_field_errors }}  <!-- Para mostrar errores generales del formulario -->
+            {% endif %}
+            
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="onButtonPress()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+      {% endif %}
       <div class="col-lg-12 ">
         <form class="form-floating" method="POST">{% csrf_token  %}
           <div class="form-floating">
@@ -45,38 +66,20 @@
         </form>
         
       </div>
-      {% if error %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <strong>Advertencia:</strong>
 
-            {% if grace_period_expired %}
-                <!-- Mostrar mensaje de vencimiento del tiempo de gracia -->
-                {{ error_message }}
-            {% else %}
-                <!-- Mostrar mensaje de error de login (credenciales incorrectas) -->
-                {{ form.get_invalid_login_error }}
-            {% endif %}
-            
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="onButtonPress()">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    {% endif %}
+      
+
     </div>
   </div>
 {% endblock %}
 
+{% block footer %}
+{% endblock %}
 
- {% block footer %}
- {% endblock %}
-
-
- {% block extraJs %} 
- <script type="text/javascript">
-   
-    function onButtonPress() {
-    $('.alert').alert('close')
-}
- </script>
-   
+{% block extraJs %} 
+<script type="text/javascript">
+  function onButtonPress() {
+    $('.alert').alert('close');
+  }
+</script>
 {% endblock %}

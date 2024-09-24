@@ -6,7 +6,8 @@ from autoslug import AutoSlugField
 from django.utils import timezone
 import uuid
 from usuarios.models import Usuario
-from .choices import estado, regiones, cards, estado_cuota, mes_num_texto, websSocio
+from .choices import *
+from usuarios.choices import *
 from import_export.admin import ImportExportModelAdmin
 from djmoney.models.fields import MoneyField
 from django.utils.html import format_html
@@ -16,6 +17,26 @@ def slugify_two_fields(self):
         return "{}_{}-{}-{}".format(self.titulo, self.fecha.day, self.fecha.month, self.fecha.year)
 
 # CONTENIDO PRINCIPAL DE HISTORIA, ETC
+
+class Parametro(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    tipo = models.CharField(max_length=20, default="A")
+    valor = models.CharField(max_length=200, blank=True, null=True)
+   
+    class Meta:
+        verbose_name = "Parametro"
+        verbose_name_plural = "Parametros"
+        ordering = ["tipo"]
+
+    def __str__(self):
+        return self.tipo
+
+
+class ParametroAdmin(SearchAutoCompleteAdmin, admin.ModelAdmin):
+    search_fields = ["tipo"]
+    list_display = ("tipo",'valor')
+    list_per_page = 10
+
 
 class CardsInicio(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -194,7 +215,6 @@ class Solicitud (models.Model):
     auto            = models.BooleanField(default=False, verbose_name= "Estacionamiento")
     patente         = models.CharField(max_length=12, blank= True , verbose_name="Patente")
     carro           = models.BooleanField(default=False)
-    caddy           = models.BooleanField(default=False)
     acompanantes    = models.TextField(blank=True, verbose_name='¿Con quién va?')   
     indice          = models.IntegerField(blank=True, null=True, verbose_name="Indice")
     deuda_socio     = models.PositiveIntegerField(default=0, verbose_name="Deuda Socio")

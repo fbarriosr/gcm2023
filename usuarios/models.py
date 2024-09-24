@@ -42,8 +42,8 @@ class MyUserManager(BaseUserManager):
 
 class Usuario(AbstractBaseUser):
     email                   = models.EmailField(verbose_name="email", max_length=255, unique=False, null=True)
-    is_active               = models.BooleanField(default=True)
-    is_admin                = models.BooleanField(default=False)
+    is_active               = models.BooleanField(default= True)  # para ingresar al login
+    is_admin                = models.BooleanField(default= False) # para ingresar al admin
     rut                     = models.CharField(max_length=12,  unique=True, verbose_name="Rut")
     primer_nombre           = models.CharField(max_length=200, blank=True, null=False, verbose_name="Primer nombre")
     segundo_nombre          = models.CharField(max_length=200, blank=True, null=True, verbose_name="Segundo nombre")

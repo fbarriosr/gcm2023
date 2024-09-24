@@ -577,6 +577,33 @@ class crearSolicitud(AutentificadoMixin,CreateView):
             form.fields['recargo_invitado'].initial = recargoInvitado
             form.fields['cuota'].initial = cuota
 
+        elif self.request.user.perfil == 'I_E':
+            cuota = 0
+            form = super().get_form(form_class)
+            form.fields['detalle_cuotas_pagadas'].initial = []
+            form.fields['deuda_socio'].initial = 0
+            form.fields['recargo'].initial = 0
+            form.fields['recargo_invitado'].initial = 0
+            form.fields['cuota'].initial = 0
+
+        elif self.request.user.perfil == 'S_E':
+            cuota = self.get_object().ticket
+            form = super().get_form(form_class)
+            form.fields['detalle_cuotas_pagadas'].initial = []
+            form.fields['deuda_socio'].initial = 0
+            form.fields['recargo'].initial = 0
+            form.fields['recargo_invitado'].initial = 0
+            form.fields['cuota'].initial = cuota
+
+        elif self.request.user.perfil == 'S_V':
+            cuota = self.get_object().ticket
+            form = super().get_form(form_class)
+            form.fields['detalle_cuotas_pagadas'].initial = []
+            form.fields['deuda_socio'].initial = 0
+            form.fields['recargo'].initial = 0
+            form.fields['recargo_invitado'].initial = 0
+            form.fields['cuota'].initial = cuota
+
         else:
 
             for t in total_lista:
@@ -627,7 +654,6 @@ class crearSolicitud(AutentificadoMixin,CreateView):
                         patente      = request.session['patente'],
                         busCGM       = request.session['busCGM'],
                         carro        = request.session['carro'],
-                        caddy        = request.session['caddy'],
                         indice       = request.session['indice'],
                         acompanantes = request.session['acompanantes'],
                         deuda_socio  = request.session['deuda_socio'],
@@ -656,7 +682,6 @@ class crearSolicitud(AutentificadoMixin,CreateView):
                         patente      = request.session['patente'],
                         busCGM       = request.session['busCGM'],
                         carro        = request.session['carro'],
-                        caddy        = request.session['caddy'],
                         indice       = request.session['indice'],
                         acompanantes = request.session['acompanantes'],
                         deuda_socio  = request.session['deuda_socio'],
@@ -680,8 +705,6 @@ class crearSolicitud(AutentificadoMixin,CreateView):
             response = super().get( *args, **kwargs)
             return response 
         
-            
-
 
     def get_context_data(self,**kwargs):
         contexto = super().get_context_data(**kwargs)
@@ -767,7 +790,6 @@ class crearSolicitud(AutentificadoMixin,CreateView):
             auto         = auto[0]
             patente      = patente[0]
             carro        = carro[0]
-            caddy        = caddy[0]
             acompanantes = acompanantes[0]
             indice       = indice[0]
             
@@ -796,7 +818,6 @@ class crearSolicitud(AutentificadoMixin,CreateView):
             request.session['auto'] = auto 
             request.session['patente'] = patente 
             request.session['carro'] = carro 
-            request.session['caddy'] = caddy 
             request.session['acompanantes'] = acompanantes 
             request.session['indice'] = indice 
             request.session['deuda_socio'] = deuda_socio 
@@ -863,8 +884,6 @@ class ranking(AutentificadoMixin,TemplateView):
         
         return contexto
     
-
-
 def crearTransaccion(buy_order, session_id, amount, return_url):
     create_request = {
         "buy_order": buy_order,

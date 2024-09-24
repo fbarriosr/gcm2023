@@ -83,8 +83,17 @@
               {% if rol == 'I' %}
               <img src="{% static '/web/assets/logos/iconInvitado.png' %}" style="padding: 10px;"> 
               {% endif %}
+              {% if rol == 'I_E' %}
+              <img src="{% static '/web/assets/logos/iconInvitadoEspecial.png' %}" style="padding: 10px;"> 
+              {% endif %}
               {% if rol == 'S' %}
               <img src="{% static '/web/assets/logos/iconSocio.png' %}" style="padding: 10px;"> 
+              {% endif %}
+              {% if rol == 'S_V' %}
+              <img src="{% static '/web/assets/logos/iconSocioVitalicio.png' %}" style="padding: 10px;"> 
+              {% endif %}
+              {% if rol == 'S_E' %}
+              <img src="{% static '/web/assets/logos/iconSocioEspecial.png' %}" style="padding: 10px;"> 
               {% endif %}
 
             </button>

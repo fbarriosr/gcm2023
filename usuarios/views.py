@@ -23,8 +23,11 @@ from django.urls import reverse_lazy
 from django.shortcuts import render,redirect
 from django.http import HttpResponseRedirect,HttpResponse,JsonResponse
 
+from django.utils import timezone
+
 from .forms import *
 from datetime import timedelta, date
+from socios.models import Parametro  # Importar la clase Parametro
 
 nameWeb = "CGM"
 
@@ -38,15 +41,50 @@ class Login(FormView):
     @method_decorator(never_cache)
     def dispatch(self, request, *args, **kwargs):
         return super(Login, self).dispatch(request, *args, **kwargs)
-    
+
     def form_valid(self, form):
         user = form.get_user()
 
-        # Supongo que 'perfil', 'tiempoGracia' y 'fecha_incorporacion' son atributos del usuario
-        if user.perfil == 'I':
+        # Verificar el estado del usuario
+        if user.estado not in ['A', 'H', 'C']:  # Activo, Honorario, Cooperador
+            if user.estado == 'S':
+                return self.form_invalid(form, error_message="Tu cuenta está suspendida. Contacta al administrador.")
+            elif user.estado == 'F':
+                return self.form_invalid(form, error_message="Tu cuenta está marcada como fallecido. Contacta al administrador.")
+            elif user.estado == 'PCS':
+                return self.form_invalid(form, error_message="Has perdido la categoría de socio. Contacta al administrador.")
+
+        # Obtener el parámetro de la edad máxima para "Socio Vitalicio"
+        try:
+            parametro_edad = Parametro.objects.get(tipo="edad_maxima_vitalicio")
+            edad_maxima_vitalicio = int(parametro_edad.valor)
+        except Parametro.DoesNotExist:
+            edad_maxima_vitalicio = 80  # Valor por defecto si no se encuentra el parámetro
+
+        # Calcular la edad del usuario con manejo de excepciones
+        try:
+            if user.fecha_nacimiento:
+                edad = (date.today() - user.fecha_nacimiento).days // 365  # Aproximando a años
+            else:
+                edad = 0  # Si no hay fecha de nacimiento, se considera la edad como 0
+        except (TypeError, ValueError) as e:
+            edad = 0  # Si hay un error, se considera la edad como 0
+            print(f"Error al calcular la edad del usuario: {e}")
+
+        # Si el usuario es "Socio" y tiene más de la edad máxima, convertirlo en "Socio Vitalicio"
+        if user.perfil == 'S' and edad > edad_maxima_vitalicio:
+            user.perfil = 'S_V'  # Cambiar a 'Socio Vitalicio'
+            user.save()  # Guardar el usuario para aplicar el cambio
+
+        # Si el usuario es "Socio Vitalicio" y ya no cumple con la edad, volverlo a "Socio"
+        elif user.perfil == 'S_V' and edad <= edad_maxima_vitalicio:
+            user.perfil = 'S'  # Cambiar a "Socio" normal
+            user.save()  # Guardar el usuario para aplicar el cambio
+
+        # Verificar el tiempo de gracia
+        if user.perfil == 'I' or user.perfil == 'I_E':
             diferencia_dias = (date.today() - user.fecha_incorporacion).days
             if user.tiempoGracia < diferencia_dias:
-                # Si el tiempo de gracia ha expirado, redirigir con error personalizado
                 return self.form_invalid(form, error_message="Se venció tu tiempo de gracia.", grace_period_expired=True)
 
         # Si pasa la validación, se procede al login
