@@ -41,27 +41,30 @@ class UserCreationForm(forms.ModelForm):
 
 
 class UserChangeForm(forms.ModelForm):
-    """A form for updating users. Includes all the fields on
-    the user, but replaces the password field with admin's
-    disabled password hash display field.
-    """
-
-    password = ReadOnlyPasswordHashField(label=("Password"),
+    password = ReadOnlyPasswordHashField(
+        label=("Password"),
         help_text=("Las contraseñas sin procesar no se almacenan, por lo que no hay forma de ver la "
-                     "contraseña de este usuario. Pero puedes cambiar esta contraseña."
-                     "Usando este formulario: <a href=\"../password/\">RESET PASSWORD</a>."))
-
-
+                   "contraseña de este usuario. Pero puedes cambiar esta contraseña."
+                   "Usando este formulario: <a href=\"../password/\">RESET PASSWORD</a>.")
+    )
 
     class Meta:
         model = Usuario
-        fields = ["password", "email", "is_active", "is_admin"]
+        fields = ['password', 'email', 'is_active', 'is_admin']
 
     def clean_password(self):
-        # Regardless of what the user provides, return the initial value.
-        # This is done here, rather than on the field, because the
-        # field does not have access to the initial value
+        # No cambia el valor de la contraseña al actualizar desde el admin, usa la contraseña actual.
         return self.initial["password"]
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        # Si el usuario cambia la contraseña, asegurarse de que se hashee correctamente
+        if 'password' in self.changed_data:
+            user.set_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+        return user
+
 
 
 class UserAdmin(ImportExportModelAdmin,BaseUserAdmin):
@@ -72,8 +75,8 @@ class UserAdmin(ImportExportModelAdmin,BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ['rut','apellido_paterno','primer_nombre',"email",'perfil', 'condicion','estado','categoria','is_admin','situacionEspecial']
-    list_filter = ['perfil','condicion', 'estado', 'categoria',"is_admin", 'situacionEspecial']
+    list_display = ['rut','apellido_paterno','primer_nombre',"email",'perfil', 'estado','categoria','condicion','is_admin','situacionEspecial','fecha_incorporacion', 'tiempoGracia']
+    list_filter = ['perfil', 'estado', 'categoria','condicion',"is_admin", 'situacionEspecial']
     fieldsets = [
         ('Principal', {"fields": ["rut",'password']}),
         ("Personal", {"fields": ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',"email",'fecha_nacimiento']}),
@@ -88,11 +91,12 @@ class UserAdmin(ImportExportModelAdmin,BaseUserAdmin):
         ("Personal", {"fields": ['primer_nombre','segundo_nombre','apellido_paterno','apellido_materno',"email",'fecha_nacimiento']}),
         ('Info', {"fields": ["telefono",'region','direccion','sexo','eCivil','perfil','estado','categoria','situacionEspecial','fundador']}),
         ("Permisos", {"fields": ["is_admin",'is_active','tiempoGracia']}),
-        ("Personal Uniformado", {"fields": ["institucion",'grado', 'condicion','profesion','fecha_incorporacion']}),
+        ("Personal Uniformado", {"fields": ["institucion",'grado', 'condicion','profesion','fecha_incorporacion', 'tiempoGracia']}),
     ]
     search_fields = ['apellido_paterno','rut','primer_nombre']
     ordering = ["apellido_paterno",'rut']
     filter_horizontal = []
+    list_editable =('categoria','estado','perfil','condicion','fecha_incorporacion','tiempoGracia')
 
 
 # Now register the new UserAdmin...

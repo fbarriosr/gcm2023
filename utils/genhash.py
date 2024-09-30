@@ -27,7 +27,7 @@ def verify_password(password, password_hash):
     return secrets.compare_digest(password_hash, compare_hash)
 
 
-pp = 'cgm2024'
+pp = 'invitadoscgm'
 
 a =hash_password(pp)
 print(a)
@@ -35,3 +35,4 @@ print(a)
 b = verify_password(pp, a)
 
 print(b)
+
