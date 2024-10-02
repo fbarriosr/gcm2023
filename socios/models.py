@@ -189,7 +189,7 @@ class Torneo (models.Model):
     galeria         = models.CharField(max_length=300, default='No Disponible', verbose_name="Url Galeria")
     ticket          = models.IntegerField(default=7000, verbose_name='Ticket Campeonato')
     recargo         = models.IntegerField(default=5000, verbose_name='Recargo Socio')
-    ticket_inv          = models.IntegerField(default=8000, verbose_name='Recargo Invitado')
+    ticket_inv      = models.IntegerField(default=8000, verbose_name='Recargo Invitado')
     
     def __str__(self):
         return self.titulo + str(self.fecha)

@@ -611,10 +611,14 @@ class crearSolicitud(AutentificadoMixin,CreateView):
                     if t.año.año== j.año:
                         total = total + j.monto_cuota
 
-
             deuda_socio = total
+            
 
             recargo = self.get_object().recargo
+
+            if deuda_socio == 0:
+                recargo = 0
+                
             cuota = self.get_object().ticket
 
             form = super().get_form(form_class)
@@ -623,6 +627,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
 
             form.fields['detalle_cuotas_pagadas'].initial = tuplas
             form.fields['deuda_socio'].initial = deuda_socio
+
             form.fields['recargo'].initial = recargo
             form.fields['recargo_invitado'].initial = 0
             form.fields['cuota'].initial = cuota

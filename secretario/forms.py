@@ -233,7 +233,7 @@ class FormularioTorneoCreate(forms.ModelForm):
             'recargo': forms.TextInput(
                 attrs = {
                     'class': 'form-control ',
-                    'id': 'recargo',
+                    'id': 'recargow',
                 }                
             ),
             'ticket_inv': forms.TextInput(
