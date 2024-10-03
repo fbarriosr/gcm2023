@@ -172,7 +172,7 @@ class FormularioTorneoCreate(forms.ModelForm):
         fields = [ 'titulo','fecha' ,'direccion','region',                     
                     'cupos','activo','actual','abierto',
                     'bases','list_salidas','resultados',     
-                    'premiacion', 'galeria', 'ticket', 'recargo','ticket_inv' ]
+                    'premiacion', 'galeria', 'ticket', 'recargo','ticket_inv', 'ticket_bus' ]
         labels = {
             'titulo'        : 'Titulo (requerido) ',
             'fecha'         : 'Fecha (requerido)',        
@@ -190,6 +190,7 @@ class FormularioTorneoCreate(forms.ModelForm):
             'ticket'        : 'Inscripción Campeonato',
             'recargo'       : 'Recargo (Socio)',
             'ticket_inv'    : 'Recargo (Invitado)',
+            'ticket_bus'    : 'Ticket Bus',
         }
         widgets = {
             'titulo': forms.TextInput(
@@ -240,6 +241,12 @@ class FormularioTorneoCreate(forms.ModelForm):
                 attrs = {
                     'class': 'form-control ',
                     'id': 'ticket_inv',
+                }                
+            ),
+            'ticket_bus': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'ticket_bus',
                 }                
             ),
             'activo': forms.CheckboxInput(

@@ -190,6 +190,7 @@ class Torneo (models.Model):
     ticket          = models.IntegerField(default=7000, verbose_name='Ticket Campeonato')
     recargo         = models.IntegerField(default=5000, verbose_name='Recargo Socio')
     ticket_inv      = models.IntegerField(default=8000, verbose_name='Recargo Invitado')
+    ticket_bus      = models.IntegerField(default=10000, verbose_name='Ticket Bus')
     
     def __str__(self):
         return self.titulo + str(self.fecha)
@@ -216,11 +217,12 @@ class Solicitud (models.Model):
     patente         = models.CharField(max_length=12, blank= True , verbose_name="Patente")
     carro           = models.BooleanField(default=False)
     acompanantes    = models.TextField(blank=True, verbose_name='¿Con quién va?')   
-    indice          = models.IntegerField(blank=True, null=True, verbose_name="Indice")
+    indice          = models.CharField(max_length=12, blank= True ,default='' , verbose_name="Indice")
     deuda_socio     = models.PositiveIntegerField(default=0, verbose_name="Deuda Socio")
     cancela_deuda_socio  = models.BooleanField(default=False)
     recargo         = models.PositiveIntegerField(default=0, verbose_name="Recargo Socio")
     recargo_invitado = models.PositiveIntegerField(default=0, verbose_name="Recargo Invitado")
+    recargo_bus     = models.PositiveIntegerField(default=0, verbose_name="Recargo Bus")
     cuota           = models.PositiveIntegerField(default=0,  verbose_name="Cuota de Campeonato")
     monto           = models.PositiveIntegerField(default=0,  verbose_name="Monto Pagado")
     detalle_cuotas_pagadas = models.TextField(default='[]', verbose_name='Detalle cuotas Pendientes')   

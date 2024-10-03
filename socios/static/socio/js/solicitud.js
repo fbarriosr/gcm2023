@@ -7,6 +7,9 @@ $(document).ready(function () {
    deuda = $('#deuda').val()
    recargo = $('#recargo').val()
 
+   $('#cuota').css('border', '2px solid #BF9D5E');
+   $('#recargo').css('border', '2px solid #BF9D5E');
+
    if (Number($('#recargo_invitado').val())== 0 ){
 
         $('#recargo_invitado').parent().hide()
@@ -23,7 +26,6 @@ $(document).ready(function () {
            $('#recargoInvitado').hide()
 
        }
-
 
 
    }else{
@@ -47,12 +49,17 @@ $(document).ready(function () {
 
 $("#cancela_deuda_socio").change(function() {
     if(this.checked) {
+      $('#deuda').css('border', '2px solid #BF9D5E');
+      $('#recargo').css('border', '1px solid #dee2e6');
+
       recargoInvitado = $('#recargo_invitado').val()
       deuda = $('#deuda').val()
       cuota = $('#cuota').val()
       total =  Number(deuda) + Number(cuota)+ Number(recargoInvitado) 
       $('#total').val(total)
     }else{
+      $('#recargo').css('border', '2px solid #BF9D5E');
+      $('#deuda').css('border', '1px solid #dee2e6');
       recargo = $('#recargo').val()
       recargoInvitado = $('#recargo_invitado').val()
       cuota = $('#cuota').val()
@@ -63,12 +70,20 @@ $("#cancela_deuda_socio").change(function() {
 
 $("#busCGM").change(function() {
     if(this.checked) {
+        $('#recargo_bus').css('border', '2px solid #BF9D5E');
+        x =  Number($('#recargo_bus').val())
+        t =  Number($('#total').val())
+        $('#total').val(t+x)
         $("#auto").prop("checked", false);
         $("#auto").parent().show()
         $("#autoLabel").show()
 
         
     }else{
+        x =  Number($('#recargo_bus').val())
+        t =  Number($('#total').val())
+        $('#total').val(t-x)
+        $('#recargo_bus').css('border', '1px solid #dee2e6');
         $("#auto").parent().hide()
         $("#autoLabel").hide()
         $("#patente").parent().hide() 

@@ -567,6 +567,8 @@ class crearSolicitud(AutentificadoMixin,CreateView):
 
         ano_valor = list(CuotaAnual.objects.all())
 
+        recargo_bus = self.get_object().ticket_bus
+
         if self.request.user.perfil == 'I':
             cuota = self.get_object().ticket
             recargoInvitado =  self.get_object().ticket_inv 
@@ -575,6 +577,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
             form.fields['deuda_socio'].initial = 0
             form.fields['recargo'].initial = 0
             form.fields['recargo_invitado'].initial = recargoInvitado
+            form.fields['recargo_bus'].initial = recargo_bus
             form.fields['cuota'].initial = cuota
 
         elif self.request.user.perfil == 'I_E':
@@ -584,6 +587,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
             form.fields['deuda_socio'].initial = 0
             form.fields['recargo'].initial = 0
             form.fields['recargo_invitado'].initial = 0
+            form.fields['recargo_bus'].initial = recargo_bus
             form.fields['cuota'].initial = 0
 
         elif self.request.user.perfil == 'S_E':
@@ -593,6 +597,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
             form.fields['deuda_socio'].initial = 0
             form.fields['recargo'].initial = 0
             form.fields['recargo_invitado'].initial = 0
+            form.fields['recargo_bus'].initial = recargo_bus
             form.fields['cuota'].initial = cuota
 
         elif self.request.user.perfil == 'S_V':
@@ -602,6 +607,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
             form.fields['deuda_socio'].initial = 0
             form.fields['recargo'].initial = 0
             form.fields['recargo_invitado'].initial = 0
+            form.fields['recargo_bus'].initial = recargo_bus
             form.fields['cuota'].initial = cuota
 
         else:
@@ -613,8 +619,8 @@ class crearSolicitud(AutentificadoMixin,CreateView):
 
             deuda_socio = total
             
-
             recargo = self.get_object().recargo
+            
 
             if deuda_socio == 0:
                 recargo = 0
@@ -630,6 +636,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
 
             form.fields['recargo'].initial = recargo
             form.fields['recargo_invitado'].initial = 0
+            form.fields['recargo_bus'].initial = recargo_bus
             form.fields['cuota'].initial = cuota
 
 
@@ -665,6 +672,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
                         cancela_deuda_socio = request.session['cancela_deuda_socio'],
                         recargo      = request.session['recargo'],
                         recargo_invitado      = request.session['recargo_invitado'],
+                        recargo_bus      = pagoBus,
                         cuota        = request.session['cuota'],
                         monto        = request.session['monto'],
                         detalle_cuotas_pagadas  = request.session['detalle_cuotas_pagadas'],
@@ -693,6 +701,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
                         cancela_deuda_socio = request.session['cancela_deuda_socio'],
                         recargo      = request.session['recargo'],
                         recargo_invitado      = request.session['recargo_invitado'],
+                        recargo_bus      = request.session['recargo_bus'],
                         cuota        = request.session['cuota'],
                         monto        = request.session['monto'],
                     )
@@ -786,6 +795,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
             cancela_deuda_socio = form.cleaned_data.get('cancela_deuda_socio'),
             recargo      = form.cleaned_data.get('recargo'),
             recargo_invitado      = form.cleaned_data.get('recargo_invitado'),
+            recargo_bus      = form.cleaned_data.get('recargo_bus'),
             cuota        = form.cleaned_data.get('cuota'),
             monto        = form.cleaned_data.get('monto'),
             detalle_cuotas_pagadas = form.cleaned_data.get('detalle_cuotas_pagadas')
@@ -802,6 +812,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
             cancela_deuda_socio = cancela_deuda_socio[0]
             recargo      = recargo[0]
             recargo_invitado      = recargo_invitado[0]
+            recargo_bus      = recargo_bus[0]
 
             cuota        = cuota[0]
             monto        = monto[0]
@@ -829,6 +840,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
             request.session['cancela_deuda_socio'] = cancela_deuda_socio 
             request.session['recargo'] = recargo 
             request.session['recargo_invitado'] = recargo_invitado 
+            request.session['recargo_bus'] = recargo_bus 
             request.session['cuota'] = cuota 
             request.session['monto'] = monto 
             request.session['detalle_cuotas_pagadas'] = detalle_cuotas_pagadas

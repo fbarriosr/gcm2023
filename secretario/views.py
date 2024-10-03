@@ -43,13 +43,13 @@ def export_csv_bus( request):
     response['Content-Disposition'] = 'attachment; filename="listado_bus.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre'])
+    writer.writerow(['Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre','Ticket Bus'])
 
     torneoid = request.COOKIES.get('torneoId') 
     sol = Solicitud.objects.filter(torneo__id=torneoid).filter(busCGM= True).order_by('usuario__apellido_paterno')
        
     for obj in sol:
-        writer.writerow([obj.usuario.apellido_paterno, obj.usuario.apellido_materno , obj.usuario.primer_nombre , obj.usuario.segundo_nombre ])
+        writer.writerow([obj.usuario.apellido_paterno, obj.usuario.apellido_materno , obj.usuario.primer_nombre , obj.usuario.segundo_nombre, obj.recargo_bus  ])
 
     return response
 
@@ -473,6 +473,7 @@ class torneoCreate(SecretarioMixin,CreateView):
                     ticket            = form.cleaned_data.get('ticket'),
                     recargo           = form.cleaned_data.get('recargo'),
                     ticket_inv        = form.cleaned_data.get('ticket_inv'),
+                    ticket_bus        = form.cleaned_data.get('ticket_bus'),
                 )
                 torneo.save()
                 mensaje = 'Torneo Enviado'

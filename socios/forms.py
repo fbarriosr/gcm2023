@@ -16,7 +16,7 @@ class FormularioSolicitudView(forms.ModelForm):
     class Meta:
         model = Solicitud
         fields = ['indice','auto','patente','busCGM','carro',
-                    'acompanantes','deuda_socio','recargo','recargo_invitado','cuota','monto','cancela_deuda_socio', 'detalle_cuotas_pagadas']
+                    'acompanantes','deuda_socio','recargo','recargo_invitado','recargo_bus','cuota','monto','cancela_deuda_socio', 'detalle_cuotas_pagadas']
         labels = {
             'usuario':'Usuario',
             'torneo': 'Torneo',
@@ -30,11 +30,12 @@ class FormularioSolicitudView(forms.ModelForm):
             'deuda_socio':'Deudas ($CLP)',
             'recargo':'Recargo Deuda Socio($CLP)',
             'recargo_invitado':  'Recargo Invitado ($CLP)',
+            'recargo_bus':  'Recargo BUS ($CLP)',
             'cuota': 'Cuota de Campeonato ($CLP)',
             'cancela_deuda_socio': 'Cancela Deuda socio (NO/SI)',
             'monto': 'Total($CLP)',
             'estado': 'Estado',
-            'detalle_cuotas_pagadas': 'Detalle Cuotas Pendientes'
+            'detalle_cuotas_pagadas': 'Detalle Cuotas Pendientes',
         }
         widgets = {
 
@@ -136,6 +137,13 @@ class FormularioSolicitudView(forms.ModelForm):
                     'readonly':''
                 }                
             ),
+            'recargo_bus': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'recargo_bus',
+                    'readonly':''
+                }                
+            ),
             'cuota': forms.TextInput(
                 attrs = {
                     'class': 'form-control ',
@@ -167,7 +175,7 @@ class FormularioSolicitudCreate(forms.ModelForm):
     class Meta:
         model = Solicitud
         fields = ['indice','auto','patente','busCGM','carro',
-                    'acompanantes','deuda_socio','recargo','recargo_invitado','cuota','monto','detalle_cuotas_pagadas']
+                    'acompanantes','deuda_socio','recargo','recargo_invitado','recargo_bus','cuota','monto','detalle_cuotas_pagadas']
         labels = {
             'usuario':'Usuario',
             'torneo': 'Torneo',
@@ -181,6 +189,7 @@ class FormularioSolicitudCreate(forms.ModelForm):
             'deuda_socio':'Deudas',
             'recargo':'Recargo Deuda Socio($CLP)',
             'recargo_invitado':  'Recargo Invitado ($CLP)',
+            'recargo_bus':  'Recargo BUS ($CLP)',
             'cuota': 'Cuota de Campeonato',
             'cancela_deuda_socio': 'Cancela Deuda socio (NO/SI)',
             'monto': 'TOTAL $ CLP: ',
@@ -275,6 +284,13 @@ class FormularioSolicitudCreate(forms.ModelForm):
                 attrs = {
                     'class': 'form-control ',
                     'id': 'recargo_invitado',
+                    'readonly':''
+                }                
+            ),
+            'recargo_bus': forms.TextInput(
+                attrs = {
+                    'class': 'form-control ',
+                    'id': 'recargo_bus',
                     'readonly':''
                 }                
             ),
