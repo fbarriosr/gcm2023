@@ -171,3 +171,4 @@ EMAIL_USE_TLS = True
 # captcha para web golfmilitar.cl
 RECAPTCHA_PUBLIC_KEY = '6Ld7uVUqAAAAANn1HZYPfdeWErplmEPpQa-ckH8A'
 RECAPTCHA_PRIVATE_KEY = '6Ld7uVUqAAAAAMz8w341-5XS6dj7xlcqqNowSSOd'
+

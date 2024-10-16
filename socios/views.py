@@ -821,7 +821,7 @@ class crearSolicitud(AutentificadoMixin,CreateView):
             buy_order = str(random.randrange(1000000, 99999999))
             session_id = str(random.randrange(1000000, 99999999))
             amount = str(monto)
-            return_url = request.build_absolute_uri(reverse('solicitud'))
+            return_url = request.build_absolute_uri(reverse('solicitud')).replace('http://','https://')
 
             create_request, response = crearTransaccion(buy_order, session_id, amount, return_url)
 
@@ -1119,7 +1119,7 @@ class cuotas(SociosMixin,TemplateView, View):
         buy_order = str(random.randrange(1000000, 99999999))
         session_id = str(random.randrange(1000000, 99999999))
         amount = str(total_pagar)
-        return_url = request.build_absolute_uri(reverse('cuotas'))
+        return_url = request.build_absolute_uri(reverse('cuotas')).replace('http://', 'https://')
         create_request, response = crearTransaccion(buy_order, session_id, amount, return_url)
 
         # Almacenar los datos en la sesion

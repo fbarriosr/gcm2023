@@ -14,22 +14,41 @@ services:
     image: jwilder/nginx-proxy
     restart: always
     ports: 
-      - "80:8000"
+      - "80:80"
+      - "443:443"
     volumes: 
       - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /home/certs:/etc/nginx/certs:ro
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
+
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    volumes:
+      - /home/certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    volumes_from:
+      - nginx-proxy:rw
+   
   web:
     container_name: web_cgm
     restart: always
     build: ./
     image: cgm:tag
-    command: python manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:80
     volumes:
       - ./:/code
     expose:
     # - "80:8000"
-      - "8000"
+      - "80"
     environment:
-      - VIRTUAL_HOST=golfmilitar.cl
+      - VIRTUAL_HOST=golfmilitar.cl, www.golfmilitar.cl
+      - LETSENCRYPT_HOST= golfmilitar.cl, www.golfmilitar.cl
+      - LETSENCRYPT_EMAIL=secretario@golfmilitar.cl
     # environment:
     #   - POSTGRES_NAME=postgres
     #   - POSTGRES_USER=postgres

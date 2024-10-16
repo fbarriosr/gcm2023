@@ -61,10 +61,10 @@ def export_csv_auto(request):
     writer.writerow(['Apellido Paterno', 'Apellido Materno', 'Primer Nombre', 'Segundo Nombre', 'Patente'])
 
     torneoid = request.COOKIES.get('torneoId') 
-    sol = Solicitud.objects.filter(torneo__id=torneoid).filter(caddy= True).order_by('usuario__apellido_paterno')
+    sol = Solicitud.objects.filter(torneo__id=torneoid).order_by('usuario__apellido_paterno')
        
     for obj in sol:
-        writer.writerow([obj.usuario.apellido_paterno, obj.usuario.apellido_materno , obj.usuario.primer_nombre , obj.usuario.segundo_nombre ])
+        writer.writerow([obj.usuario.apellido_paterno, obj.usuario.apellido_materno , obj.usuario.primer_nombre , obj.usuario.segundo_nombre, obj.patente ])
 
     return response
 
@@ -112,7 +112,7 @@ class bus(SecretarioMixin, TemplateView):
 
         torneoid = self.request.COOKIES.get('torneoId') 
         listado = Solicitud.objects.filter(torneo__id=torneoid).filter(busCGM= True).order_by('usuario__apellido_paterno')
-        paginator = Paginator(listado,1)
+        paginator = Paginator(listado,10)
         page = self.request.GET.get('page')
         contexto['datos']= paginator.get_page(page)
 
@@ -135,7 +135,7 @@ class carro(SecretarioMixin, TemplateView):
 
         torneoid = self.request.COOKIES.get('torneoId') 
         listado = Solicitud.objects.filter(torneo__id=torneoid).filter(carro= True).order_by('usuario__apellido_paterno')
-        paginator = Paginator(listado,1)
+        paginator = Paginator(listado,10)
         page = self.request.GET.get('page')
         contexto['datos']= paginator.get_page(page)
 
@@ -209,7 +209,7 @@ class auto(SecretarioMixin, TemplateView):
         contexto['rol'] = self.request.user.perfil
         torneoid = self.request.COOKIES.get('torneoId') 
         listado = Solicitud.objects.filter(torneo__id=torneoid).filter(auto= True).order_by('usuario__apellido_paterno')
-        paginator = Paginator(listado,1)
+        paginator = Paginator(listado,10)
         page = self.request.GET.get('page')
         contexto['datos']= paginator.get_page(page)
 
